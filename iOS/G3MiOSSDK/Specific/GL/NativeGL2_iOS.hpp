@@ -150,7 +150,7 @@ public:
   
 //  NativeGL2_iOS(){}
 //  
-  ~NativeGL2_iOS(){}
+  virtual ~NativeGL2_iOS(){}
   
   void useProgram(int program) const{
     glUseProgram(program);
@@ -256,7 +256,7 @@ public:
     glPixelStorei(getEnum(pname), param);
   }
   
-  std::vector<int> genTextures(int	n) const{
+  virtual std::vector<int> genTextures(int	n) const {
     GLuint textureID[n];    
     glGenTextures(n, textureID);
     std::vector<int> ts;

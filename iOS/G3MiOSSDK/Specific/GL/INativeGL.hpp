@@ -90,7 +90,7 @@ public:
   
   virtual void pixelStorei(GLAlignment pname, int param) const = 0;
   
-  virtual std::vector<int> genTextures(int	n) const = 0;
+  virtual std::vector<int> genTextures(int n) const = 0;
   
   virtual void texParameteri(GLTextureType target, GLTextureParameter par, GLTextureParameterValue v) const = 0;
   
