@@ -13,6 +13,8 @@
 
 #include "INativeGL.hpp"
 
+#include <vector>
+
 class NativeGL2_iOS: public INativeGL
 {
   inline GLbitfield getBitField(GLBufferType b) const {
@@ -145,6 +147,11 @@ class NativeGL2_iOS: public INativeGL
   }
   
 public:
+  
+//  NativeGL2_iOS(){}
+//  
+  ~NativeGL2_iOS(){}
+  
   void useProgram(int program) const{
     glUseProgram(program);
   }

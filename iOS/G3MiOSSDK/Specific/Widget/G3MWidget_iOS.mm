@@ -15,7 +15,6 @@
 #include "Planet.hpp"
 #include "Logger_iOS.hpp"
 #include "Factory_iOS.hpp"
-#include "GL2.hpp"
 
 #include "CameraRenderer.hpp"
 #include "CameraSimpleDragHandler.h"
@@ -45,6 +44,9 @@
 #include "StaticImageLayer.hpp"
 
 #include "Downloader_iOS.hpp"
+
+#include "INativeGL.hpp"
+#include "NativeGL2_iOS.hpp"
 
 #include <stdlib.h>
 
@@ -77,7 +79,6 @@
 
   IFactory *factory = new Factory_iOS();
   ILogger *logger = new Logger_iOS(ErrorLevel);
-  IGL* gl  = new GL2();
 
   // composite renderer is the father of the rest of renderers
   CompositeRenderer* comp = new CompositeRenderer();
@@ -159,6 +160,8 @@
     SimplePlanetRenderer* spr = new SimplePlanetRenderer("world.jpg");
     comp->addRenderer(spr);
   }
+  
+  GL* gl = new GL(new NativeGL2_iOS());
 
   TextureBuilder* texBuilder = new CPUTextureBuilder();
   TexturesHandler* texturesHandler = new TexturesHandler(gl, factory, texBuilder, false);
@@ -166,7 +169,6 @@
   const Planet* planet = Planet::createEarth();
   
   Renderer* busyRenderer = new BusyRenderer();
-  
   
   _widget = G3MWidget::create(factory,
                               logger,
@@ -195,7 +197,6 @@
 
   IFactory *factory = new Factory_iOS();
   ILogger *logger = new Logger_iOS(ErrorLevel);
-  IGL* gl  = new GL2();
   
   //Testing downloads
   if (false) {
@@ -311,9 +312,7 @@
     };
     
     IDownloadListener* listener = new Listener();
-    long requestId = downloader->request(URL("http://glob3.sourceforge.net/img/isologo640x160.png"),
-                                         priority,
-                                         listener);
+    downloader->request(URL("http://glob3.sourceforge.net/img/isologo640x160.png"), priority, listener);
 //    downloader->cancelRequest(requestId);
   }
 
@@ -415,15 +414,14 @@
   
   //    comp->addRenderer(new GLErrorRenderer());
   
-  
+  GL* gl = new GL(new NativeGL2_iOS());
   TextureBuilder* texBuilder = new CPUTextureBuilder();
   TexturesHandler* texturesHandler = new TexturesHandler(gl, factory, texBuilder, false);
   
   const Planet* planet = Planet::createEarth();
   
   Renderer* busyRenderer = new BusyRenderer();
-
-
+  
   _widget = G3MWidget::create(factory,
                               logger,
                               gl,
@@ -450,7 +448,7 @@
     eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
                                     [NSNumber numberWithBool:FALSE], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
     
-    // create IGL object
+    // create GL object
     _renderer = [[ES2Renderer alloc] init];
     if (!_renderer) {
       printf("**** ERROR: G3MWidget_iOS Mobile needs Opengl ES 2.0\n");

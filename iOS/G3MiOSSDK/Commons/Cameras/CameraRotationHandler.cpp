@@ -9,7 +9,7 @@
 #include <iostream>
 
 #include "CameraRotationHandler.h"
-#include "IGL.hpp"
+#include "GL.hpp"
 
 
 bool CameraRotationHandler::onTouchEvent(const TouchEvent* touchEvent) 
@@ -127,7 +127,7 @@ int CameraRotationHandler::render(const RenderContext* rc) {
   if (false) {
     if (_currentGesture == Rotate) {
       float vertices[] = { 0,0,0};
-      unsigned int indices[] = {0};
+      int indices[] = {0};
       gl->enableVerticesPosition();
       gl->disableTexture2D();
       gl->disableTextures();

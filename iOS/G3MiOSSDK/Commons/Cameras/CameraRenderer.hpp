@@ -30,7 +30,7 @@ public:
 
 class ILogger;
 class Planet;
-class IGL;
+class GL;
 
 
 class CameraRenderer: public Renderer
@@ -40,7 +40,7 @@ private:
   const ILogger * _logger;
   
   const Planet* _planet;
-  IGL *gl;
+  GL *gl;
     
   Camera _camera0;                //Initial Camera saved on Down event
   Camera* _camera;         // Camera used at current frame

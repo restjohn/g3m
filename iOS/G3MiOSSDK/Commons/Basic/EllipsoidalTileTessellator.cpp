@@ -31,7 +31,7 @@ Mesh* EllipsoidalTileTessellator::createMesh(const RenderContext* rc,
   }
   
   // create indices
-  std::vector<unsigned int> indices;
+  std::vector<int> indices;
   for (unsigned int j=0; j<resol_1; j++) {
     if (j > 0) {
       indices.push_back(j*_resolution);
@@ -166,7 +166,7 @@ Mesh* EllipsoidalTileTessellator::createDebugMesh(const RenderContext* rc,
   // create vectors
   std::vector<MutableVector3D> vertices;
   std::vector<MutableVector2D> texCoords;
-  std::vector<unsigned int> indices;
+  std::vector<int> indices;
   unsigned int resol_1 = _resolution - 1;  
   unsigned int posS = 0;
   

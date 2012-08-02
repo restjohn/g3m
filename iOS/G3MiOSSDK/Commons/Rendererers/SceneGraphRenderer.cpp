@@ -192,7 +192,7 @@ void SGCubeNode::initialize(const RenderContext *rc)
   int res = 12;
   _vertices = new float[res * res * 3];
   _numIndices = 2 * (res - 1) * (res + 1);
-  _index = new unsigned int[_numIndices];
+  _index = new int[_numIndices];
   
   // create vertices
   
@@ -222,7 +222,7 @@ void SGCubeNode::initialize(const RenderContext *rc)
 }  
 
 int SGCubeNode::rawRender(const RenderContext *rc) {
-  IGL* gl = rc->getGL();
+  GL* gl = rc->getGL();
 
   if (!_initializedGL) {
     initialize(rc);

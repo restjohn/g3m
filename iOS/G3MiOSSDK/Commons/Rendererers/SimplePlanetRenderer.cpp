@@ -56,12 +56,12 @@ float * SimplePlanetRenderer::createVertices(const Planet& planet)
 
 
 
-unsigned int* SimplePlanetRenderer::createMeshIndex()
+int* SimplePlanetRenderer::createMeshIndex()
 {
   const unsigned int res = _lonRes;
   
   const int numIndexes = (2 * (res - 1) * (res + 1)) -1;
-  unsigned int *indexes = new unsigned int[numIndexes];
+  int *indexes = new int[numIndexes];
   
   unsigned int n = 0;
   for (unsigned int j = 0; j < res - 1; j++) {
@@ -102,7 +102,7 @@ bool SimplePlanetRenderer::initializeMesh(const RenderContext* rc) {
   float* ver = createVertices(*planet);
   const int res = _lonRes;
   const int numIndexes = (2 * (res - 1) * (res + 1)) -1;
-  unsigned int * ind = createMeshIndex();
+  int * ind = createMeshIndex();
   
   //TEXTURED
   int texID = 0;

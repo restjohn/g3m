@@ -82,13 +82,13 @@ void GL::useProgram(unsigned int program) {
 }
 
 void GL::loadModelView() {
-  float M[16];
+  static float M[16];
   _modelView.copyToFloatMatrix(M);
   _gl->uniformMatrix4fv(Uniforms.Modelview, 1, 0, M);
 }
 
 void GL::setProjection(const MutableMatrix44D &projection) {
-  float M[16];
+  static float M[16];
   projection.copyToFloatMatrix(M);
   _gl->uniformMatrix4fv(Uniforms.Projection, 1, 0, M);
 }

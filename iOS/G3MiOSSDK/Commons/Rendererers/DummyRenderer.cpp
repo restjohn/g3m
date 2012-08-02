@@ -9,7 +9,7 @@
 #include "DummyRenderer.hpp"
 
 #include "Context.hpp"
-#include "IGL.hpp"
+#include "GL.hpp"
 #include "Planet.hpp"
 #include "Vector3D.hpp"
 
@@ -24,7 +24,7 @@ void DummyRenderer::initialize(const InitializationContext* ic)
   int res = 12;
   _vertices = new float[res * res * 3];
   _numIndices = 2 * (res - 1) * (res + 1);
-  _index = new unsigned int[_numIndices];
+  _index = new int[_numIndices];
   
   // create vertices
   
@@ -62,7 +62,7 @@ int DummyRenderer::render(const RenderContext* rc)
 {
   
   // obtaing gl object reference
-  IGL *gl = rc->getGL();
+  GL *gl = rc->getGL();
   
   gl->enableVerticesPosition();
   

@@ -25,7 +25,7 @@ public:
              Vector3D center,
              const unsigned int numVertices,
              float* vertices,
-             const unsigned int* indexes,
+             const int* indexes,
              const int numIndex, 
              const Color* flatColor = NULL,
              const float * colors = NULL,

@@ -15,7 +15,7 @@
 
 #include <vector>
 #include "Context.hpp"
-#include "IGL.hpp"
+#include "GL.hpp"
 
 
 class SGGGroupNode;
@@ -156,7 +156,7 @@ public:
       return MAX_TIME_TO_RENDER;
     }
     
-    IGL* gl = rc->getGL();
+    GL* gl = rc->getGL();
     
     gl->pushMatrix();
     MutableMatrix44D fullMatrix = getFullMatrix();
@@ -178,7 +178,7 @@ private:
   
   int _numIndices;
   
-  unsigned int* _index;
+  int* _index;
   float* _vertices;
   float _halfSize;
   

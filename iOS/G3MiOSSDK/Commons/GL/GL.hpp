@@ -11,9 +11,9 @@
 
 #include "MutableMatrix44D.hpp"
 
-#include "IGL.hpp"
-
 #include "INativeGL.hpp"
+#include "IImage.hpp"
+#include "Color.hpp"
 
 #include <list>
 
@@ -83,7 +83,19 @@ public:
   
   void color(float r, float g, float b, float a) ;
   
+  void clearScreen(const Color& col){
+    clearScreen(col.getRed(),col.getGreen(),col.getBlue(),col.getAlpha());
+  }
+  
+  void color(const Color& col) {
+    color(col.getRed(),col.getGreen(),col.getBlue(),col.getAlpha());
+  }
+  
   void enableVertexColor(float const colors[], float intensity);
+  
+  void enableVertexFlatColor(const Color& c, float intensity) {
+    enableVertexFlatColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha(), intensity);
+  }
   
   void disableVertexColor();
   

@@ -34,7 +34,7 @@ void LatLonMeshRenderer::initialize(const InitializationContext* ic)
   // create vertices and indices in dinamic memory
   float *vertices = new float [numVertices*3];
   memcpy(vertices, v, numVertices*3*sizeof(float));
-  unsigned int *indices = new unsigned int [numIndices];
+  int *indices = new int [numIndices];
   memcpy(indices, i, numIndices*sizeof(unsigned int));
 
   // create mesh

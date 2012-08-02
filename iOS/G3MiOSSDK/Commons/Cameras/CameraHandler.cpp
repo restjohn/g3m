@@ -9,11 +9,11 @@
 #include <iostream>
 
 #include "CameraHandler.h"
-#include "IGL.hpp"
+#include "GL.hpp"
 
 const Planet*     CameraHandler::_planet;
 const ILogger*    CameraHandler::_logger;
-IGL*              CameraHandler::gl;
+GL*              CameraHandler::gl;
 
 Camera            CameraHandler::_camera0(NULL, 0, 0);               
 Camera*           CameraHandler::_camera = NULL;               

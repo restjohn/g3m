@@ -11,7 +11,7 @@
 
 #include <vector>
 
-#include "IGL.hpp"
+enum CullFace { FRONT, BACK, FRONT_AND_BACK };
 
 enum GLBufferType { ColorBuffer, DepthBuffer };
 
@@ -39,7 +39,9 @@ class INativeGL
 {
 public:
   
-  virtual ~INativeGL() = 0;
+//  INativeGL();
+//  
+  virtual ~INativeGL(){};
   
   virtual void useProgram(int program) const = 0;
   
@@ -88,7 +90,7 @@ public:
   
   virtual void pixelStorei(GLAlignment pname, int param) const = 0;
   
-  std::vector<int> genTextures(int	n) const;
+  virtual std::vector<int> genTextures(int	n) const = 0;
   
   virtual void texParameteri(GLTextureType target, GLTextureParameter par, GLTextureParameterValue v) const = 0;
   
