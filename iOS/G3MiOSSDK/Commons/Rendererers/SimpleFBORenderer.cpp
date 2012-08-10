@@ -50,3 +50,51 @@ int SimpleFBORenderer::render(const RenderContext* rc)
   
   return MAX_TIME_TO_RENDER;
 }
+
+
+/*
+int LatLonMeshRenderer::render(const RenderContext* rc)
+{  
+  static GLuint id=0;
+  GL *gl = rc->getGL();
+  gl->enableTextures();
+  gl->enableTexture2D();
+  
+  if (id==0) {
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
+    unsigned char pixels[4][4][3] = {
+      {{64,0,0},  {128,0,0},   {192,0,0},   {255,0,0}},  // Rojos 
+      {{0,64,0},  {0,128,0},   {0,192,0},   {0,255,0}},  // Verdes 
+      {{0,0,64},  {0,0,128},   {0,0,192},   {0,0,255}},  // Azules 
+      {{64,64,0}, {128,128,0}, {192,192,0}, {255,255,0}} // Amarillos 
+    };
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+  }
+  else {
+    glBindTexture(GL_TEXTURE_2D, id);
+  }
+  
+  float texCoords[] = { 0, 0, 1, 0, 0, 1, 1, 1};
+  gl->setTextureCoordinates(2, 0, texCoords);
+  
+  //mesh->render(rc);
+  {
+    gl->enableVerticesPosition();
+    //gl->disableVertexColor();
+    //gl->disableVertexFlatColor();
+    //gl->disableVertexNormal();
+    gl->vertexPointer(3, 0, vertices);
+    gl->drawTriangleStrip(4, indices);
+    gl->disableVerticesPosition();
+  }
+  
+  gl->disableTextures();
+  gl->disableTexture2D();
+  
+  return MAX_TIME_TO_RENDER;
+}*/
+
