@@ -10,14 +10,15 @@
 #define G3MiOSSDK_SimpleFBORenderer_hpp
 
 #include "Renderer.hpp"
-#include "IndexedMesh.hpp"
 
 
 class SimpleFBORenderer: public Renderer {
   
 private:
-  Mesh *mesh;
-  
+  float*        _vertices;
+  int*          _indices;
+  float*        _texCoords;
+  unsigned int  _idTexture;
   
 public:
   ~SimpleFBORenderer();

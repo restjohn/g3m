@@ -429,7 +429,7 @@
     }
   }
   
-  if (false) {
+  if (true) {
     LatLonMeshRenderer *renderer = new LatLonMeshRenderer();
     comp->addRenderer(renderer);
   }

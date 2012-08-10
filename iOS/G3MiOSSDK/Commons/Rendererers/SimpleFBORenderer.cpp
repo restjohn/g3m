@@ -8,12 +8,18 @@
 
 #include <iostream>
 
+#include <OpenGLES/ES2/gl.h>
+
 #include "SimpleFBORenderer.hpp"
+#include "GL.hpp"
+#include "Context.hpp"
 
 
 SimpleFBORenderer::~SimpleFBORenderer()
 {
-  delete mesh;
+  delete _vertices;
+  delete _indices;
+  delete _texCoords;
 }
 
 
@@ -21,80 +27,61 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
 {
   unsigned int numVertices = 4;
   int numIndices = 4;
+  float x=7e6, y=1e6;
   
   float v[] = {
-    (float) 30, (float) -19, 5000,
-    (float) 26, (float) -19, 5000,
-    (float) 30, (float) -16,  5000,
-    (float) 26, (float) -16,  5000
+    x, -y, y,
+    x, -y, -y,
+    x, y, y,
+    x, y, -y
   };
   
   int i[] = { 0, 1, 2, 3};
   
-  // create vertices and indices in dinamic memory
-  float *vertices = new float [numVertices*3];
-  memcpy(vertices, v, numVertices*3*sizeof(float));
-  int *indices = new int [numIndices];
-  memcpy(indices, i, numIndices*sizeof(unsigned int));
+  float texCoords[] = {0, 0, 1, 0, 0, 1, 1, 1};
   
-  // create mesh
-  Color *flatColor = new Color(Color::fromRGBA(1.0, 1.0, 0.0, 1.0));
-  mesh = IndexedMesh::CreateFromGeodetic3D(ic->getPlanet(), true, TriangleStrip, NoCenter, Vector3D(0,0,0), 
-                                           4, vertices, indices, 4, flatColor);
+  unsigned char pixels[4][4][3] = {
+    {{64,0,0},  {128,0,0},   {192,0,0},   {255,0,0}},  // Rojos 
+    {{0,64,0},  {0,128,0},   {0,192,0},   {0,255,0}},  // Verdes 
+    {{0,0,64},  {0,0,128},   {0,0,192},   {0,0,255}},  // Azules 
+    {{64,64,0}, {128,128,0}, {192,192,0}, {255,255,0}} // Amarillos 
+  };
+  
+  // create vertices and indices in dinamic memory
+  _vertices = new float [numVertices*3];
+  memcpy(_vertices, v, numVertices*3*sizeof(float));
+  _indices = new int [numIndices];
+  memcpy(_indices, i, numIndices*sizeof(unsigned int));
+  _texCoords = new float [numVertices*2];
+  memcpy(_texCoords, texCoords, numVertices*2*sizeof(float));
+  
+  // create texture
+  glGenTextures(1, &_idTexture);
+  glBindTexture(GL_TEXTURE_2D, _idTexture);  
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 }  
 
 
 int SimpleFBORenderer::render(const RenderContext* rc)
 {  
-  mesh->render(rc);
-  
-  return MAX_TIME_TO_RENDER;
-}
-
-
-/*
-int LatLonMeshRenderer::render(const RenderContext* rc)
-{  
-  static GLuint id=0;
   GL *gl = rc->getGL();
   gl->enableTextures();
   gl->enableTexture2D();
-  
-  if (id==0) {
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-    unsigned char pixels[4][4][3] = {
-      {{64,0,0},  {128,0,0},   {192,0,0},   {255,0,0}},  // Rojos 
-      {{0,64,0},  {0,128,0},   {0,192,0},   {0,255,0}},  // Verdes 
-      {{0,0,64},  {0,0,128},   {0,0,192},   {0,0,255}},  // Azules 
-      {{64,64,0}, {128,128,0}, {192,192,0}, {255,255,0}} // Amarillos 
-    };
-    
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
-  }
-  else {
-    glBindTexture(GL_TEXTURE_2D, id);
-  }
-  
-  float texCoords[] = { 0, 0, 1, 0, 0, 1, 1, 1};
-  gl->setTextureCoordinates(2, 0, texCoords);
-  
-  //mesh->render(rc);
-  {
-    gl->enableVerticesPosition();
-    //gl->disableVertexColor();
-    //gl->disableVertexFlatColor();
-    //gl->disableVertexNormal();
-    gl->vertexPointer(3, 0, vertices);
-    gl->drawTriangleStrip(4, indices);
-    gl->disableVerticesPosition();
-  }
-  
-  gl->disableTextures();
+  glBindTexture(GL_TEXTURE_2D, _idTexture);
+  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);
+  gl->setTextureCoordinates(2, 0, _texCoords);
+  gl->enableVerticesPosition();
+  gl->disableVertexColor();
+  gl->disableVertexFlatColor();
+  gl->disableVertexNormal();
+  gl->vertexPointer(3, 0, _vertices);
+  gl->drawTriangleStrip(4, _indices);
+  gl->disableVerticesPosition();  
   gl->disableTexture2D();
+  gl->disableTextures();
   
   return MAX_TIME_TO_RENDER;
-}*/
+}
 
