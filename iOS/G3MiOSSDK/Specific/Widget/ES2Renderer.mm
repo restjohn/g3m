@@ -11,6 +11,8 @@
 #include "G3MWidget.hpp"
 #include "GL.hpp"
 
+GLuint fboHandle; 
+
 // uniform index
 enum {
   UNIFORM_TRANSLATE,
@@ -62,8 +64,8 @@ enum {
     
     // create buffer for render to texture
     {
-      fbo_width = 512;
-      fbo_height = 512;
+      fbo_width = 256;
+      fbo_height = 256;
       glGenFramebuffers(1, &fboHandle);
       glGenTextures(1, &fboTex);      
       glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);

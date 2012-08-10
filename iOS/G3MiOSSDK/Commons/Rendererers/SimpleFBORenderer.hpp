@@ -20,6 +20,8 @@ private:
   float*        _texCoords;
   unsigned int  _idTexture;
   
+  void renderFBO();
+  
 public:
   ~SimpleFBORenderer();
   

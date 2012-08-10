@@ -26,7 +26,7 @@
     GLuint defaultFramebuffer, colorRenderbuffer, depthRenderbuffer;
   
     // params for render to texture
-    GLuint fboHandle, fboTex;
+    GLuint fboTex;
     int fbo_width, fbo_height;
 
 

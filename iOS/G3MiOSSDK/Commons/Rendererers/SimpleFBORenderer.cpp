@@ -63,9 +63,27 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 }  
 
+extern GLuint fboHandle; 
+
+void SimpleFBORenderer::renderFBO()
+{
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glEnable(GL_TEXTURE_2D);
+  glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+  
+  glViewport(0,0, 256, 256);
+  glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 
 int SimpleFBORenderer::render(const RenderContext* rc)
 {  
+  // creo que falta allocar una teximage y bindearla al buffer
+  //renderFBO();
+  
   GL *gl = rc->getGL();
   gl->enableTextures();
   gl->enableTexture2D();
