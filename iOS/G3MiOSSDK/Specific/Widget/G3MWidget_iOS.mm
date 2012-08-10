@@ -32,6 +32,7 @@
 #include "GLErrorRenderer.hpp"
 #include "EllipsoidalTileTessellator.hpp"
 #include "LatLonMeshRenderer.h"
+#include "simpleFBORenderer.hpp"
 
 #include "DummyDownload.hpp"
 #include "SQLiteStorage_iOS.hpp"
@@ -428,8 +429,13 @@
     }
   }
   
-  if (true) {
+  if (false) {
     LatLonMeshRenderer *renderer = new LatLonMeshRenderer();
+    comp->addRenderer(renderer);
+  }
+  
+  if (true) {
+    SimpleFBORenderer *renderer = new SimpleFBORenderer();
     comp->addRenderer(renderer);
   }
   

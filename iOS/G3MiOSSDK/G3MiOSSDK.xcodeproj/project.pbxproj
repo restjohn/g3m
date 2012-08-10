@@ -44,6 +44,7 @@
 		38D786E61587B446003BBC75 /* Tile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 38D786E51587B446003BBC75 /* Tile.cpp */; };
 		44EEB5DD1598C64C0086F243 /* SQLiteStorage_iOS.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44EEB5DC1598C64C0086F243 /* SQLiteStorage_iOS.mm */; };
 		CC14B64E157D35C100793C92 /* IImage.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CC14B64C157D35C100793C92 /* IImage.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		CC29DF2F15D512AC00859578 /* SimpleFBORenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC29DF2E15D512AC00859578 /* SimpleFBORenderer.cpp */; };
 		CC41E3A015B1FD5B00B5581C /* Plane.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC41E39F15B1FD5B00B5581C /* Plane.cpp */; };
 		CC41E3B615B32DFB00B5581C /* Frustum.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC41E3B515B32DFB00B5581C /* Frustum.cpp */; };
 		CC55C47F15D11D8500923D7B /* CameraDoubleTapHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CC55C47E15D11D8500923D7B /* CameraDoubleTapHandler.cpp */; };
@@ -203,6 +204,8 @@
 		443BBC8115A59AC200EAE280 /* DBStorage */ = {isa = PBXFileReference; lastKnownFileType = folder; path = DBStorage; sourceTree = "<group>"; };
 		44EEB5DC1598C64C0086F243 /* SQLiteStorage_iOS.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SQLiteStorage_iOS.mm; path = Specific/Derived/SQLiteStorage_iOS.mm; sourceTree = "<group>"; };
 		CC14B64C157D35C100793C92 /* IImage.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = IImage.hpp; path = Commons/Interfaces/IImage.hpp; sourceTree = "<group>"; };
+		CC29DF2C15D5127300859578 /* SimpleFBORenderer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = SimpleFBORenderer.hpp; path = Commons/Rendererers/SimpleFBORenderer.hpp; sourceTree = "<group>"; };
+		CC29DF2E15D512AC00859578 /* SimpleFBORenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = SimpleFBORenderer.cpp; path = Commons/Rendererers/SimpleFBORenderer.cpp; sourceTree = "<group>"; };
 		CC41E39D15B1FD1300B5581C /* Plane.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Plane.hpp; path = Commons/Geometry/Plane.hpp; sourceTree = "<group>"; };
 		CC41E39F15B1FD5B00B5581C /* Plane.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Plane.cpp; path = Commons/Geometry/Plane.cpp; sourceTree = "<group>"; };
 		CC41E3B315B32D2E00B5581C /* Frustum.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = Frustum.hpp; path = Commons/Geometry/Frustum.hpp; sourceTree = "<group>"; };
@@ -551,8 +554,10 @@
 				CCC2A02715CA6C7D00923850 /* Renderer.hpp */,
 				CCC2A02815CA6C7D00923850 /* SceneGraphRenderer.cpp */,
 				CCC2A02915CA6C7D00923850 /* SceneGraphRenderer.hpp */,
-				CCC2A02A15CA6C7D00923850 /* SimplePlanetRenderer.cpp */,
+				CC29DF2C15D5127300859578 /* SimpleFBORenderer.hpp */,
+				CC29DF2E15D512AC00859578 /* SimpleFBORenderer.cpp */,
 				CCC2A02B15CA6C7D00923850 /* SimplePlanetRenderer.hpp */,
+				CCC2A02A15CA6C7D00923850 /* SimplePlanetRenderer.cpp */,
 				CCC2A02C15CA6C7D00923850 /* TileRenderer.cpp */,
 				CCC2A02D15CA6C7D00923850 /* TileRenderer.hpp */,
 			);
@@ -868,6 +873,7 @@
 				CCC2A03F15CA6C7D00923850 /* TileRenderer.cpp in Sources */,
 				D81BA17115CBF19F004EF0B0 /* GL.cpp in Sources */,
 				CC55C47F15D11D8500923D7B /* CameraDoubleTapHandler.cpp in Sources */,
+				CC29DF2F15D512AC00859578 /* SimpleFBORenderer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
