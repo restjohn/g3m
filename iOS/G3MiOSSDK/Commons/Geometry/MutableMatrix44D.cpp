@@ -242,9 +242,10 @@ MutableMatrix44D MutableMatrix44D::createModelMatrix(const MutableVector3D& pos,
   return MutableMatrix44D(LA);
 }
 
-MutableMatrix44D MutableMatrix44D::createProjectionMatrix(double left, double right,
-                                                          double bottom, double top,
-                                                          double znear, double zfar) {
+MutableMatrix44D MutableMatrix44D::createPerspectiveProjectionMatrix (double left, double right,
+                                                                      double bottom, double top,
+                                                                      double znear, double zfar) 
+{
   // set frustum matrix in double
   const double rl = right - left;
   const double tb = top - bottom;
@@ -266,11 +267,35 @@ MutableMatrix44D MutableMatrix44D::createProjectionMatrix(double left, double ri
   return MutableMatrix44D(P);
 }
 
-MutableMatrix44D MutableMatrix44D::createProjectionMatrix(const FrustumData& data)
+MutableMatrix44D MutableMatrix44D::createOrthographicProjectionMatrix(double left, double right,
+                                                                      double bottom, double top,
+                                                                      double znear, double zfar) 
 {
-  return createProjectionMatrix(data._left, data._right,
-                                data._bottom, data._top,
-                                data._znear, data._zfar);
+  // set frustum matrix in double
+  const double rl = right - left;
+  const double tb = top - bottom;
+  const double fn = zfar - znear;
+  
+  double P[16];
+  P[0] = 2 / rl;
+  P[1] = P[2] = P[3] = P[4] = 0;
+  P[5] = 2 / tb;
+  P[6] = P[7] = P[8] = P[9] = 0;
+  P[10] = -2 / fn;
+  P[11] = 0;
+  P[12] = -(right+left) / rl;
+  P[13] = -(top+bottom) / tb;
+  P[14] = -(zfar+znear) / fn;
+  P[15] = 1;
+  
+  return MutableMatrix44D(P);
+}
+
+MutableMatrix44D MutableMatrix44D::createPerspectiveProjectionMatrix(const FrustumData& data)
+{
+  return createPerspectiveProjectionMatrix(data._left, data._right,
+                                           data._bottom, data._top,
+                                           data._znear, data._zfar);
 }
 
 

@@ -11,6 +11,8 @@
 
 #include "Renderer.hpp"
 
+class GL;
+
 
 class SimpleFBORenderer: public Renderer {
   
@@ -20,7 +22,7 @@ private:
   float*        _texCoords;
   unsigned int  _idTexture;
   
-  void renderFBO();
+  void renderFBO(const RenderContext* rc);
   
 public:
   ~SimpleFBORenderer();

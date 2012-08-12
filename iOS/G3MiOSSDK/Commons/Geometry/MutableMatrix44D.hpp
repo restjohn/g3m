@@ -175,11 +175,15 @@ public:
                                             const MutableVector3D& center,
                                             const MutableVector3D& up);
   
-  static MutableMatrix44D createProjectionMatrix(double left, double right,
-                                                 double bottom, double top,
-                                                 double znear, double zfar);
+  static MutableMatrix44D createPerspectiveProjectionMatrix(double left, double right,
+                                                            double bottom, double top,
+                                                            double znear, double zfar);
   
-  static MutableMatrix44D createProjectionMatrix(const FrustumData& data);
+  static MutableMatrix44D createOrthographicProjectionMatrix(double left, double right,
+                                                            double bottom, double top,
+                                                            double znear, double zfar);
+  
+  static MutableMatrix44D createPerspectiveProjectionMatrix(const FrustumData& data);
   
 };
 

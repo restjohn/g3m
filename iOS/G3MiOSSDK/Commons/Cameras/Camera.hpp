@@ -148,6 +148,7 @@ public:
   Geodetic3D getGeodeticCenterOfView() { return *_getGeodeticCenterOfView(); }
   Vector3D getXYZCenterOfView() { return _getXYZCenterOfView().asVector3D(); }
   Vector3D getViewDirection() const { return _center.sub(_position).asVector3D(); }
+  MutableMatrix44D getProjectionMatrix() { return _getProjectionMatrix(); }
 
   
   //Dragging camera
@@ -209,10 +210,10 @@ private:
   
   // opengl projection matrix 
   MutableMatrix44D _projectionMatrix;       
-  MutableMatrix44D getProjectionMatrix() {
+  MutableMatrix44D _getProjectionMatrix() {
     if (_dirtyFlags._projectionMatrix) {
       _dirtyFlags._projectionMatrix = false;
-      _projectionMatrix = MutableMatrix44D::createProjectionMatrix(getFrustumData());
+      _projectionMatrix = MutableMatrix44D::createPerspectiveProjectionMatrix(getFrustumData());
     }
     return _projectionMatrix;
   }
@@ -232,7 +233,7 @@ private:
   MutableMatrix44D getModelViewMatrix() {
     if (_dirtyFlags._modelViewMatrix) {
       _dirtyFlags._modelViewMatrix = false;
-      _modelViewMatrix = getProjectionMatrix().multiply(getModelMatrix());
+      _modelViewMatrix = _getProjectionMatrix().multiply(getModelMatrix());
     }
     return _modelViewMatrix;
   }

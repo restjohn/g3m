@@ -13,6 +13,7 @@
 #include "SimpleFBORenderer.hpp"
 #include "GL.hpp"
 #include "Context.hpp"
+#include "Camera.hpp"
 
 
 SimpleFBORenderer::~SimpleFBORenderer()
@@ -38,7 +39,7 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
   
   int i[] = { 0, 1, 2, 3};
   
-  float texCoords[] = {0, 0, 1, 0, 0, 1, 1, 1};
+  float texCoords[] = {0, 0, 0, 1, 1, 0, 1, 1};
   
   unsigned char pixels[4][4][3] = {
     {{64,0,0},  {128,0,0},   {192,0,0},   {255,0,0}},  // Rojos 
@@ -64,31 +65,80 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
 }  
 
 extern GLuint fboHandle; 
+extern GLuint fboTex;
+extern GLuint defaultFramebuffer;
+extern GLint backingWidth;
+extern GLint backingHeight;
 
-void SimpleFBORenderer::renderFBO()
+
+
+void SimpleFBORenderer::renderFBO(const RenderContext* rc)
 {
+  //glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
-  glEnable(GL_TEXTURE_2D);
+
   glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+  glDisable(GL_DEPTH_TEST);
   
   glViewport(0,0, 256, 256);
-  glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT);
+    
+  float v[] = {
+    30, -30, 
+    30, -128,
+    128, -30,
+    128, -128
+  };
   
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  int i[] = { 0, 1, 2, 3};
+  
+  GL *gl = rc->getGL();
+  
+  MutableMatrix44D M0 = rc->getNextCamera()->getProjectionMatrix();
+  MutableMatrix44D M1 = MutableMatrix44D::createOrthographicProjectionMatrix(0, 256, -256, 0, -1, 1);
+  gl->setProjection(M1);
+  gl->pushMatrix();
+  gl->loadMatrixf(MutableMatrix44D::identity());
+  
+  gl->disableTexture2D();
+  gl->disableTextures();
+  gl->color(0, 0, 1, 1);
+
+  gl->enableVerticesPosition();
+  gl->vertexPointer(2, 0, v);
+  gl->drawTriangleStrip(4, i);
+  gl->disableVerticesPosition();  
+  
+  
+
+  
+  glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
+  glEnable(GL_DEPTH_TEST);
+  glViewport(0, 0, backingWidth, backingHeight);
+  
+  gl->enableTextures();
+  gl->enableTexture2D();
+  gl->setProjection(M0);
+  gl->popMatrix();
+
 }
 
 
 int SimpleFBORenderer::render(const RenderContext* rc)
-{  
-  // creo que falta allocar una teximage y bindearla al buffer
-  //renderFBO();
-  
+{    
   GL *gl = rc->getGL();
   gl->enableTextures();
   gl->enableTexture2D();
-  glBindTexture(GL_TEXTURE_2D, _idTexture);
-  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);
+  
+  //glBindTexture(GL_TEXTURE_2D, _idTexture);
+  //gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
+
+  
+  renderFBO(rc);
+  glBindTexture(GL_TEXTURE_2D, fboTex);
+  gl->transformTexCoords(1.0, -1.0, 0.0, 0.0);  
+  
   gl->setTextureCoordinates(2, 0, _texCoords);
   gl->enableVerticesPosition();
   gl->disableVertexColor();

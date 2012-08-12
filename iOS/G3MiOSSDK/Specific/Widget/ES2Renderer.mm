@@ -12,6 +12,12 @@
 #include "GL.hpp"
 
 GLuint fboHandle; 
+GLuint fboTex;
+GLuint defaultFramebuffer;
+GLint backingWidth;
+GLint backingHeight;
+
+
 
 // uniform index
 enum {
@@ -100,7 +106,7 @@ enum {
           break;
       }
       
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);    
+      glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);    
     }
   
   }

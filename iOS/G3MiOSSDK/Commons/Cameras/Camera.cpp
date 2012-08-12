@@ -80,7 +80,7 @@ void Camera::resizeViewport(int width, int height) {
 void Camera::print() {
   if (_logger != NULL){ 
     getModelMatrix().print("Model Matrix", _logger);
-    getProjectionMatrix().print("Projection Matrix", _logger);
+    _getProjectionMatrix().print("Projection Matrix", _logger);
     getModelViewMatrix().print("ModelView Matrix", _logger);
     _logger->logInfo("Width: %d, Height %d\n", _width, _height);
   }
@@ -146,7 +146,7 @@ void Camera::render(const RenderContext* rc) {
   }*/
   
   GL *gl = rc->getGL();
-  gl->setProjection(getProjectionMatrix());
+  gl->setProjection(_getProjectionMatrix());
   gl->loadMatrixf(getModelMatrix());
     
   // TEMP: TEST TO SEE HALF SIZE FRUSTUM CLIPPING 
