@@ -81,17 +81,22 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   glDisable(GL_DEPTH_TEST);
   
   glViewport(0,0, 256, 256);
-  glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
     
   float v[] = {
     30, -30, 
     30, -128,
     128, -30,
-    128, -128
+    128, -128,
+    
+    80, -100,
+    80, -200,
+    200, -100,
+    200, -200
   };
   
-  int i[] = { 0, 1, 2, 3};
+  int i[] = { 0, 1, 2, 3, 4, 5, 6, 7};
   
   GL *gl = rc->getGL();
   
@@ -101,22 +106,28 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   gl->pushMatrix();
   gl->loadMatrixf(MutableMatrix44D::identity());
   
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  
   gl->disableTexture2D();
   gl->disableTextures();
-  gl->color(0, 0, 1, 1);
 
   gl->enableVerticesPosition();
   gl->vertexPointer(2, 0, v);
+  
+  gl->color(1, 0, 0, 0.5);
   gl->drawTriangleStrip(4, i);
-  gl->disableVerticesPosition();  
   
-  
+  gl->color(0, 0, 1, 0.5);
+  gl->drawTriangleStrip(4, i+4);
 
   
   glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
   glEnable(GL_DEPTH_TEST);
   glViewport(0, 0, backingWidth, backingHeight);
   
+  gl->disableVerticesPosition();  
+  glDisable(GL_BLEND);
   gl->enableTextures();
   gl->enableTexture2D();
   gl->setProjection(M0);
