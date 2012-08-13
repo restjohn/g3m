@@ -78,14 +78,16 @@ enum {
       glBindTexture(GL_TEXTURE_2D, fboTex);
       glTexImage2D( GL_TEXTURE_2D,
                    0,
-                   GL_RGBA,
+                   GL_RGB,
                    fbo_width, fbo_height,
                    0,
-                   GL_RGBA,
-                   GL_UNSIGNED_BYTE,
+                   GL_RGB,
+                   GL_UNSIGNED_SHORT_5_6_5,
                    NULL);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
       glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER_APPLE, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0);
       
       // FBO status check
