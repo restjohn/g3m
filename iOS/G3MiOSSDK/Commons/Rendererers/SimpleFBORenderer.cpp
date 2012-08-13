@@ -80,6 +80,10 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
   glDisable(GL_DEPTH_TEST);
   
+  // save current viewport
+  GLint currentViewport[4];
+  glGetIntegerv(GL_VIEWPORT, currentViewport);
+  
   glViewport(0,0, 256, 256);
   //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   //glClear(GL_COLOR_BUFFER_BIT);
@@ -143,7 +147,9 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   
   glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
   glEnable(GL_DEPTH_TEST);
-  glViewport(0, 0, backingWidth, backingHeight);
+  
+  // restore viewport
+  glViewport(currentViewport[0], currentViewport[1], currentViewport[2], currentViewport[3]);
   
   gl->disableVerticesPosition();  
   glDisable(GL_BLEND);

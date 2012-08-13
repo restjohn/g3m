@@ -37,14 +37,17 @@ void NativeGL2_iOS::deleteTextures(int n, const int textures[]) const
 
 extern GLuint fboHandle; 
 extern GLuint fboTex;
-extern GLuint defaultFramebuffer;
-extern GLint backingWidth;
-extern GLint backingHeight;
-
 
 
 void NativeGL2_iOS::initFBORender2Texture()
 {
+  // obtain current current frame buffer parameters
+  GLint defaultFrameBuffer;
+  glGetFramebufferAttachmentParameteriv(GL_FRAMEBUFFER, 
+                                        GL_COLOR_ATTACHMENT0, 
+                                        GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, 
+                                        &defaultFrameBuffer);
+  
   // create buffer for render to texture
   GLuint fbo_width = 256;
   GLuint fbo_height = 256;
@@ -52,19 +55,14 @@ void NativeGL2_iOS::initFBORender2Texture()
   glGenTextures(1, &fboTex);      
   glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
   glBindTexture(GL_TEXTURE_2D, fboTex);
-  glTexImage2D( GL_TEXTURE_2D,
-               0,
-               GL_RGB,
-               fbo_width, fbo_height,
-               0,
-               GL_RGB,
-               GL_UNSIGNED_SHORT_5_6_5,
-               NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,fbo_width, fbo_height,
+               0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER_APPLE, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER_APPLE, GL_COLOR_ATTACHMENT0, 
+                         GL_TEXTURE_2D, fboTex, 0);
   
   // FBO status check
   GLenum status;
@@ -83,5 +81,5 @@ void NativeGL2_iOS::initFBORender2Texture()
       break;
   }
   
-  glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);    
+  glBindFramebuffer(GL_FRAMEBUFFER, defaultFrameBuffer);    
 }
