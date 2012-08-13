@@ -16,7 +16,6 @@
 
 
 extern unsigned int fboHandle; 
-extern unsigned int fboTex;
 extern int          defaultFramebuffer;
 
 
@@ -25,7 +24,6 @@ void GPUTextureBuilder::initialize(const InitializationContext* ic)
   _fboContext = ic->getGL()->initFBORender2Texture();
   
   fboHandle = _fboContext._fboHandle;
-  fboTex = _fboContext._fboTex;
   defaultFramebuffer = _fboContext._defaultFrameBuffer;
   
 }

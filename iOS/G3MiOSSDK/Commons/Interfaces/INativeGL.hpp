@@ -14,16 +14,14 @@
 class FBOContext {
 public:
   unsigned int _fboHandle;
-  unsigned int _fboTex;
   int          _defaultFrameBuffer;
 
-  FBOContext(unsigned int fboHandle, unsigned int fboTex, int defaultFrameBuffer):
+  FBOContext(unsigned int fboHandle, int defaultFrameBuffer):
   _fboHandle          (fboHandle),
-  _fboTex             (fboTex),
   _defaultFrameBuffer (defaultFrameBuffer)
   {}
   
-  FBOContext(): _fboHandle(0), _fboTex(0), _defaultFrameBuffer(0) {}
+  FBOContext(): _fboHandle(0), _defaultFrameBuffer(0) {}
 };
 
 

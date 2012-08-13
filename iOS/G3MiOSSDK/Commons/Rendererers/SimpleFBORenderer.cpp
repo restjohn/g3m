@@ -69,7 +69,6 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
 }  
 
 unsigned int fboHandle; 
-unsigned int fboTex;
 int defaultFramebuffer;
 
 

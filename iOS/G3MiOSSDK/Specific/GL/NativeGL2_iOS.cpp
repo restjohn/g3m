@@ -38,7 +38,6 @@ void NativeGL2_iOS::deleteTextures(int n, const int textures[]) const
 FBOContext NativeGL2_iOS::initFBORender2Texture()
 {
   GLuint fboHandle; 
-  GLuint fboTex;
   
   // obtain current current frame buffer parameters
   GLint defaultFrameBuffer;
@@ -85,5 +84,5 @@ FBOContext NativeGL2_iOS::initFBORender2Texture()
   glBindFramebuffer(GL_FRAMEBUFFER, defaultFrameBuffer); */
   
   // return FBOContext
-  return FBOContext(fboHandle, fboTex, defaultFrameBuffer);
+  return FBOContext(fboHandle, defaultFrameBuffer);
 }
