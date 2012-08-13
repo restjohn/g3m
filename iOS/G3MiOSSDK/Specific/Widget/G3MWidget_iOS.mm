@@ -42,6 +42,7 @@
 #include "SingleImageTileTexturizer.hpp"
 #include "BusyRenderer.hpp"
 #include "CPUTextureBuilder.hpp"
+#include "GPUTextureBuilder.hpp"
 #include "LayerSet.hpp"
 #include "WMSLayer.hpp"
 #include "StaticImageLayer.hpp"
@@ -171,7 +172,7 @@
     comp->addRenderer(spr);
   }
 
-  TextureBuilder* texBuilder = new CPUTextureBuilder();
+  TextureBuilder* texBuilder = new GPUTextureBuilder();
   TexturesHandler* texturesHandler = new TexturesHandler(gl, factory, texBuilder, false);
   
   const Planet* planet = Planet::createEarth();
@@ -434,7 +435,7 @@
     comp->addRenderer(renderer);
   }
   
-  if (true) {
+  if (false) {
     SimpleFBORenderer *renderer = new SimpleFBORenderer();
     comp->addRenderer(renderer);
   }
@@ -458,7 +459,7 @@
   comp->addRenderer(new GLErrorRenderer());
   
   
-  TextureBuilder* texBuilder = new CPUTextureBuilder();
+  TextureBuilder* texBuilder = new GPUTextureBuilder();
   TexturesHandler* texturesHandler = new TexturesHandler(gl, factory, texBuilder, false);
   
   const Planet* planet = Planet::createEarth();
