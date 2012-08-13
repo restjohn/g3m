@@ -81,8 +81,8 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   glDisable(GL_DEPTH_TEST);
   
   glViewport(0,0, 256, 256);
-  glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
+  //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+  //glClear(GL_COLOR_BUFFER_BIT);
     
   float v1[] = {
     0,    256,
