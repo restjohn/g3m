@@ -66,51 +66,7 @@ enum {
     // create depth_buffer
     glGenRenderbuffers(1, &depthRenderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthRenderbuffer);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);
-    
-    // create buffer for render to texture
-    {
-      fbo_width = 256;
-      fbo_height = 256;
-      glGenFramebuffers(1, &fboHandle);
-      glGenTextures(1, &fboTex);      
-      glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
-      glBindTexture(GL_TEXTURE_2D, fboTex);
-      glTexImage2D( GL_TEXTURE_2D,
-                   0,
-                   GL_RGB,
-                   fbo_width, fbo_height,
-                   0,
-                   GL_RGB,
-                   GL_UNSIGNED_SHORT_5_6_5,
-                   NULL);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-      glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-      glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER_APPLE, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, fboTex, 0);
-      
-      // FBO status check
-      GLenum status;
-      status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-      switch(status) {
-        case GL_FRAMEBUFFER_COMPLETE:
-          NSLog(@"fbo complete");
-          break;
-          
-        case GL_FRAMEBUFFER_UNSUPPORTED:
-          NSLog(@"fbo unsupported");
-          break;
-          
-        default:
-          /* programming error; will fail on all hardware */
-          NSLog(@"Framebuffer Error");
-          break;
-      }
-      
-      glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);    
-    }
-  
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderbuffer);  
   }
   
   return self;

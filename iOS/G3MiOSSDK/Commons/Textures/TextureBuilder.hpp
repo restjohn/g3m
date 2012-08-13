@@ -14,6 +14,8 @@
 #include "IFactory.hpp"
 #include <vector>
 
+class InitializationContext;
+
 class TextureBuilder
 {
 public:
@@ -24,7 +26,8 @@ public:
                               const std::vector<const Rectangle*>& vRectangles, 
                               int width, int height) const = 0;
   
-  
+  virtual void initialize(const InitializationContext* ic) = 0;
+    
   virtual ~TextureBuilder() {} 
 };
 

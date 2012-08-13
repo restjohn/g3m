@@ -10,10 +10,15 @@
 #define G3MiOSSDK_GPUTextureBuilder_hpp
 
 #include "TextureBuilder.hpp"
+#include "Context.hpp"
+#include "GL.hpp"
 
 
 class GPUTextureBuilder:public TextureBuilder
 {
+private:
+
+  
 public:
   int createTextureFromImages(GL * gl, const std::vector<const IImage*>& vImages, int width, int height) const;
   
@@ -21,6 +26,11 @@ public:
                               const std::vector<const IImage*>& vImages, 
                               const std::vector<const Rectangle*>& vRectangles, 
                               int width, int height) const;
+  
+  void initialize(const InitializationContext* ic)
+  {
+    ic->getGL()->initFBORender2Texture();
+  }
   
 };
 

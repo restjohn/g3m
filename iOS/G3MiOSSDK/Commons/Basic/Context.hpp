@@ -77,14 +77,24 @@ public:
 
 
 class InitializationContext: public Context {
+private:
+  GL* _gl;
+  
 public:
   InitializationContext(IFactory *factory,
                         ILogger* logger,
                         const Planet* planet,
                         Downloader* const downloaderOLD,
                         IDownloader* downloader,
-                        EffectsScheduler* scheduler) :
-  Context(factory, logger, planet, downloaderOLD, downloader, scheduler) {
+                        EffectsScheduler* scheduler,
+                        GL* gl) :
+  Context(factory, logger, planet, downloaderOLD, downloader, scheduler),
+  _gl(gl)
+  {
+  }
+  
+  GL* getGL() const {
+    return _gl;
   }
 };
 

@@ -56,12 +56,13 @@ _rendererReady(false) // false until first call to G3MWidget::render()
 {
   initializeGL();
   
-  InitializationContext ic(_factory, _logger, _planet, _downloaderOLD, _downloader, _scheduler);
+  InitializationContext ic(_factory, _logger, _planet, _downloaderOLD, _downloader, _scheduler, _gl);
   _scheduler->initialize(&ic);
   _renderer->initialize(&ic);
   _busyRenderer->initialize(&ic);
   _currentCamera->initialize(&ic);
   _nextCamera->initialize(&ic);
+  _texturesHandler->initialize(&ic);
   
   _downloader->start();
 }

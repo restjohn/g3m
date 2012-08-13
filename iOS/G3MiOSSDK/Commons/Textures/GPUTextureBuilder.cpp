@@ -17,6 +17,18 @@ int GPUTextureBuilder::createTextureFromImages(GL * gl, const IFactory* factory,
                                                const std::vector<const Rectangle*>& vRectangles, 
                                                int width, int height) const 
 {
+  /*
+  printf ("createTextureFromImages. width=%d  height=%d\n");
+  for (unsigned int n=0; n<vImages.size(); n++) 
+    printf ("--- image=%d width=%d height=%d. Rectangle xy=%.2f, %.2f  w=%f, h=%f\n",
+            n, vImages[n]->getWidth(), vImages[n]->getHeight(),
+            vRectangles[n]->_x, vRectangles[n]->_y,
+            vRectangles[n]->_width, vRectangles[n]->_height);*/
+  
+  if (width!=256 || height!=256) 
+    printf ("**** GPUTextureBuilder only works with 256x256 textures in the image output!!\n");
+  
+  
   const IImage* base;
   int i = 0; //First image to merge
   Rectangle baseRec(0,0, width, height);

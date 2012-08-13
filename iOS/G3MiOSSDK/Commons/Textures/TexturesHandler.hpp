@@ -28,7 +28,7 @@ private:
   
   GL * const _gl;
   const IFactory * const _factory;
-  const TextureBuilder* _texBuilder;
+  TextureBuilder* _texBuilder;
   
   const bool _verbose;
   
@@ -36,7 +36,7 @@ public:
   
   TexturesHandler(GL* const  gl,
                   const IFactory const * factory,
-                  const TextureBuilder* texBuilder,
+                  TextureBuilder* texBuilder,
                   bool verbose): 
   _gl(gl),
   _factory(factory),
@@ -46,6 +46,10 @@ public:
   }
   
   ~TexturesHandler();
+  
+  void initialize(const InitializationContext* ic) {
+    _texBuilder->initialize(ic);
+  }
   
   int getTextureIdFromFileName(const std::string& filename,
                                int textureWidth,

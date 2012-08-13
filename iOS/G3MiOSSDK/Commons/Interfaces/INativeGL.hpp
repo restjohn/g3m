@@ -106,7 +106,7 @@ public:
   
   virtual void cullFace(GLCullFace c) const = 0;
 
-
+  virtual void initFBORender2Texture() = 0;
 
 };
 

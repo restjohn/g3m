@@ -229,13 +229,7 @@ public:
     glBindTexture(getEnum(target), texture);
   }
   
-  void deleteTextures(int n, const int textures[]) const{
-    unsigned int ts[n];
-    for(int i = 0; i < n; i++){
-      ts[i] = textures[i];
-    }
-    glDeleteTextures(n, ts);
-  }
+  void deleteTextures(int n, const int textures[]) const;
   
   void enableVertexAttribArray(int location) const {
     glEnableVertexAttribArray(location);
@@ -249,15 +243,7 @@ public:
     glPixelStorei(getEnum(pname), param);
   }
   
-  std::vector<int> genTextures(int n) const {
-    GLuint textureID[n];    
-    glGenTextures(n, textureID);
-    std::vector<int> ts;
-    for(int i = 0; i < n; i++){
-      ts.push_back(textureID[i]);
-    }
-    return ts;
-  }
+  std::vector<int> genTextures(int n) const;
   
   void texParameteri(GLTextureType target, GLTextureParameter par, GLTextureParameterValue v) const {
     glTexParameteri(getEnum(target), getEnum(par), getValue(v));
@@ -283,6 +269,8 @@ public:
   void cullFace(GLCullFace c) const{
     glCullFace(getEnum(c));
   }
+  
+  void initFBORender2Texture();
   
 };
 

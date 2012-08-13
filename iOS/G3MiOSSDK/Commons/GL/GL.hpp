@@ -16,8 +16,6 @@
 #include "Color.hpp"
 #include "MutableVector2D.hpp"
 
-#include "INativeGL.hpp"
-
 #include <list>
 
 
@@ -218,6 +216,9 @@ public:
     enableVertexFlatColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha(), intensity);
   }
   
+  void initFBORender2Texture() {
+    _gl->initFBORender2Texture();
+  }
 };
 
 #endif
