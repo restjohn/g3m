@@ -21,6 +21,7 @@ private:
   int*          _indices;
   float*        _texCoords;
   unsigned int  _idTexture;
+  unsigned int  _fboTexture[2];
   
   void renderFBO(const RenderContext* rc, int numTexture);
   

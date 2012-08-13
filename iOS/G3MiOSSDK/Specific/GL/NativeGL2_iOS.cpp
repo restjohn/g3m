@@ -47,10 +47,11 @@ FBOContext NativeGL2_iOS::initFBORender2Texture()
                                         GL_FRAMEBUFFER_ATTACHMENT_OBJECT_NAME, 
                                         &defaultFrameBuffer);
   
-  // create buffer for render to texture
+  glGenFramebuffers(1, &fboHandle);
+  
+/*  // create buffer for render to texture
   GLuint fbo_width = 256;
   GLuint fbo_height = 256;
-  glGenFramebuffers(1, &fboHandle);
   glGenTextures(1, &fboTex);      
   glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
   glBindTexture(GL_TEXTURE_2D, fboTex);
@@ -81,7 +82,7 @@ FBOContext NativeGL2_iOS::initFBORender2Texture()
   }
   
   // restore default Frame Buffer
-  glBindFramebuffer(GL_FRAMEBUFFER, defaultFrameBuffer); 
+  glBindFramebuffer(GL_FRAMEBUFFER, defaultFrameBuffer); */
   
   // return FBOContext
   return FBOContext(fboHandle, fboTex, defaultFrameBuffer);

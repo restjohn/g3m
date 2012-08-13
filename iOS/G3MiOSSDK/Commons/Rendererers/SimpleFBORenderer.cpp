@@ -9,6 +9,7 @@
 #include <iostream>
 
 #include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
 
 #include "SimpleFBORenderer.hpp"
 #include "GL.hpp"
@@ -62,6 +63,9 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+  
+  // create textures for FBO
+  glGenTextures(2, _fboTexture);
 }  
 
 unsigned int fboHandle; 
@@ -72,6 +76,21 @@ int defaultFramebuffer;
 
 void SimpleFBORenderer::renderFBO(const RenderContext* rc, int numTexture)
 {
+  // create buffer for render to texture
+  GLuint fbo_width = 256;
+  GLuint fbo_height = 256;
+  glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+  glBindTexture(GL_TEXTURE_2D, _fboTexture[numTexture]);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,fbo_width, fbo_height,
+               0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER_APPLE, GL_COLOR_ATTACHMENT0, 
+                         GL_TEXTURE_2D, _fboTexture[numTexture], 0);
+
+  
   //glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -124,7 +143,7 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc, int numTexture)
   gl->pushMatrix();
   gl->loadMatrixf(MutableMatrix44D::identity());
   
-  if (numTexture==1) {
+  if (numTexture==0) {
   
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -162,6 +181,8 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc, int numTexture)
 
 int SimpleFBORenderer::render(const RenderContext* rc)
 {    
+  static bool firstTime = true;
+  
   GL *gl = rc->getGL();
   gl->enableTextures();
   gl->enableTexture2D();
@@ -172,8 +193,13 @@ int SimpleFBORenderer::render(const RenderContext* rc)
   gl->enableVerticesPosition();
   
   // draw first square
-  renderFBO(rc, 1);
-  glBindTexture(GL_TEXTURE_2D, fboTex);
+  if (firstTime) {
+    firstTime = false;
+    renderFBO(rc, 0);
+    renderFBO(rc, 1);
+  }
+
+  glBindTexture(GL_TEXTURE_2D, _fboTexture[0]);
   gl->setTextureCoordinates(2, 0, _texCoords);
   gl->vertexPointer(3, 0, _vertices);
   gl->pushMatrix();
@@ -182,8 +208,8 @@ int SimpleFBORenderer::render(const RenderContext* rc)
   gl->popMatrix();
   
   // draw second square
-  renderFBO(rc, 2);
-  glBindTexture(GL_TEXTURE_2D, fboTex);
+  //renderFBO(rc, 1);
+  glBindTexture(GL_TEXTURE_2D, _fboTexture[1]);
   gl->setTextureCoordinates(2, 0, _texCoords);
   gl->vertexPointer(3, 0, _vertices);
   gl->pushMatrix();
