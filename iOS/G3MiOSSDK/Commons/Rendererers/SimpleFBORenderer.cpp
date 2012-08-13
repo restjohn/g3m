@@ -26,7 +26,7 @@ SimpleFBORenderer::~SimpleFBORenderer()
 
 void SimpleFBORenderer::initialize(const InitializationContext* ic)
 {
-  unsigned int numVertices = 4;
+  unsigned int numVertices = 8;
   int numIndices = 4;
   float x=7e6, y=1e6;
   
@@ -175,7 +175,20 @@ int SimpleFBORenderer::render(const RenderContext* rc)
   gl->disableVertexFlatColor();
   gl->disableVertexNormal();
   gl->vertexPointer(3, 0, _vertices);
+  
+  // draw first square
+  gl->pushMatrix();
+  gl->multMatrixf(MutableMatrix44D::createTranslationMatrix(Vector3D(0,-1.2e6,0)));
   gl->drawTriangleStrip(4, _indices);
+  gl->popMatrix();
+  
+  // draw second square
+  gl->pushMatrix();
+  gl->multMatrixf(MutableMatrix44D::createTranslationMatrix(Vector3D(0,1.2e6,0)));
+  gl->drawTriangleStrip(4, _indices);
+  gl->popMatrix();
+  
+  
   gl->disableVerticesPosition();  
   gl->disableTexture2D();
   gl->disableTextures();
