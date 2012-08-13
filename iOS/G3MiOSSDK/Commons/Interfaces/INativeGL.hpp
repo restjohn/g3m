@@ -11,6 +11,23 @@
 
 #include <vector>
 
+class FBOContext {
+public:
+  unsigned int _fboHandle;
+  unsigned int _fboTex;
+  int          _defaultFrameBuffer;
+
+  FBOContext(unsigned int fboHandle, unsigned int fboTex, int defaultFrameBuffer):
+  _fboHandle          (fboHandle),
+  _fboTex             (fboTex),
+  _defaultFrameBuffer (defaultFrameBuffer)
+  {}
+  
+  FBOContext(): _fboHandle(0), _fboTex(0), _defaultFrameBuffer(0) {}
+};
+
+
+
 enum GLCullFace { Front, Back, FrontAndBack };
 
 enum GLBufferType { ColorBuffer, DepthBuffer };
@@ -106,7 +123,7 @@ public:
   
   virtual void cullFace(GLCullFace c) const = 0;
 
-  virtual void initFBORender2Texture() = 0;
+  virtual FBOContext initFBORender2Texture() = 0;
 
 };
 

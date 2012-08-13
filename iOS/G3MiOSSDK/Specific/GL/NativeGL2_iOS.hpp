@@ -13,6 +13,8 @@
 
 #include "INativeGL.hpp"
 
+
+
 class NativeGL2_iOS: public INativeGL
 {
   inline GLbitfield getBitField(GLBufferType b) const {
@@ -270,7 +272,7 @@ public:
     glCullFace(getEnum(c));
   }
   
-  void initFBORender2Texture();
+  FBOContext initFBORender2Texture();
   
 };
 

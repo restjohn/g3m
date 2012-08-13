@@ -9,7 +9,26 @@
 #include <iostream>
 
 #include "GPUTextureBuilder.hpp"
+#include "Context.hpp"
+#include "GL.hpp"
 
+
+
+
+extern unsigned int fboHandle; 
+extern unsigned int fboTex;
+extern int          defaultFramebuffer;
+
+
+void GPUTextureBuilder::initialize(const InitializationContext* ic)
+{
+  _fboContext = ic->getGL()->initFBORender2Texture();
+  
+  fboHandle = _fboContext._fboHandle;
+  fboTex = _fboContext._fboTex;
+  defaultFramebuffer = _fboContext._defaultFrameBuffer;
+  
+}
 
 
 int GPUTextureBuilder::createTextureFromImages(GL * gl, const IFactory* factory,
@@ -68,7 +87,7 @@ int GPUTextureBuilder::createTextureFromImages(GL * gl,
 {
   printf ("GPUTextureBuilder::createTextureFromImages still not implemented!! (using CPU version)\n");
   
-  const int imagesSize = images.size();
+/*  const int imagesSize = images.size();
   
   if (imagesSize == 0) {
     return -1;
@@ -91,7 +110,7 @@ int GPUTextureBuilder::createTextureFromImages(GL * gl,
     delete im;
   }
   
-  return texID;
+  return texID;*/
 }
 
 

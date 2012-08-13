@@ -64,11 +64,9 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 }  
 
-extern GLuint fboHandle; 
-extern GLuint fboTex;
-extern GLuint defaultFramebuffer;
-extern GLint backingWidth;
-extern GLint backingHeight;
+unsigned int fboHandle; 
+unsigned int fboTex;
+int defaultFramebuffer;
 
 
 

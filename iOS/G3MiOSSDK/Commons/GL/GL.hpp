@@ -216,8 +216,8 @@ public:
     enableVertexFlatColor(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha(), intensity);
   }
   
-  void initFBORender2Texture() {
-    _gl->initFBORender2Texture();
+  FBOContext initFBORender2Texture() {
+    return _gl->initFBORender2Texture();
   }
 };
 

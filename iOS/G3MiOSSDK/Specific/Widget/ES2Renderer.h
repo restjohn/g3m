@@ -22,10 +22,9 @@
 
     // The OpenGL ES names for the framebuffer and renderbuffer used to render to this view
     GLuint colorRenderbuffer, depthRenderbuffer;
-  
-    // params for render to texture
-    int fbo_width, fbo_height;
-
+    GLuint defaultFramebuffer;
+    GLint backingWidth;
+    GLint backingHeight;
 
     GLuint program;
 }

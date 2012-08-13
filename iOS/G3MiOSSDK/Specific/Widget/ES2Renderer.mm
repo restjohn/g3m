@@ -11,14 +11,6 @@
 #include "G3MWidget.hpp"
 #include "GL.hpp"
 
-GLuint fboHandle; 
-GLuint fboTex;
-GLuint defaultFramebuffer;
-GLint backingWidth;
-GLint backingHeight;
-
-
-
 // uniform index
 enum {
   UNIFORM_TRANSLATE,
