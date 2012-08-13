@@ -84,19 +84,37 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT);
     
-  float v[] = {
+  float v1[] = {
     30, -30, 
     30, -128,
     128, -30,
-    128, -128,
+    128, -128
+  };
     
+  float v2[] = {
     80, -100,
     80, -200,
     200, -100,
     200, -200
   };
   
-  int i[] = { 0, 1, 2, 3, 4, 5, 6, 7};
+  int i[] = { 0, 1, 2, 3};
+  
+  unsigned char pixels1[] = {
+    128,  128,  128,  255,
+    255,  0,    0,    255,
+    0,    255,  0,    255,
+    0,    0,    255,  255
+  };
+  
+  unsigned char pixels2[] = {
+    255,  255,  0,    128,
+    0,    255,  255,  128,
+    255,  0,    255,  128,
+    0,    0,    0,    128
+  };
+  
+  float texCoords[] = {0, 0, 0, 1, 1, 0, 1, 1};
   
   GL *gl = rc->getGL();
   
@@ -109,18 +127,25 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
-  gl->disableTexture2D();
-  gl->disableTextures();
-
   gl->enableVerticesPosition();
-  gl->vertexPointer(2, 0, v);
+  gl->enableTexture2D();
+  gl->enableTextures();
   
-  gl->color(1, 0, 0, 0.5);
+  gl->setTextureCoordinates(2, 0, texCoords);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels1);
+  gl->vertexPointer(2, 0, v1);
   gl->drawTriangleStrip(4, i);
   
-  gl->color(0, 0, 1, 0.5);
-  gl->drawTriangleStrip(4, i+4);
-
+  //gl->disableTexture2D();
+  //gl->disableTextures();
+  //gl->color(1, 1, 0, 0.5);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels2);
+  gl->vertexPointer(2, 0, v2);
+  gl->drawTriangleStrip(4, i);
   
   glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
   glEnable(GL_DEPTH_TEST);
