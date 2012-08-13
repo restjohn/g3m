@@ -70,7 +70,7 @@ int defaultFramebuffer;
 
 
 
-void SimpleFBORenderer::renderFBO(const RenderContext* rc)
+void SimpleFBORenderer::renderFBO(const RenderContext* rc, int numTexture)
 {
   //glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -83,8 +83,6 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   glGetIntegerv(GL_VIEWPORT, currentViewport);
   
   glViewport(0,0, 256, 256);
-  //glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-  //glClear(GL_COLOR_BUFFER_BIT);
     
   float v1[] = {
     0,    256,
@@ -126,30 +124,35 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc)
   gl->pushMatrix();
   gl->loadMatrixf(MutableMatrix44D::identity());
   
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  if (numTexture==1) {
   
-  gl->enableVerticesPosition();
-  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);
-  
-  gl->setTextureCoordinates(2, 0, texCoords);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels1);
-  gl->vertexPointer(2, 0, v1);
-  gl->drawTriangleStrip(4, i);
-  
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels2);
-  gl->vertexPointer(2, 0, v2);
-  gl->drawTriangleStrip(4, i);
-  
-  glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
-  glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    gl->enableVerticesPosition();
+    gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);
+    
+    gl->setTextureCoordinates(2, 0, texCoords);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels1);
+    gl->vertexPointer(2, 0, v1);
+    gl->drawTriangleStrip(4, i);
+    
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels2);
+    gl->vertexPointer(2, 0, v2);
+    gl->drawTriangleStrip(4, i);
+  }
+  else {
+    glClearColor(0, 1, 0, 1);
+    glClear(GL_COLOR_BUFFER_BIT);
+  }
   
   // restore viewport
+  glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
   glViewport(currentViewport[0], currentViewport[1], currentViewport[2], currentViewport[3]);
-  
-  gl->disableVerticesPosition();  
+    
+  glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
   gl->setProjection(M0);
   gl->popMatrix();
@@ -165,24 +168,24 @@ int SimpleFBORenderer::render(const RenderContext* rc)
   
   //glBindTexture(GL_TEXTURE_2D, _idTexture);
   
-  renderFBO(rc);
-  glBindTexture(GL_TEXTURE_2D, fboTex);
-  
   gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
-  gl->setTextureCoordinates(2, 0, _texCoords);
   gl->enableVerticesPosition();
-  gl->disableVertexColor();
-  gl->disableVertexFlatColor();
-  gl->disableVertexNormal();
-  gl->vertexPointer(3, 0, _vertices);
   
   // draw first square
+  renderFBO(rc, 1);
+  glBindTexture(GL_TEXTURE_2D, fboTex);
+  gl->setTextureCoordinates(2, 0, _texCoords);
+  gl->vertexPointer(3, 0, _vertices);
   gl->pushMatrix();
   gl->multMatrixf(MutableMatrix44D::createTranslationMatrix(Vector3D(0,-1.2e6,0)));
   gl->drawTriangleStrip(4, _indices);
   gl->popMatrix();
   
   // draw second square
+  renderFBO(rc, 2);
+  glBindTexture(GL_TEXTURE_2D, fboTex);
+  gl->setTextureCoordinates(2, 0, _texCoords);
+  gl->vertexPointer(3, 0, _vertices);
   gl->pushMatrix();
   gl->multMatrixf(MutableMatrix44D::createTranslationMatrix(Vector3D(0,1.2e6,0)));
   gl->drawTriangleStrip(4, _indices);

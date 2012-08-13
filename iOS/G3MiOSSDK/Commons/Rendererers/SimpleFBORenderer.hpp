@@ -22,7 +22,7 @@ private:
   float*        _texCoords;
   unsigned int  _idTexture;
   
-  void renderFBO(const RenderContext* rc);
+  void renderFBO(const RenderContext* rc, int numTexture);
   
 public:
   ~SimpleFBORenderer();
