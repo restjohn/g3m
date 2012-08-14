@@ -65,7 +65,7 @@ int CPUTextureBuilder::createTextureFromImages(const RenderContext* rc,
 int CPUTextureBuilder::createTextureFromImages(const RenderContext* rc, 
                                                const std::vector<const IImage*>& vImages, 
                                                const std::vector<const Rectangle*>& vRectangles, 
-                                               int width, int height) const {
+                                               int width, int height) {
   const IImage* base;
   int i = 0; //First image to merge
   Rectangle baseRec(0,0, width, height);

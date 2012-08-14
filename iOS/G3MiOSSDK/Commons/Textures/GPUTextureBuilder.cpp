@@ -25,17 +25,18 @@ void GPUTextureBuilder::initialize(const InitializationContext* ic)
 {
   _fboContext = ic->getGL()->initFBORender2Texture();
   
+  int __agustin_note; // this variables externs are for temp singleFBOrenderer.cpp
   fboHandle = _fboContext._fboHandle;
   defaultFramebuffer = _fboContext._defaultFrameBuffer;
   
 }
 
-
-int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc) const
+/*
+int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc, const IImage* image) const
 {
   unsigned int fbo_width = 256;
   unsigned int fbo_height = 256;
-
+  
   // init params
   GL* gl = rc->getGL();
   gl->enableTextures();
@@ -48,7 +49,7 @@ int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc) const
   int texID = gl->getTextureID();
   
   // create buffer for render to texture
-  glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._fboHandle);
   glBindTexture(GL_TEXTURE_2D, texID);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,fbo_width, fbo_height,
                0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
@@ -61,7 +62,7 @@ int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc) const
   
   // init Frame Buffer to draw
   glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebuffer(GL_FRAMEBUFFER, fboHandle);
+  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._fboHandle);
   glDisable(GL_DEPTH_TEST);
   
   // save current viewport
@@ -100,7 +101,7 @@ int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc) const
   };
   
   float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
-    
+  
   MutableMatrix44D M0 = rc->getNextCamera()->getProjectionMatrix();
   MutableMatrix44D M1 = MutableMatrix44D::createOrthographicProjectionMatrix(0, 256, 0, 256, -1, 1);
   gl->setProjection(M1);
@@ -124,7 +125,7 @@ int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc) const
   gl->drawTriangleStrip(4, i);
   
   // restore viewport
-  glBindFramebuffer(GL_FRAMEBUFFER, defaultFramebuffer);
+  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._defaultFrameBuffer);
   glViewport(currentViewport[0], currentViewport[1], currentViewport[2], currentViewport[3]);
   
   glEnable(GL_DEPTH_TEST);
@@ -133,15 +134,122 @@ int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc) const
   gl->popMatrix();
   
   return texID;
+}*/
+
+
+
+void GPUTextureBuilder::renderDummyImageInFBO(GL *gl) const
+{  
+  float v1[] = {
+    0,    256,
+    0,    0, 
+    256,  256,
+    256,  0
+  };
+  
+  float v2[] = {
+    80, 200,
+    80, 100,
+    200, 200,
+    200, 100
+  };
+  
+  int i[] = { 0, 1, 2, 3};
+  
+  unsigned char pixels1[] = {
+    128,  128,  128,  255,
+    255,  0,    0,    255,
+    0,    255,  0,    255,
+    0,    0,    255,  255
+  };
+  
+  unsigned char pixels2[] = {
+    255,  255,  0,    128,
+    0,    255,  255,  128,
+    255,  0,    255,  128,
+    0,    0,    0,    128
+  };
+  
+  float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
+      
+  gl->setTextureCoordinates(2, 0, texCoords);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels1);
+  gl->vertexPointer(2, 0, v1);
+  gl->drawTriangleStrip(4, i);
+  
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels2);
+  gl->vertexPointer(2, 0, v2);
+  gl->drawTriangleStrip(4, i);
 }
 
 
+int GPUTextureBuilder::startRenderFBO(GL *gl, Camera *camera, unsigned int width, unsigned int height)
+{
+  // init params
+  gl->enableTextures();
+  gl->enableTexture2D();
+  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
+  gl->enableVerticesPosition();
+  
+  int __agustin_note; // this function must be private
+  // get texture id
+  int texID = gl->getTextureID();
+  
+  // create buffer for render to texture
+  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._fboHandle);
+  glBindTexture(GL_TEXTURE_2D, texID);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height,
+               0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER_APPLE, GL_COLOR_ATTACHMENT0, 
+                         GL_TEXTURE_2D, texID, 0);
+  
+  // init Frame Buffer to draw
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._fboHandle);
+  glDisable(GL_DEPTH_TEST);
+  
+  // save current viewport
+  glGetIntegerv(GL_VIEWPORT, (GLint *) _defaultViewport);
+  glViewport(0,0, 256, 256);
+  
+  _projectionMatrix = camera->getProjectionMatrix();
+  MutableMatrix44D M1 = MutableMatrix44D::createOrthographicProjectionMatrix(0, 256, 0, 256, -1, 1);
+  gl->setProjection(M1);
+  gl->pushMatrix();
+  gl->loadMatrixf(MutableMatrix44D::identity());
+  
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  gl->enableVerticesPosition();
+  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);
+
+  return texID;
+}
+
+
+void GPUTextureBuilder::stopRenderFBO(GL *gl) const
+{  
+  // restore viewport
+  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._defaultFrameBuffer);
+  glViewport(_defaultViewport[0], _defaultViewport[1], _defaultViewport[2], _defaultViewport[3]);
+  
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
+  gl->setProjection(_projectionMatrix);
+  gl->popMatrix();
+}
 
 
 int GPUTextureBuilder::createTextureFromImages(const RenderContext* rc,
                                                const std::vector<const IImage*>& vImages, 
                                                const std::vector<const Rectangle*>& vRectangles, 
-                                               int width, int height) const 
+                                               int width, int height) 
 {
   
   /*printf ("createTextureFromImages. width=%d  height=%d\n");
@@ -154,7 +262,12 @@ int GPUTextureBuilder::createTextureFromImages(const RenderContext* rc,
   if (width!=256 || height!=256) 
     printf ("**** GPUTextureBuilder only works with 256x256 textures in the image output!!\n");
   
-  return renderImageInFBO(rc);
+  GL *gl = rc->getGL();
+  int texID = startRenderFBO(gl, rc->getNextCamera(), width, height);
+  renderDummyImageInFBO(gl);
+  stopRenderFBO(gl);
+  
+  return texID;
   
 /*  
   const IImage* base;

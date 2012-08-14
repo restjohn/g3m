@@ -22,7 +22,7 @@ public:
   int createTextureFromImages(const RenderContext* rc, 
                               const std::vector<const IImage*>& vImages, 
                               const std::vector<const Rectangle*>& vRectangles, 
-                              int width, int height) const;
+                              int width, int height);
   
   void initialize(const InitializationContext* ic) {}
   
