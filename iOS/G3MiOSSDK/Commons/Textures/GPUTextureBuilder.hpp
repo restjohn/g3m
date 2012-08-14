@@ -28,7 +28,7 @@ private:
   
   int startRenderFBO(GL *gl, Camera* camera, unsigned int width, unsigned int height);
   
-  void stopRenderFBO(GL *gl) const;
+  void stopRenderFBO(GL *gl);
 
   
 public:

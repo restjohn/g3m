@@ -127,7 +127,7 @@ public:
   
   virtual void getViewport(int viewport[4]) = 0;
 
-
+  virtual void stopRenderFBO(int defaultFrameBuffer, int viewport[4]) = 0;
 };
 
 

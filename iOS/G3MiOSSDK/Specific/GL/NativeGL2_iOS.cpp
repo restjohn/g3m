@@ -53,6 +53,7 @@ FBOContext NativeGL2_iOS::initFBORender2Texture()
   return FBOContext(fboHandle, defaultFrameBuffer);
 }
 
+
 void NativeGL2_iOS::startRenderFBO(GLuint handle, int texID, int width, int height)
 {
   // create buffer for render to texture
@@ -76,7 +77,23 @@ void NativeGL2_iOS::startRenderFBO(GLuint handle, int texID, int width, int heig
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
+
 void NativeGL2_iOS::getViewport(int viewport[4])
 {
   glGetIntegerv(GL_VIEWPORT, viewport);
 }
+
+
+void NativeGL2_iOS::stopRenderFBO(int defaultFrameBuffer, int viewport[4])
+{
+  // restore viewport
+  glBindFramebuffer(GL_FRAMEBUFFER, defaultFrameBuffer);
+  glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
+  
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_BLEND);
+
+}
+
+
+

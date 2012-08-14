@@ -264,6 +264,12 @@ public:
   void getViewport(int viewport[4]) {
     _gl->getViewport(viewport);
   }
+  
+  void stopRenderFBO(MutableMatrix44D projectionMatrix, int defaultFrameBuffer, int viewport[4]) {
+    _gl->stopRenderFBO(defaultFrameBuffer, viewport);
+    setProjection(projectionMatrix);
+    popMatrix();
+  }
 };
 
 #endif

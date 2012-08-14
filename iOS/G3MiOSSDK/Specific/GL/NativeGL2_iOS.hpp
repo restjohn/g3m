@@ -280,7 +280,7 @@ public:
   
   void getViewport(int viewport[4]);
 
-  
+  void stopRenderFBO(int defaultFrameBuffer, int viewport[4]);
 };
 
 #endif

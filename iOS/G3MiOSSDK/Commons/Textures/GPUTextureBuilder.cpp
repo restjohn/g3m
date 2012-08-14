@@ -13,9 +13,6 @@
 #include "GL.hpp"
 #include "Camera.hpp"
 
-#include <OpenGLES/ES2/gl.h>
-#include <OpenGLES/ES2/glext.h>
-
 
 //extern unsigned int fboHandle; 
 //extern int          defaultFramebuffer;
@@ -124,16 +121,18 @@ int GPUTextureBuilder::startRenderFBO(GL *gl, Camera *camera, unsigned int width
 }
 
 
-void GPUTextureBuilder::stopRenderFBO(GL *gl) const
+void GPUTextureBuilder::stopRenderFBO(GL *gl)
 {  
-  // restore viewport
+  gl->stopRenderFBO(_projectionMatrix, _fboContext._defaultFrameBuffer, _defaultViewport);
+  
+/*  // restore viewport
   glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._defaultFrameBuffer);
   glViewport(_defaultViewport[0], _defaultViewport[1], _defaultViewport[2], _defaultViewport[3]);
   
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
   gl->setProjection(_projectionMatrix);
-  gl->popMatrix();
+  gl->popMatrix();*/
 }
 
 
