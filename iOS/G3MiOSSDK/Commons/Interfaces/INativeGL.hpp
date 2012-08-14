@@ -44,7 +44,7 @@ enum GLTextureType { Texture2D };
 
 enum GLTextureParameter { MinFilter, MagFilter, WrapS, WrapT };
 
-enum GLTextureParameterValue { Linear, ClampToEdge };
+enum GLTextureParameterValue { Nearest, Linear, ClampToEdge };
 
 enum GLAlignment { Unpack, Pack };
 
@@ -122,6 +122,11 @@ public:
   virtual void cullFace(GLCullFace c) const = 0;
 
   virtual FBOContext initFBORender2Texture() = 0;
+  
+  virtual void startRenderFBO(unsigned int handle, int texID, int width, int height) = 0;
+  
+  virtual void getViewport(int viewport[4]) = 0;
+
 
 };
 

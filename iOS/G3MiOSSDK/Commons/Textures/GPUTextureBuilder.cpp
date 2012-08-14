@@ -17,17 +17,18 @@
 #include <OpenGLES/ES2/glext.h>
 
 
-extern unsigned int fboHandle; 
-extern int          defaultFramebuffer;
+//extern unsigned int fboHandle; 
+//extern int          defaultFramebuffer;
 
 
 void GPUTextureBuilder::initialize(const InitializationContext* ic)
 {
   _fboContext = ic->getGL()->initFBORender2Texture();
   
+  /*
   int __agustin_note; // this variables externs are for temp singleFBOrenderer.cpp
   fboHandle = _fboContext._fboHandle;
-  defaultFramebuffer = _fboContext._defaultFrameBuffer;
+  defaultFramebuffer = _fboContext._defaultFrameBuffer;*/
   
 }
 
@@ -45,21 +46,21 @@ void GPUTextureBuilder::renderImageInFBO(GL *gl, const IImage* image, const Rect
   float temp=y1;  y1=y0;  y0=temp;
 
   // declare arrays
-  float vertices[] = { x0, y1, x0, y0, x1, y1, x1, y0};
-  int indices[] = { 0, 1, 2, 3};
-  float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
+  float   vertices[]  = { x0, y1, x0, y0, x1, y1, x1, y0};
+  int     indices[]   = { 0, 1, 2, 3};
+  float   texCoords[] = { 0, 1, 0, 0, 1, 1, 1, 0};
   
   // init texture params
   gl->setTextureCoordinates(2, 0, texCoords);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  gl->texParameteri(Texture2D, MinFilter, Linear);
+  gl->texParameteri(Texture2D, MagFilter, Nearest);
   
   // copy pixel data to gpu
   unsigned int width = image->getWidth();
   unsigned int height = image->getHeight();
   unsigned char *data = new unsigned char [width*height*4];
   image->fillWithRGBA(data, width, height);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  gl->texImage2D(Texture2D, 0, RGBA, width, height, 0, RGBA, UnsignedByte, data);
   delete data;
   
   // draw texture quad
@@ -68,57 +69,17 @@ void GPUTextureBuilder::renderImageInFBO(GL *gl, const IImage* image, const Rect
 }
 
 
-
-void GPUTextureBuilder::renderDummyImageInFBO(GL *gl) const
-{  
-  float v1[] = {
-    0,    256,
-    0,    0, 
-    256,  256,
-    256,  0
-  };
-  
-  float v2[] = {
-    80, 200,
-    80, 100,
-    200, 200,
-    200, 100
-  };
-  
-  int i[] = { 0, 1, 2, 3};
-  
-  unsigned char pixels1[] = {
-    128,  128,  128,  255,
-    255,  0,    0,    255,
-    0,    255,  0,    255,
-    0,    0,    255,  255
-  };
-  
-  unsigned char pixels2[] = {
-    255,  255,  0,    128,
-    0,    255,  255,  128,
-    255,  0,    255,  128,
-    0,    0,    0,    128
-  };
-  
-  float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
-      
-  gl->setTextureCoordinates(2, 0, texCoords);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels1);
-  gl->vertexPointer(2, 0, v1);
-  gl->drawTriangleStrip(4, i);
-  
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels2);
-  gl->vertexPointer(2, 0, v2);
-  gl->drawTriangleStrip(4, i);
-}
-
-
 int GPUTextureBuilder::startRenderFBO(GL *gl, Camera *camera, unsigned int width, unsigned int height)
 {
-  // init params
+  // save current projection matrix
+  _projectionMatrix = camera->getProjectionMatrix();
+  
+  // save current viewport
+  gl->getViewport(_defaultViewport);
+  
+  return gl->startRenderFBO(_fboContext._fboHandle, width, height);
+  
+ /* // init params
   gl->enableTextures();
   gl->enableTexture2D();
   gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
@@ -159,7 +120,7 @@ int GPUTextureBuilder::startRenderFBO(GL *gl, Camera *camera, unsigned int width
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   gl->enableVerticesPosition();
 
-  return texID;
+  return texID;*/
 }
 
 

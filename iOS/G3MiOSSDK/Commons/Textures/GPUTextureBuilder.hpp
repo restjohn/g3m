@@ -23,9 +23,7 @@ private:
   int               _defaultViewport[4];
   MutableMatrix44D  _projectionMatrix;
 
-  
-  void renderDummyImageInFBO(GL *gl) const;
-  
+    
   void renderImageInFBO(GL *gl, const IImage* image, const Rectangle* rectangle) const;
   
   int startRenderFBO(GL *gl, Camera* camera, unsigned int width, unsigned int height);

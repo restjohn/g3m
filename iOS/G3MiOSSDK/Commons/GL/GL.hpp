@@ -54,10 +54,11 @@ private:
   
   inline void loadModelView();
   
+  int getTextureID();
+
+  
   
 public:
-  
-  int getTextureID();
 
   
   GL(INativeGL* const gl) :
@@ -220,6 +221,48 @@ public:
   
   FBOContext initFBORender2Texture() {
     return _gl->initFBORender2Texture();
+  }
+  
+  void texParameteri(GLTextureType target, GLTextureParameter par, GLTextureParameterValue v) const {
+    _gl->texParameteri(target, par, v);
+  }
+
+  void texImage2D(GLTextureType target,
+                  int         level,
+                  GLFormat    internalFormat,
+                  int         width,
+                  int         height,
+                  int         border,
+                  GLFormat    format,
+                  GLType      type,
+                  const void* data) const{
+    _gl->texImage2D(target, level, internalFormat, width, height,
+                    border, format, type, data);
+  }
+  
+  int startRenderFBO(unsigned int handle, int width, int height) {
+    // init params
+    enableTextures();
+    enableTexture2D();
+    transformTexCoords(1.0, 1.0, 0.0, 0.0);  
+    enableVerticesPosition();
+    
+    // get texture id
+    int texID = getTextureID();
+    
+    _gl->startRenderFBO(handle, texID, width, height);
+    
+    MutableMatrix44D M1 = MutableMatrix44D::createOrthographicProjectionMatrix(0, 256, 0, 256, -1, 1);
+    setProjection(M1);
+    pushMatrix();
+    loadMatrixf(MutableMatrix44D::identity());
+    enableVerticesPosition();
+    
+    return texID;
+  }
+
+  void getViewport(int viewport[4]) {
+    _gl->getViewport(viewport);
   }
 };
 

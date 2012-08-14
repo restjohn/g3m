@@ -132,6 +132,8 @@ class NativeGL2_iOS: public INativeGL
   
   inline GLint getValue(GLTextureParameterValue t) const{
     switch (t) {
+      case Nearest:
+        return GL_NEAREST;
       case Linear:
         return GL_LINEAR;
       case ClampToEdge:
@@ -273,6 +275,11 @@ public:
   }
   
   FBOContext initFBORender2Texture();
+  
+  void startRenderFBO(GLuint handle, int texID, int width, int height);
+  
+  void getViewport(int viewport[4]);
+
   
 };
 
