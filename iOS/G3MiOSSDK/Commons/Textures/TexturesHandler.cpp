@@ -66,15 +66,14 @@ public:
 };
 
 
-int TexturesHandler::getTextureIdFromFileName(const std::string &filename,
+int TexturesHandler::getTextureIdFromFileName(const RenderContext* rc,
+                                              const std::string &filename,
                                               int textureWidth,
                                               int textureHeight) {
   const IImage* image = _factory->createImageFromFileName(filename);
   
-  const int texId = getTextureId(image,
-                                 filename, // filename as the textureId
-                                 textureWidth,
-                                 textureHeight);
+  const int texId = getTextureId(rc, image, filename, // filename as the textureId
+                                 textureWidth, textureHeight);
   
   delete image;
   
@@ -96,7 +95,8 @@ int TexturesHandler::getTextureIdIfAvailable(const std::string &textureId,
   return -1;
 }
 
-int TexturesHandler::getTextureId(const std::vector<const IImage*>& images,
+int TexturesHandler::getTextureId(const RenderContext* rc,
+                                  const std::vector<const IImage*>& images,
                                   const std::string& textureId,
                                   int textureWidth,
                                   int textureHeight) {
@@ -106,7 +106,7 @@ int TexturesHandler::getTextureId(const std::vector<const IImage*>& images,
   }
   
   TextureHolder* holder = new TextureHolder(textureId, textureWidth, textureHeight);
-  holder->_glTextureId = _texBuilder->createTextureFromImages(_gl, images, textureWidth, textureHeight);
+  holder->_glTextureId = _texBuilder->createTextureFromImages(rc, images, textureWidth, textureHeight);
   
   if (_verbose) {
     ILogger::instance()->logInfo("Uploaded texture \"%s\" (%dx%d) to GPU with texId=%d" ,
@@ -121,7 +121,8 @@ int TexturesHandler::getTextureId(const std::vector<const IImage*>& images,
   return holder->_glTextureId;
 }
 
-int TexturesHandler::getTextureId(const std::vector<const IImage*>& images,
+int TexturesHandler::getTextureId(const RenderContext* rc,
+                                  const std::vector<const IImage*>& images,
                                   const std::vector<const Rectangle*>& rectangles,
                                   const std::string& textureId,
                                   int textureWidth,
@@ -132,7 +133,7 @@ int TexturesHandler::getTextureId(const std::vector<const IImage*>& images,
   }
   
   TextureHolder* holder = new TextureHolder(textureId, textureWidth, textureHeight);
-  holder->_glTextureId = _texBuilder->createTextureFromImages(_gl, _factory, images, rectangles, textureWidth, textureHeight);
+  holder->_glTextureId = _texBuilder->createTextureFromImages(rc, images, rectangles, textureWidth, textureHeight);
   
   if (_verbose) {
     ILogger::instance()->logInfo("Uploaded texture \"%s\" (%dx%d) to GPU with texId=%d" ,
@@ -147,13 +148,14 @@ int TexturesHandler::getTextureId(const std::vector<const IImage*>& images,
   return holder->_glTextureId;
 }
 
-int TexturesHandler::getTextureId(const IImage *image,
+int TexturesHandler::getTextureId(const RenderContext* rc,
+                                  const IImage *image,
                                   const std::string &textureId,
                                   int textureWidth,
                                   int textureHeight) {
   std::vector<const IImage*> images;
   images.push_back(image);
-  return getTextureId(images, textureId, textureWidth, textureHeight);
+  return getTextureId(rc, images, textureId, textureWidth, textureHeight);
 }
 
 void TexturesHandler::takeTexture(int glTextureId) {

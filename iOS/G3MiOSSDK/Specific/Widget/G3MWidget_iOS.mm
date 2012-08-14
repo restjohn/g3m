@@ -435,7 +435,7 @@
     comp->addRenderer(renderer);
   }
   
-  if (true) {
+  if (false) {
     SimpleFBORenderer *renderer = new SimpleFBORenderer();
     comp->addRenderer(renderer);
   }

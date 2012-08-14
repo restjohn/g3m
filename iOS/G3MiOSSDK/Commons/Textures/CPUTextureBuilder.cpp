@@ -7,8 +7,9 @@
 //
 
 #include "CPUTextureBuilder.hpp"
+#include "Context.hpp"
 
-int CPUTextureBuilder::createTextureFromImages(GL * gl, 
+int CPUTextureBuilder::createTextureFromImages(const RenderContext* rc, 
                                                const std::vector<const IImage*>& images,
                                                int width, int height) const {
   const int imagesSize = images.size();
@@ -28,7 +29,7 @@ int CPUTextureBuilder::createTextureFromImages(GL * gl,
     im = im2;
   }
   
-  int texID = gl->uploadTexture(im, width, height);
+  int texID = rc->getGL()->uploadTexture(im, width, height);
   
   if (imagesSize > 1) {
     delete im;
@@ -61,7 +62,7 @@ int CPUTextureBuilder::createTextureFromImages(GL * gl,
 //  }
 }
 
-int CPUTextureBuilder::createTextureFromImages(GL * gl, const IFactory* factory,
+int CPUTextureBuilder::createTextureFromImages(const RenderContext* rc, 
                                                const std::vector<const IImage*>& vImages, 
                                                const std::vector<const Rectangle*>& vRectangles, 
                                                int width, int height) const {
@@ -72,7 +73,7 @@ int CPUTextureBuilder::createTextureFromImages(GL * gl, const IFactory* factory,
     base = vImages[0];
     i = 1;
   } else{
-    base = factory->createImageFromSize(width, height);
+    base = rc->getFactory()->createImageFromSize(width, height);
     
     printf("IMAGE BASE %d, %d\n", base->getWidth(), base->getHeight());
   }
@@ -89,7 +90,7 @@ int CPUTextureBuilder::createTextureFromImages(GL * gl, const IFactory* factory,
     base = im2;
   }
   
-  int texID = gl->uploadTexture(base, width, height);
+  int texID = rc->getGL()->uploadTexture(base, width, height);
   
   if (vRectangles.size() > 0 && base != vImages[0]) {
     delete base;

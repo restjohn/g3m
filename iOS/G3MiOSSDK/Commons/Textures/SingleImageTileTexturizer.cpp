@@ -40,10 +40,8 @@ Mesh* SingleImageTileTexturizer::texturize(const RenderContext* rc,
   _renderContext = rc; //SAVING CONTEXT
   
   if (_texID < 0) {
-    _texID = rc->getTexturesHandler()->getTextureId(_image,
-                                                    "SINGLE_IMAGE_TEX",
-                                                    _image->getWidth(),
-                                                    _image->getHeight());
+    _texID = rc->getTexturesHandler()->getTextureId(rc, _image, "SINGLE_IMAGE_TEX",
+                                                    _image->getWidth(), _image->getHeight());
     
     if (_texID < 0) {
       rc->getLogger()->logError("Can't upload texture to GPU");

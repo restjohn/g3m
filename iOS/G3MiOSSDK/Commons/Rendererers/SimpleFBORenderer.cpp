@@ -57,12 +57,12 @@ void SimpleFBORenderer::initialize(const InitializationContext* ic)
   _texCoords = new float [numVertices*2];
   memcpy(_texCoords, texCoords, numVertices*2*sizeof(float));
   
-  // create texture
+  /*// create texture
   glGenTextures(1, &_idTexture);
   glBindTexture(GL_TEXTURE_2D, _idTexture);  
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels);*/
   
   // create textures for FBO
   glGenTextures(2, _fboTexture);

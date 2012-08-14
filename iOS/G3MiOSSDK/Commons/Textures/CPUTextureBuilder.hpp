@@ -11,12 +11,15 @@
 
 #include "TextureBuilder.hpp"
 
+
 class CPUTextureBuilder:public TextureBuilder
 {
 public:
-  int createTextureFromImages(GL * gl, const std::vector<const IImage*>& vImages, int width, int height) const;
+  int createTextureFromImages(const RenderContext* rc, 
+                              const std::vector<const IImage*>& vImages, 
+                              int width, int height) const;
   
-  int createTextureFromImages(GL * gl, const IFactory* factory,
+  int createTextureFromImages(const RenderContext* rc, 
                               const std::vector<const IImage*>& vImages, 
                               const std::vector<const Rectangle*>& vRectangles, 
                               int width, int height) const;

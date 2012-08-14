@@ -53,7 +53,8 @@ void TileImagesTileTexturizer::translateAndScaleFallBackTex(Tile* tile,
                                tileSector.getScaleFactor(fallbackTileSector));
 }
 
-Mesh* TileImagesTileTexturizer::getNewTextureMesh(Tile* tile,
+Mesh* TileImagesTileTexturizer::getNewTextureMesh(const RenderContext* rc,
+                                                  Tile* tile,
                                                   const TileTessellator* tessellator,
                                                   Mesh* tessellatorMesh,
                                                   Mesh* previousMesh) {
@@ -64,7 +65,7 @@ Mesh* TileImagesTileTexturizer::getNewTextureMesh(Tile* tile,
     int texID = tp->getTexID();
     if (texID < 0){ //Texture has not been created
       if (tp->allFinished()){
-        tp->createTexture(_texHandler, _factory, 
+        tp->createTexture(rc, _texHandler, 
                           _parameters->_tileTextureWidth, _parameters->_tileTextureHeight);
         texID = tp->getTexID();
       }
@@ -148,11 +149,11 @@ Mesh* TileImagesTileTexturizer::texturize(const RenderContext* rc,
   
   //printf("TP SIZE: %lu\n", _tilePetitions.size());
   
-  Mesh* mesh = getNewTextureMesh(tile, tessellator, tessellatorMesh, previousMesh);
+  Mesh* mesh = getNewTextureMesh(rc, tile, tessellator, tessellatorMesh, previousMesh);
   if (mesh == NULL){
     //REGISTERING PETITION AND SENDING TO THE NET IF NEEDED
     registerNewRequest(tile);
-    mesh = getNewTextureMesh(tile, tessellator, tessellatorMesh, previousMesh);
+    mesh = getNewTextureMesh(rc, tile, tessellator, tessellatorMesh, previousMesh);
     
     //If we still can't get a new TexturedMesh we try to get a FallBack Mesh
     if (mesh == NULL){

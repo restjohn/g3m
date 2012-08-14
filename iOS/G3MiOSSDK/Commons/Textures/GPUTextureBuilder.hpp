@@ -11,8 +11,7 @@
 
 #include "TextureBuilder.hpp"
 
-class InitializationContext;
-
+class RenderContext;
 
 
 class GPUTextureBuilder:public TextureBuilder
@@ -20,10 +19,14 @@ class GPUTextureBuilder:public TextureBuilder
 private:
   FBOContext _fboContext;
   
-public:
-  int createTextureFromImages(GL * gl, const std::vector<const IImage*>& vImages, int width, int height) const;
+  int renderImageInFBO(const RenderContext* rc) const;
   
-  int createTextureFromImages(GL * gl, const IFactory* factory,
+public:
+  int createTextureFromImages(const RenderContext* rc, 
+                              const std::vector<const IImage*>& vImages, 
+                              int width, int height) const;
+  
+  int createTextureFromImages(const RenderContext* rc,
                               const std::vector<const IImage*>& vImages, 
                               const std::vector<const Rectangle*>& vRectangles, 
                               int width, int height) const;

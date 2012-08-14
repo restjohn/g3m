@@ -62,7 +62,8 @@ private:
                                 Mesh* tessellatorMesh,
                                 Mesh* previousMesh);
   
-  Mesh* getNewTextureMesh(Tile* tile,
+  Mesh* getNewTextureMesh(const RenderContext* rc,
+                          Tile* tile,
                           const TileTessellator* tessellator,
                           Mesh* mesh,
                           Mesh* previousMesh);
