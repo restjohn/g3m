@@ -39,6 +39,12 @@ void GPUTextureBuilder::renderImageInFBO(GL *gl, const IImage* image, const Rect
   float x1 = x0 + (float) rectangle->_width;
   float y1 = y0 + (float) rectangle->_height;
   
+  // flip y coordinates 
+  y0 = 256 - y0;
+  y1 = 256 - y1;
+  float temp=y1;  y1=y0;  y0=temp;
+
+  // declare arrays
   float vertices[] = { x0, y1, x0, y0, x1, y1, x1, y0};
   int indices[] = { 0, 1, 2, 3};
   float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
@@ -152,7 +158,6 @@ int GPUTextureBuilder::startRenderFBO(GL *gl, Camera *camera, unsigned int width
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   gl->enableVerticesPosition();
-  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);
 
   return texID;
 }
@@ -176,13 +181,13 @@ int GPUTextureBuilder::createTextureFromImages(const RenderContext* rc,
                                                const std::vector<const Rectangle*>& vRectangles, 
                                                int width, int height) 
 {
-  
+  /*
   printf ("createTextureFromImages. width=%d  height=%d\n", width, height);
   for (unsigned int n=0; n<vImages.size(); n++) 
     printf ("--- image=%d width=%d height=%d. Rectangle xy=%.2f, %.2f  w=%f, h=%f\n",
             n, vImages[n]->getWidth(), vImages[n]->getHeight(),
             vRectangles[n]->_x, vRectangles[n]->_y,
-            vRectangles[n]->_width, vRectangles[n]->_height);
+            vRectangles[n]->_width, vRectangles[n]->_height);*/
   
   if (width!=256 || height!=256) 
     printf ("**** GPUTextureBuilder only works with 256x256 textures in the image output!!\n");
