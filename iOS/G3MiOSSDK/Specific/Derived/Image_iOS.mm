@@ -123,6 +123,7 @@ ByteBuffer* Image_iOS::getEncodedImage() const
   return new ByteBuffer(data, length);
 }
 
+/*
 void Image_iOS::fillWithRGBA(unsigned char imageData[], int width, int height) const
 {
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -138,4 +139,19 @@ void Image_iOS::fillWithRGBA(unsigned char imageData[], int width, int height) c
   CGContextDrawImage( context, bounds, _image.CGImage );
   
   CGContextRelease(context);
+}*/
+
+void Image_iOS::fillWithRGBA(unsigned char imageData[], int width, int height) const
+{
+  NSData *image4Data = (__bridge_transfer NSData *) CGDataProviderCopyData(CGImageGetDataProvider(_image.CGImage));
+  //unsigned char *pixelBytes = (unsigned char *) [image4Data bytes];
+
+  int bitsPerPixel = CGImageGetBitsPerPixel([_image CGImage]);
+  if (bitsPerPixel != 32){
+    printf("THIS IMAGE DOESN'T HAVE 4 BYTES PER PIXEL");
+  }
+    
+  memcpy(imageData, [image4Data bytes], width*height*4);
 }
+
+

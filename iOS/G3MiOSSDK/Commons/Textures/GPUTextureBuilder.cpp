@@ -32,32 +32,33 @@ void GPUTextureBuilder::initialize(const InitializationContext* ic)
 }
 
 
-void GPUTextureBuilder::renderImageInFBO(GL *gl, const IImage* image) const
+void GPUTextureBuilder::renderImageInFBO(GL *gl, const IImage* image, const Rectangle* rectangle) const
 {
-  float v1[] = {
-    0,    256,
-    0,    0, 
-    256,  256,
-    256,  0
-  };
-    
-  int i[] = { 0, 1, 2, 3};
+  float x0 = (float) rectangle->_x;
+  float y0 = (float) rectangle->_y;
+  float x1 = x0 + (float) rectangle->_width;
+  float y1 = y0 + (float) rectangle->_height;
   
-  unsigned char pixels1[] = {
-    128,  128,  128,  255,
-    255,  0,    0,    255,
-    0,    255,  0,    255,
-    0,    0,    255,  255
-  };
-    
+  float vertices[] = { x0, y1, x0, y0, x1, y1, x1, y0};
+  int indices[] = { 0, 1, 2, 3};
   float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
   
+  // init texture params
   gl->setTextureCoordinates(2, 0, texCoords);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels1);
-  gl->vertexPointer(2, 0, v1);
-  gl->drawTriangleStrip(4, i);
+  
+  // copy pixel data to gpu
+  unsigned int width = image->getWidth();
+  unsigned int height = image->getHeight();
+  unsigned char *data = new unsigned char [width*height*4];
+  image->fillWithRGBA(data, width, height);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+  delete data;
+  
+  // draw texture quad
+  gl->vertexPointer(2, 0, vertices);
+  gl->drawTriangleStrip(4, indices);
 }
 
 
@@ -176,19 +177,20 @@ int GPUTextureBuilder::createTextureFromImages(const RenderContext* rc,
                                                int width, int height) 
 {
   
-  /*printf ("createTextureFromImages. width=%d  height=%d\n");
+  printf ("createTextureFromImages. width=%d  height=%d\n", width, height);
   for (unsigned int n=0; n<vImages.size(); n++) 
     printf ("--- image=%d width=%d height=%d. Rectangle xy=%.2f, %.2f  w=%f, h=%f\n",
             n, vImages[n]->getWidth(), vImages[n]->getHeight(),
             vRectangles[n]->_x, vRectangles[n]->_y,
-            vRectangles[n]->_width, vRectangles[n]->_height);*/
+            vRectangles[n]->_width, vRectangles[n]->_height);
   
   if (width!=256 || height!=256) 
     printf ("**** GPUTextureBuilder only works with 256x256 textures in the image output!!\n");
   
   GL *gl = rc->getGL();
   int texID = startRenderFBO(gl, rc->getNextCamera(), width, height);
-  renderImageInFBO(gl, NULL);
+  for (unsigned int n=0; n<vImages.size(); n++)
+    renderImageInFBO(gl, vImages[n], vRectangles[n]);
   stopRenderFBO(gl);
   
   return texID;
