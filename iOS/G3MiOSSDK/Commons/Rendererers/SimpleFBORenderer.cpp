@@ -75,6 +75,12 @@ int defaultFramebuffer;
 
 void SimpleFBORenderer::renderFBO(const RenderContext* rc, int numTexture)
 {
+  GL *gl = rc->getGL();
+  gl->enableTextures();
+  gl->enableTexture2D();
+  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
+  gl->enableVerticesPosition();
+
   // create buffer for render to texture
   GLuint fbo_width = 256;
   GLuint fbo_height = 256;
@@ -130,9 +136,7 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc, int numTexture)
   };
   
   float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
-  
-  GL *gl = rc->getGL();
-  
+    
   MutableMatrix44D M0 = rc->getNextCamera()->getProjectionMatrix();
   MutableMatrix44D M1 = MutableMatrix44D::createOrthographicProjectionMatrix(0, 256, 0, 256, -1, 1);
   gl->setProjection(M1);
@@ -183,23 +187,18 @@ void SimpleFBORenderer::renderFBO(const RenderContext* rc, int numTexture)
 
 int SimpleFBORenderer::render(const RenderContext* rc)
 {    
-  static bool firstTime = true;
-  
+  static int counter = 0;
+    
+  // draw first square  
+  counter++;
+  if (counter==1) renderFBO(rc, 0);
+  if (counter==10) renderFBO(rc, 1);
+
   GL *gl = rc->getGL();
   gl->enableTextures();
-  gl->enableTexture2D();
-  
-  //glBindTexture(GL_TEXTURE_2D, _idTexture);
-  
+  gl->enableTexture2D();  
   gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
   gl->enableVerticesPosition();
-  
-  // draw first square
-  if (firstTime) {
-    firstTime = false;
-    renderFBO(rc, 0);
-    renderFBO(rc, 1);
-  }
 
   glBindTexture(GL_TEXTURE_2D, _fboTexture[0]);
   gl->setTextureCoordinates(2, 0, _texCoords);
@@ -211,14 +210,15 @@ int SimpleFBORenderer::render(const RenderContext* rc)
   
   // draw second square
   //renderFBO(rc, 1);
-  glBindTexture(GL_TEXTURE_2D, _fboTexture[1]);
-  gl->setTextureCoordinates(2, 0, _texCoords);
-  gl->vertexPointer(3, 0, _vertices);
-  gl->pushMatrix();
-  gl->multMatrixf(MutableMatrix44D::createTranslationMatrix(Vector3D(0,1.2e6,0)));
-  gl->drawTriangleStrip(4, _indices);
-  gl->popMatrix();
-  
+  if (counter>=10) {
+    glBindTexture(GL_TEXTURE_2D, _fboTexture[1]);
+    gl->setTextureCoordinates(2, 0, _texCoords);
+    gl->vertexPointer(3, 0, _vertices);
+    gl->pushMatrix();
+    gl->multMatrixf(MutableMatrix44D::createTranslationMatrix(Vector3D(0,1.2e6,0)));
+    gl->drawTriangleStrip(4, _indices);
+    gl->popMatrix();    
+  }
   
   gl->disableVerticesPosition();  
   gl->disableTexture2D();
