@@ -26,7 +26,7 @@ private:
   
   void renderDummyImageInFBO(GL *gl) const;
   
-  //void renderImageInFBO(const RenderContext* rc, const IImage* image) const;
+  void renderImageInFBO(GL *gl, const IImage* image) const;
   
   int startRenderFBO(GL *gl, Camera* camera, unsigned int width, unsigned int height);
   

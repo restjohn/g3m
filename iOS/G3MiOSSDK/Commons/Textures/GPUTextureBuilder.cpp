@@ -31,59 +31,16 @@ void GPUTextureBuilder::initialize(const InitializationContext* ic)
   
 }
 
-/*
-int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc, const IImage* image) const
+
+void GPUTextureBuilder::renderImageInFBO(GL *gl, const IImage* image) const
 {
-  unsigned int fbo_width = 256;
-  unsigned int fbo_height = 256;
-  
-  // init params
-  GL* gl = rc->getGL();
-  gl->enableTextures();
-  gl->enableTexture2D();
-  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
-  gl->enableVerticesPosition();
-  
-  int __agustin_note; // this function must be private
-  // get texture id
-  int texID = gl->getTextureID();
-  
-  // create buffer for render to texture
-  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._fboHandle);
-  glBindTexture(GL_TEXTURE_2D, texID);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,fbo_width, fbo_height,
-               0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, NULL);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER_APPLE, GL_COLOR_ATTACHMENT0, 
-                         GL_TEXTURE_2D, texID, 0);
-  
-  // init Frame Buffer to draw
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._fboHandle);
-  glDisable(GL_DEPTH_TEST);
-  
-  // save current viewport
-  GLint currentViewport[4];
-  glGetIntegerv(GL_VIEWPORT, currentViewport);
-  glViewport(0,0, 256, 256);
-  
   float v1[] = {
     0,    256,
     0,    0, 
     256,  256,
     256,  0
   };
-  
-  float v2[] = {
-    80, 200,
-    80, 100,
-    200, 200,
-    200, 100
-  };
-  
+    
   int i[] = { 0, 1, 2, 3};
   
   unsigned char pixels1[] = {
@@ -92,26 +49,8 @@ int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc, const IImage* i
     0,    255,  0,    255,
     0,    0,    255,  255
   };
-  
-  unsigned char pixels2[] = {
-    255,  255,  0,    128,
-    0,    255,  255,  128,
-    255,  0,    255,  128,
-    0,    0,    0,    128
-  };
-  
+    
   float texCoords[] = {0, 1, 0, 0, 1, 1, 1, 0};
-  
-  MutableMatrix44D M0 = rc->getNextCamera()->getProjectionMatrix();
-  MutableMatrix44D M1 = MutableMatrix44D::createOrthographicProjectionMatrix(0, 256, 0, 256, -1, 1);
-  gl->setProjection(M1);
-  gl->pushMatrix();
-  gl->loadMatrixf(MutableMatrix44D::identity());
-  
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  gl->enableVerticesPosition();
-  gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);
   
   gl->setTextureCoordinates(2, 0, texCoords);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -119,22 +58,7 @@ int GPUTextureBuilder::renderImageInFBO(const RenderContext* rc, const IImage* i
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels1);
   gl->vertexPointer(2, 0, v1);
   gl->drawTriangleStrip(4, i);
-  
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels2);
-  gl->vertexPointer(2, 0, v2);
-  gl->drawTriangleStrip(4, i);
-  
-  // restore viewport
-  glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._defaultFrameBuffer);
-  glViewport(currentViewport[0], currentViewport[1], currentViewport[2], currentViewport[3]);
-  
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_BLEND);
-  gl->setProjection(M0);
-  gl->popMatrix();
-  
-  return texID;
-}*/
+}
 
 
 
@@ -264,7 +188,7 @@ int GPUTextureBuilder::createTextureFromImages(const RenderContext* rc,
   
   GL *gl = rc->getGL();
   int texID = startRenderFBO(gl, rc->getNextCamera(), width, height);
-  renderDummyImageInFBO(gl);
+  renderImageInFBO(gl, NULL);
   stopRenderFBO(gl);
   
   return texID;
