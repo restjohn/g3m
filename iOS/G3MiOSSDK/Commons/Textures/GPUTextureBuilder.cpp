@@ -13,6 +13,10 @@
 #include "GL.hpp"
 #include "Camera.hpp"
 
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES2/glext.h>
+
+
 
 //extern unsigned int fboHandle; 
 //extern int          defaultFramebuffer;
@@ -68,15 +72,16 @@ void GPUTextureBuilder::renderImageInFBO(GL *gl, const IImage* image, const Rect
 
 int GPUTextureBuilder::startRenderFBO(GL *gl, Camera *camera, unsigned int width, unsigned int height)
 {
+  /*
   // save current projection matrix
   _projectionMatrix = camera->getProjectionMatrix();
   
   // save current viewport
   gl->getViewport(_defaultViewport);
   
-  return gl->startRenderFBO(_fboContext._fboHandle, width, height);
+  return gl->startRenderFBO(_fboContext._fboHandle, width, height);*/
   
- /* // init params
+  // init params
   gl->enableTextures();
   gl->enableTexture2D();
   gl->transformTexCoords(1.0, 1.0, 0.0, 0.0);  
@@ -117,22 +122,22 @@ int GPUTextureBuilder::startRenderFBO(GL *gl, Camera *camera, unsigned int width
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   gl->enableVerticesPosition();
 
-  return texID;*/
+  return texID;
 }
 
 
 void GPUTextureBuilder::stopRenderFBO(GL *gl)
 {  
-  gl->stopRenderFBO(_projectionMatrix, _fboContext._defaultFrameBuffer, _defaultViewport);
+  //gl->stopRenderFBO(_projectionMatrix, _fboContext._defaultFrameBuffer, _defaultViewport);
   
-/*  // restore viewport
+  // restore viewport
   glBindFramebuffer(GL_FRAMEBUFFER, _fboContext._defaultFrameBuffer);
   glViewport(_defaultViewport[0], _defaultViewport[1], _defaultViewport[2], _defaultViewport[3]);
   
   glEnable(GL_DEPTH_TEST);
   glDisable(GL_BLEND);
   gl->setProjection(_projectionMatrix);
-  gl->popMatrix();*/
+  gl->popMatrix();
 }
 
 

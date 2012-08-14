@@ -54,11 +54,12 @@ private:
   
   inline void loadModelView();
   
-  int getTextureID();
 
   
   
 public:
+
+  int getTextureID();
 
   
   GL(INativeGL* const gl) :
