@@ -44,7 +44,10 @@ enum GLPrimitive {
   TriangleStrip,
   Lines,
   LineLoop,
-  Points
+  Points,
+  LineStrip,
+  TriangleFan,
+  Triangle
 };
 
 enum GLError {

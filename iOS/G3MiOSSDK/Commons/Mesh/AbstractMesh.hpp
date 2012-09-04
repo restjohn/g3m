@@ -58,6 +58,8 @@ protected:
   
 public:
   
+  ~AbstractMesh();
+  
   AbstractMesh(std::vector<MutableVector3D>& vertices,
                const GLPrimitive primitive,
                CenterStrategy strategy,

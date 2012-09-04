@@ -18,17 +18,9 @@
 IndexedMesh::~IndexedMesh()
 {
 #ifdef C_CODE
-  
   if (_owner){
-    delete[] _vertices;
     delete[] _indexes;
-    if (_normals != NULL) delete[] _normals;
-    if (_colors != NULL) delete[] _colors;
-    if (_flatColor != NULL) delete _flatColor;
   }
-  
-  if (_extent != NULL) delete _extent;
-  
 #endif
 }
 

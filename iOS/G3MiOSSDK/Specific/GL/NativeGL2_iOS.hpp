@@ -74,6 +74,12 @@ class NativeGL2_iOS: public INativeGL
         return GL_LINE_LOOP;
       case Points:
         return GL_POINTS;
+      case LineStrip:
+        return GL_LINE_STRIP;
+      case Triangle:
+        return GL_TRIANGLES;
+      case TriangleFan:
+        return GL_TRIANGLE_FAN;
     }
   }
   
