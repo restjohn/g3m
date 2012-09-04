@@ -20,15 +20,17 @@
 
 #include "INativeGL.hpp"
 
-enum CenterStrategy {
-  NoCenter,
-  AveragedVertex,
-  FirstVertex,
-  GivenCenter
-};
+#include "AbstractMesh.hpp"
+
+//enum CenterStrategy {
+//  NoCenter,
+//  AveragedVertex,
+//  FirstVertex,
+//  GivenCenter
+//};
 
 
-class IndexedMesh : public Mesh {
+class IndexedMesh : public AbstractMesh {
 private:
   IndexedMesh(std::vector<MutableVector3D>& vertices,
               const GLPrimitive primitive,
@@ -54,32 +56,14 @@ private:
               const float normals[] = NULL);
   
 #ifdef C_CODE
-  const float*         _vertices;
-  const int*           _indexes;
-  const float*         _normals;
-  const float *        _colors;
-  const GLPrimitive    _primitive; 
+  const int*           _indexes; 
 #endif
   
 #ifdef JAVA_CODE
-  private final float[]         _vertices;
-  private final int[]           _indexes;
-  private final float[]         _normals;
-  private final float[]         _colors;
-  private final GLPrimitive     _primitive; 
+  private final int[]           _indexes; 
 #endif
 
-  const bool           _owner;
-  const int            _numVertices;
   const int            _numIndex;
-  const Color *        _flatColor;
-  const float          _colorsIntensity;
-  mutable Extent *     _extent;
-  
-  Extent* computeExtent() const;
-  
-  CenterStrategy       _centerStrategy;
-  Vector3D             _center;
   
 public:
   
@@ -146,21 +130,6 @@ public:
 
     
   virtual void render(const RenderContext* rc) const;
-  
-  Extent* getExtent() const;
-  
-  int getVertexCount() const {
-    return _numVertices;
-  }
-  
-  const Vector3D getVertex(int i) const {
-    const int p = i * 3;
-    return Vector3D(_vertices[p  ] + _center.x(),
-                    _vertices[p+1] + _center.y(),
-                    _vertices[p+2] + _center.z());
-  }
-
-  
 };
 
 #endif

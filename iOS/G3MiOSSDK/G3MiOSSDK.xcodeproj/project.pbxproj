@@ -150,6 +150,7 @@
 		D87EC5CF15BEB31000E38C36 /* CPUTextureBuilder.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D87EC5CC15BEB31000E38C36 /* CPUTextureBuilder.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D87EC5D015BEB31000E38C36 /* TextureBuilder.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D87EC5CD15BEB31000E38C36 /* TextureBuilder.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D87EC5D315BEC73500E38C36 /* Rectangle.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D87EC5D215BEC73400E38C36 /* Rectangle.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		D88267F515F613330041FB69 /* AbstractMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D88267F415F613330041FB69 /* AbstractMesh.cpp */; };
 		D88B5E0D15C15BFC0083A43F /* Sector.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 38D786E71587B52F003BBC75 /* Sector.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D88B5E0E15C15C180083A43F /* TexturedMesh.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8A5602315AEF69200035086 /* TexturedMesh.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D88B5E0F15C15C180083A43F /* Response.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 38589EBD159C91F700DCC302 /* Response.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -368,6 +369,8 @@
 		D87EC5CC15BEB31000E38C36 /* CPUTextureBuilder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; lineEnding = 0; name = CPUTextureBuilder.hpp; path = Commons/Basic/CPUTextureBuilder.hpp; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.cpp; };
 		D87EC5CD15BEB31000E38C36 /* TextureBuilder.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = TextureBuilder.hpp; path = Commons/Basic/TextureBuilder.hpp; sourceTree = "<group>"; };
 		D87EC5D215BEC73400E38C36 /* Rectangle.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = Rectangle.hpp; path = Commons/Geometry/Rectangle.hpp; sourceTree = "<group>"; };
+		D88267F215F613150041FB69 /* AbstractMesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = AbstractMesh.hpp; path = Commons/Mesh/AbstractMesh.hpp; sourceTree = "<group>"; };
+		D88267F415F613330041FB69 /* AbstractMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AbstractMesh.cpp; path = Commons/Mesh/AbstractMesh.cpp; sourceTree = "<group>"; };
 		D88B5E5115C162AF0083A43F /* G3MWidget.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = G3MWidget.hpp; path = Commons/Basic/G3MWidget.hpp; sourceTree = "<group>"; };
 		D892FBCB15C930CC00E69254 /* NativeGL2_iOS.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = NativeGL2_iOS.hpp; path = Specific/GL/NativeGL2_iOS.hpp; sourceTree = "<group>"; };
 		D8A5601B15AEF64E00035086 /* IndexedMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IndexedMesh.cpp; path = Commons/Mesh/IndexedMesh.cpp; sourceTree = "<group>"; };
@@ -690,6 +693,8 @@
 				D8A5602315AEF69200035086 /* TexturedMesh.hpp */,
 				CC96079115AF23F600D438D4 /* TextureMapping.cpp */,
 				CCB2564D15B5A30900079B96 /* TextureMapping.hpp */,
+				D88267F215F613150041FB69 /* AbstractMesh.hpp */,
+				D88267F415F613330041FB69 /* AbstractMesh.cpp */,
 			);
 			name = Mesh;
 			sourceTree = "<group>";
@@ -997,6 +1002,7 @@
 				D80D525915EE698E00ACEA16 /* TileTessellator.cpp in Sources */,
 				CFCE679D15EFB06700B35FE0 /* IThreadUtils.cpp in Sources */,
 				CF47030B15EFB4C000426B8B /* ThreadUtils_iOS.mm in Sources */,
+				D88267F515F613330041FB69 /* AbstractMesh.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
