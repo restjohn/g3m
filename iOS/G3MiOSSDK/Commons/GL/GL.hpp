@@ -271,6 +271,8 @@ public:
   
   void setBlendFuncSrcAlpha();
   
+  void drawArrays(GLPrimitive primitive, int first, int count);
+  
   void getViewport(int v[]){
 #ifdef C_CODE
     _gl->getIntegerv(Viewport, v);

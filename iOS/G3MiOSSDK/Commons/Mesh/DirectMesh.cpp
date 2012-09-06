@@ -13,20 +13,7 @@ void DirectMesh::render(const RenderContext* rc) const {
   
   preRender(gl); //Calling AbstractRender
   
-  switch (_primitive) {
-    case TriangleStrip:
-      gl->drawTriangleStrip(_numIndex, _indexes);
-      break;
-    case Lines:
-      gl->drawLines(_numIndex, _indexes);
-      break;
-    case LineLoop:
-      gl->drawLineLoop(_numIndex, _indexes);
-      break;
-    default:
-      ILogger::instance()->logError("Calling DirectMesh Render with invalid GLPrimitive");
-      break;
-  }
+  int todo_draw_array;
   
   postRender(gl); //Calling AbstractRender
   

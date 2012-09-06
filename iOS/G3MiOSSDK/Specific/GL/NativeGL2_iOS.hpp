@@ -309,7 +309,6 @@ public:
   void getIntegerv(GLVariable v, int i[]) const{
     glGetIntegerv(getEnum(v), i);
   }
-  
 };
 
 #endif

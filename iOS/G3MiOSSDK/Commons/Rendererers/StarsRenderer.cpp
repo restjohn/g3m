@@ -12,6 +12,7 @@
 #include "Geodetic3D.hpp"
 #include "Planet.hpp"
 #include "DirectMesh.hpp"
+#include "MutableVector3D.hpp"
 
 #include <cstdlib>
 #include <vector>
@@ -30,7 +31,7 @@ void StarsRenderer::initialize(const InitializationContext* ic){
   
   double starsHeight = planet->getRadii().x() * 2;
   
-  std::vector<Vector3D> stars;
+  std::vector<MutableVector3D> stars;
   
   for (int i = 0; i < _nStars; i++) {
     float lat = (float)(rand() % 36000) / 10;
@@ -39,10 +40,11 @@ void StarsRenderer::initialize(const InitializationContext* ic){
     Geodetic3D g = Geodetic3D::fromDegrees(lat, lon, starsHeight);
     Vector3D pos = planet->toCartesian(g);
     
-    stars.push_back(pos);
+    stars.push_back(pos.asMutableVector3D());
   }
   
-  _mesh = DirectMesh::createFromVector3D(true, Points, NoCenter, Vector3D(0,0,0), stars);
+  int todo_create_mesh;
+  //_mesh = DirectMesh::createFromVector3D(true, Points, NoCenter, Vector3D(0,0,0), stars);
 }
 
 void render(const RenderContext* rc){

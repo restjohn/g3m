@@ -731,3 +731,7 @@ void GL::deleteTexture(const GLTextureId& textureId) {
   
   _texturesIdTakeCounter++;
 }
+
+void GL::drawArrays(GLPrimitive primitive, int first, int count){
+  _gl->drawArrays(primitive, first, count);
+}
