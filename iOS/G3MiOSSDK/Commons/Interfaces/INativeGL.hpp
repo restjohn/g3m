@@ -201,7 +201,6 @@ public:
   virtual void cullFace(GLCullFace c) const = 0;
   
   virtual void getIntegerv(GLVariable v, int i[]) const = 0;
-  
 };
 
 #endif

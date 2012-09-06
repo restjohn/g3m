@@ -1,115 +1,105 @@
 //
-//  IndexedMesh.hpp
+//  DirectMesh.hpp
 //  G3MiOSSDK
 //
-//  Created by José Miguel S N on 22/06/12.
+//  Created by José Miguel S N on 06/09/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#ifndef G3MiOSSDK_IndexedMesh_h
-#define G3MiOSSDK_IndexedMesh_h
-
-#include "Mesh.hpp"
-#include "Color.hpp"
-#include "MutableVector2D.hpp"
-#include "MutableVector3D.hpp"
-#include "Geodetic3D.hpp"
-#include "Planet.hpp"
-
-#include <vector>
-
-#include "INativeGL.hpp"
+#ifndef G3MiOSSDK_DirectMesh_hpp
+#define G3MiOSSDK_DirectMesh_hpp
 
 #include "AbstractMesh.hpp"
 
-//enum CenterStrategy {
-//  NoCenter,
-//  AveragedVertex,
-//  FirstVertex,
-//  GivenCenter
-//};
+#include "Planet.hpp"
 
+class DirectMesh: public AbstractMesh{
 
-class IndexedMesh : public AbstractMesh {
-private:
-  IndexedMesh(std::vector<MutableVector3D>& vertices,
-              const GLPrimitive primitive,
-              CenterStrategy strategy,
-              Vector3D center,
-              std::vector<int>& indexes,
-              const Color* flatColor = NULL,
-              std::vector<Color>* colors = NULL,
-              const float colorsIntensity = (float)0.0,
-              std::vector<MutableVector3D>* normals = NULL);
   
-  IndexedMesh(bool owner,
-              const GLPrimitive primitive,
-              CenterStrategy strategy,
-              Vector3D center,
-              const int numVertices,
-              const float vertices[],
-              const int indexes[],
-              const int numIndex, 
-              const Color* flatColor = NULL,
-              const float colors[] = NULL,
-              const float colorsIntensity = (float)0.0,
-              const float normals[] = NULL);
   
-#ifdef C_CODE
-  const int*           _indexes;
-#endif
+  DirectMesh(bool owner,
+                           const GLPrimitive primitive,
+                           CenterStrategy strategy,
+                           Vector3D center,
+                           const int numVertices,
+                           const float vertices[], 
+                           const Color* flatColor,
+                           const float colors[],
+                           const float colorsIntensity,
+                           const float normals[]):
+  AbstractMesh(owner,
+               primitive,
+               strategy,
+               center,
+               numVertices,
+               vertices, 
+               flatColor,
+               colors,
+               colorsIntensity,
+               normals)
+  {
+    
+  }
   
-#ifdef JAVA_CODE
-  private final int[]           _indexes; 
-#endif
-
-  const int            _numIndex;
+  DirectMesh(std::vector<MutableVector3D>& vertices,
+               const GLPrimitive primitive,
+               CenterStrategy strategy,
+               Vector3D center,
+               const Color* flatColor = NULL,
+               std::vector<Color>* colors = NULL,
+               const float colorsIntensity = (float)0.0,
+             std::vector<MutableVector3D>* normals = NULL):
+  AbstractMesh(vertices, 
+               primitive,
+               strategy,
+               center,                         
+               flatColor,
+               colors,
+               colorsIntensity,
+               normals)
+  {
+    
+    
+  }
+  
   
 public:
   
-  ~IndexedMesh();
-
-    
-  static IndexedMesh* createFromVector3D(bool owner,
+  static DirectMesh* createFromVector3D(bool owner,
                                          const GLPrimitive primitive,
                                          CenterStrategy strategy,
                                          Vector3D center,
                                          const int numVertices,
                                          const float vertices[],
-                                         const int indexes[],
-                                         const int numIndex, 
                                          const Color* flatColor = NULL,
                                          const float colors[] = NULL,
                                          const float colorsIntensity = (float)0.0,
                                          const float normals[] = NULL) {
-    return new IndexedMesh(owner, primitive, strategy, center, numVertices, vertices,
-                           indexes, numIndex, flatColor, colors, colorsIntensity, normals);
+    return new DirectMesh(owner, primitive, strategy, center, numVertices, vertices,
+                          flatColor, colors, colorsIntensity, normals);
   }
-
-    
-  static IndexedMesh* createFromVector3D(std::vector<MutableVector3D>& vertices,
+  
+  
+  static DirectMesh* createFromVector3D(std::vector<MutableVector3D>& vertices,
                                          const GLPrimitive primitive,
                                          CenterStrategy strategy,
                                          Vector3D center,
-                                         std::vector<int>& indexes,
                                          const Color* flatColor = NULL,
                                          std::vector<Color>* colors = NULL,
                                          const float colorsIntensity = (float)0.0,
                                          std::vector<MutableVector3D>* normals = NULL) {
-    return new IndexedMesh(vertices, primitive, strategy, center, indexes,
+    return new DirectMesh(vertices, primitive, strategy, center,
                            flatColor, colors, colorsIntensity, normals);
   }
-
   
-  static IndexedMesh* createFromGeodetic3D(const Planet *planet,
+  
+  static DirectMesh* createFromGeodetic3D(const Planet *planet,
                                            bool owner,
                                            const GLPrimitive primitive,
                                            CenterStrategy strategy,
                                            Vector3D center,
                                            const int numVertices,
                                            float vertices[],
-                                           const int indexes[],
-                                           const int numIndex, 
                                            const Color* flatColor = NULL,
                                            const float colors[] = NULL,
                                            const float colorsIntensity = (float)0.0,
@@ -124,11 +114,12 @@ public:
     }
     
     // create indexed mesh
-    return new IndexedMesh(owner, primitive, strategy, center, numVertices, vertices,
-                           indexes, numIndex, flatColor, colors, colorsIntensity, normals);
+    return new DirectMesh(owner, primitive, strategy, center, numVertices, vertices,
+                          flatColor, colors, colorsIntensity, normals);
   }
-
+  
   void render(const RenderContext* rc) const;
 };
+
 
 #endif

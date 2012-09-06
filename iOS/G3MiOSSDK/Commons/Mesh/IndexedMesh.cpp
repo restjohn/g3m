@@ -74,6 +74,7 @@ AbstractMesh(vertices,
 _numIndex(indexes.size())
 {
   int * ind = new int[indexes.size()];
+
   for (int i = 0; i < indexes.size(); i++) {
     ind[i] = indexes[i];
   }
@@ -96,6 +97,7 @@ void IndexedMesh::render(const RenderContext* rc) const {
       gl->drawLineLoop(_numIndex, _indexes);
       break;
     default:
+      ILogger::instance()->logError("Calling IndexedMesh Render with invalid GLPrimitive");
       break;
   }
   
