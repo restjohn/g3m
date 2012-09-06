@@ -9,14 +9,40 @@
 #include "StarsRenderer.hpp"
 
 #include "Context.hpp"
+#include "Geodetic3D.hpp"
+#include "Planet.hpp"
+#include "DirectMesh.hpp"
+
+#include <cstdlib>
+#include <vector>
+#include <cstring>
+
+
+StarsRenderer::~StarsRenderer(){
+  if (_mesh != NULL){
+    delete _mesh;
+  }
+}
 
 void StarsRenderer::initialize(const InitializationContext* ic){
   
   const Planet * planet = ic->getPlanet();
   
+  double starsHeight = planet->getRadii().x() * 2;
   
+  std::vector<Vector3D> stars;
   
+  for (int i = 0; i < _nStars; i++) {
+    float lat = (float)(rand() % 36000) / 10;
+    float lon = (float)(rand() % 36000) / 10;
+    
+    Geodetic3D g = Geodetic3D::fromDegrees(lat, lon, starsHeight);
+    Vector3D pos = planet->toCartesian(g);
+    
+    stars.push_back(pos);
+  }
   
+  _mesh = DirectMesh::createFromVector3D(true, Points, NoCenter, Vector3D(0,0,0), stars);
 }
 
 void render(const RenderContext* rc){

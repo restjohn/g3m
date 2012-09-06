@@ -11,7 +11,20 @@
 
 #include "Renderer.hpp"
 
+class DirectMesh;
+
 class StarsRenderer: public Renderer{
+  
+  int _nStars;
+  
+  DirectMesh* _mesh;
+  
+public:
+  StarsRenderer(int nStars){
+    _nStars = nStars;
+  }
+  
+  ~StarsRenderer();
   
   void initialize(const InitializationContext* ic);
   
