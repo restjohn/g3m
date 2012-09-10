@@ -10,18 +10,31 @@
 #define G3MiOSSDK_CompassRenderer_hpp
 
 #include "Renderer.hpp"
+#include <string>
 
-class DirectMesh;
+class Mesh;
 
 class CompassRenderer: public Renderer{
   
-  DirectMesh* _mesh;
+  Mesh* _mesh;
+  const std::string _textureName;
+  const int _texWidth;
+  const int _texHeight;
+  
+  Mesh* createMesh(const RenderContext* rc);
   
 public:
   
+  CompassRenderer(const std::string& texName, int width, int height):
+  _textureName(texName),
+  _texWidth(width),
+  _texHeight(height),
+  _mesh(NULL){
+  }
+  
   ~CompassRenderer();
   
-  void initialize(const InitializationContext* ic);
+  void initialize(const InitializationContext* ic){}
   
   bool isReadyToRender(const RenderContext* rc){
     return true;

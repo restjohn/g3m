@@ -56,6 +56,9 @@
 #include "MathUtils_iOS.hpp"
 #include "ThreadUtils_iOS.hpp"
 
+#include "StarsRenderer.hpp"
+#include "CompassRenderer.hpp"
+
 @interface G3MWidget_iOS ()
 @property(nonatomic, getter=isAnimating) BOOL animating;
 @end
@@ -137,6 +140,11 @@
 
   CompositeRenderer* composite = new CompositeRenderer();
   
+  //StarsRenderer
+  if (true){
+    renderers.push_back(new StarsRenderer(100));
+  }
+  
   composite->addRenderer(cameraRenderer);
   
   if (layerSet != NULL) {
@@ -156,6 +164,12 @@
   
   for (int i = 0; i < renderers.size(); i++) {
     composite->addRenderer(renderers[i]);
+  }
+  
+  
+  if (true){
+    CompassRenderer* compass = new CompassRenderer("compass.jpg", 256, 256);
+    renderers.push_back(compass);
   }
   
   

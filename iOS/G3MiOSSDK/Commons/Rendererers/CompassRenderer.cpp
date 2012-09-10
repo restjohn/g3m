@@ -13,6 +13,9 @@
 
 #include "FloatBufferBuilderFromCartesian2D.hpp"
 #include "FloatBufferBuilderFromCartesian3D.hpp"
+#include "TexturesHandler.hpp"
+#include "TextureMapping.hpp"
+#include "TexturedMesh.hpp"
 
 CompassRenderer::~CompassRenderer(){
   if (_mesh != NULL){
@@ -20,7 +23,7 @@ CompassRenderer::~CompassRenderer(){
   }
 }
 
-void CompassRenderer::initialize(const InitializationContext* ic){
+Mesh* CompassRenderer::createMesh(const RenderContext* rc){
   
   FloatBufferBuilderFromCartesian2D texCoor;
   texCoor.add(1,1);
@@ -38,11 +41,32 @@ void CompassRenderer::initialize(const InitializationContext* ic){
   
   Color* flatColor = new Color(Color::white());
   
-  _mesh = new DirectMesh(TriangleStrip, true, vertices.getCenter(), vertices.create(), flatColor, NULL, 1.0);
+  Mesh* dMesh = new DirectMesh(TriangleStrip, true, vertices.getCenter(), vertices.create(), flatColor, NULL, 1.0);
+
+  GLTextureId texId = GLTextureId::invalid();
+  if (true){
+    texId = rc->getTexturesHandler()->getGLTextureIdFromFileName(_textureName, _texWidth, _texHeight, true);
+    if (!texId.isValid()) {
+      rc->getLogger()->logError("Can't load file %s", _textureName.c_str());
+      
+      //If there's no texture a DirectMesh will be renderized
+      return dMesh;
+    }
+  }
+  
+  TextureMapping* texMap = new SimpleTextureMapping(texId,
+                                                    texCoor.create(),
+                                                    true);
+  
+  return new TexturedMesh(dMesh, true, texMap, true);
   
 }
 
 void CompassRenderer::render(const RenderContext* rc){
+  
+  if (_mesh == NULL){
+    _mesh = createMesh(rc);
+  }
   
   _mesh->render(rc);
   

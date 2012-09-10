@@ -17,7 +17,6 @@
 #include "GLErrorRenderer.hpp"
 
 #include "LevelTileCondition.hpp"
-#include "StarsRenderer.hpp"
 
 @implementation ViewController
 
@@ -219,11 +218,6 @@
   //  }
   
 //  renderers.push_back(new GLErrorRenderer());
-  
-  
-  if (true){
-    renderers.push_back(new StarsRenderer(100));
-  }
   
   std::vector <ICameraConstrainer*> cameraConstraints;
   SimpleCameraConstrainer* scc = new SimpleCameraConstrainer();

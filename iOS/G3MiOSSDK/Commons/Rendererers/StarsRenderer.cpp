@@ -21,6 +21,7 @@
 #include "FloatBufferBuilderFromGeodetic.hpp"
 #include "Color.hpp"
 #include "DirectMesh.hpp"
+#include "GL.hpp"
 
 
 StarsRenderer::~StarsRenderer(){
@@ -62,6 +63,7 @@ void StarsRenderer::initialize(const InitializationContext* ic){
 void StarsRenderer::render(const RenderContext* rc){
   
   int todo_change_zfar; //Stars beyond 0,0,0 are not rendered
-  
+  int change_frustum;
   _mesh->render(rc);
+  
 }
