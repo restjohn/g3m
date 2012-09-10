@@ -358,8 +358,11 @@ private:
       if (_halfFrustum!=NULL) delete _halfFrustum;
 #endif
       FrustumData data = getFrustumData();
-      _halfFrustum = new Frustum(data._left/2, data._right/2,
+      /*_halfFrustum = new Frustum(data._left/2, data._right/2,
                                  data._bottom/2, data._top/2,
+                                 data._znear, data._zfar);*/
+      _halfFrustum = new Frustum(data._left/4, data._right/4,
+                                 data._bottom/4, data._top/4,
                                  data._znear, data._zfar);
     }
     return _halfFrustum;
