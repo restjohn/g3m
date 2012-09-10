@@ -18,6 +18,10 @@
 #include <vector>
 #include <cstring>
 
+#include "FloatBufferBuilderFromGeodetic.hpp"
+#include "Color.hpp"
+#include "DirectMesh.hpp"
+
 
 StarsRenderer::~StarsRenderer(){
   if (_mesh != NULL){
@@ -27,26 +31,37 @@ StarsRenderer::~StarsRenderer(){
 
 void StarsRenderer::initialize(const InitializationContext* ic){
   
+  int todo_set_stars_further_from_origin; 
+  
   const Planet * planet = ic->getPlanet();
+  double starsHeight = planet->getRadii().x() * 2.0;
+  Planet starsSphere("stars", Vector3D(starsHeight, starsHeight, starsHeight));
   
-  double starsHeight = planet->getRadii().x() * 2;
-  
-  std::vector<MutableVector3D> stars;
+  FloatBufferBuilderFromGeodetic stars(NoCenter, &starsSphere, Vector3D::zero());
   
   for (int i = 0; i < _nStars; i++) {
     float lat = (float)(rand() % 36000) / 10;
     float lon = (float)(rand() % 36000) / 10;
     
-    Geodetic3D g = Geodetic3D::fromDegrees(lat, lon, starsHeight);
-    Vector3D pos = planet->toCartesian(g);
-    
-    stars.push_back(pos.asMutableVector3D());
+    Geodetic3D g = Geodetic3D::fromDegrees(lat, lon, 0);
+    stars.add(g);
   }
   
-  int todo_create_mesh;
-  //_mesh = DirectMesh::createFromVector3D(true, Points, NoCenter, Vector3D(0,0,0), stars);
+  Color* color = new Color(Color::white()); //White stars
+  
+  //Creating mesh
+  _mesh = new DirectMesh(Points,
+                        true,
+                        Vector3D::zero(),
+                        stars.create(),
+                        color,
+                        NULL,
+                        0.0);
 }
 
-void render(const RenderContext* rc){
+void StarsRenderer::render(const RenderContext* rc){
   
+  int todo_change_zfar; //Stars beyond 0,0,0 are not rendered
+  
+  _mesh->render(rc);
 }

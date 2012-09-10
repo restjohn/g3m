@@ -14,6 +14,8 @@
 #include "Planet.hpp"
 
 class DirectMesh: public AbstractMesh{
+
+public:
   
   DirectMesh(const GLPrimitive primitive,
              bool owner,
@@ -22,7 +24,7 @@ class DirectMesh: public AbstractMesh{
              const Color* flatColor,
              IFloatBuffer* colors,
              const float colorsIntensity);
-public:
+  
     void render(const RenderContext* rc) const;
 };
 

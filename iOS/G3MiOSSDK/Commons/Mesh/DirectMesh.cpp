@@ -33,8 +33,8 @@ void DirectMesh::render(const RenderContext* rc) const {
   
   preRender(gl); //Calling AbstractRender
   
-  int todo_draw_array;
-  gl->drawArrays(_primitive, 0, _vertices->size() / 3);
+  int nVertices = getVertexCount();
+  gl->drawArrays(_primitive, 0, nVertices);
   
   postRender(gl); //Calling AbstractRender
   

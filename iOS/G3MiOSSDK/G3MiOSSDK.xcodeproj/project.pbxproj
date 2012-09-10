@@ -191,6 +191,7 @@
 		D8A723AA15E4D3D800ABDF07 /* Downloader_iOS_Handler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8A723A915E4D3D800ABDF07 /* Downloader_iOS_Handler.cpp */; };
 		D8A723AC15E4D42B00ABDF07 /* StringBuilder_iOS.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8A723AB15E4D42B00ABDF07 /* StringBuilder_iOS.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		D8A723AE15E4D47E00ABDF07 /* StringBuilder_iOS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8A723AD15E4D47E00ABDF07 /* StringBuilder_iOS.cpp */; };
+		D8CD680D15FDE86F008CD7E7 /* StarsRenderer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8CD74C415F8A46D00B801CC /* StarsRenderer.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D8CD6F7A15A6FFAC00279BE7 /* IDownloadListener.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8CD6F7815A6FFAC00279BE7 /* IDownloadListener.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D8CD74C215F89BB900B801CC /* DirectMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8CD74C115F89BB900B801CC /* DirectMesh.cpp */; };
 		D8CD74C615F8A4B800B801CC /* StarsRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8CD74C515F8A4B800B801CC /* StarsRenderer.cpp */; };
@@ -826,6 +827,7 @@
 				CF9D2D8915F7D3C100B5CE2E /* IBuffer.hpp in Headers */,
 				CF7E626215F7D6FC0086B71D /* FloatBufferBuilder.hpp in Headers */,
 				CF7E626715F7DD740086B71D /* IntBufferBuilder.hpp in Headers */,
+				D8CD680D15FDE86F008CD7E7 /* StarsRenderer.hpp in Headers */,
 				CFCE679E15EFB06700B35FE0 /* IThreadUtils.hpp in Headers */,
 				CFB72A6A15E6808900A5BAF4 /* IStringUtils.hpp in Headers */,
 				CFB72A3615E65B1F00A5BAF4 /* LayerCondition.hpp in Headers */,
