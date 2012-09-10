@@ -11,74 +11,38 @@
 #include "IndexedMesh.hpp"
 #include "Box.hpp"
 #include "GL.hpp"
-
 #include "INativeGL.hpp"
-
+#include "IFloatBuffer.hpp"
+#include "IIntBuffer.hpp"
+#include "Color.hpp"
+#include "Vector3D.hpp"
 
 IndexedMesh::~IndexedMesh()
 {
 #ifdef C_CODE
   if (_owner){
-    delete[] _indexes;
+    delete _indexes;
   }
 #endif
 }
 
-IndexedMesh::IndexedMesh(bool owner,
-                         const GLPrimitive primitive,
-                         CenterStrategy strategy,
-                         Vector3D center,
-                         const int numVertices,
-                         const float vertices[],
-                         const int indexes[],
-                         const int numIndex, 
+IndexedMesh::IndexedMesh(const GLPrimitive primitive,
+                         bool owner,
+                         const Vector3D& center,
+                         IFloatBuffer* vertices,
+                         IIntBuffer* indices,
                          const Color* flatColor,
-                         const float colors[],
-                         const float colorsIntensity,
-                         const float normals[]):
-AbstractMesh(owner,
-             primitive,
-             strategy,
+                         IFloatBuffer* colors,
+                         const float colorsIntensity) :
+AbstractMesh(primitive,
+             owner,
              center,
-             numVertices,
-             vertices, 
+             vertices,
              flatColor,
              colors,
-             colorsIntensity,
-             normals),
-_indexes(indexes),
-_numIndex(numIndex)
+             colorsIntensity),
+_indexes(indices)
 {
-  if (strategy!=NoCenter) 
-    printf ("IndexedMesh array constructor: this center Strategy is not yet implemented\n");
-}
-
-
-IndexedMesh::IndexedMesh(std::vector<MutableVector3D>& vertices, 
-                         const GLPrimitive primitive,
-                         CenterStrategy strategy,
-                         Vector3D center,                         
-                         std::vector<int>& indexes,
-                         const Color* flatColor,
-                         std::vector<Color>* colors,
-                         const float colorsIntensity,
-                         std::vector<MutableVector3D>* normals):
-AbstractMesh(vertices, 
-             primitive,
-             strategy,
-             center,                         
-             flatColor,
-             colors,
-             colorsIntensity,
-             normals),
-_numIndex(indexes.size())
-{
-  int * ind = new int[indexes.size()];
-
-  for (int i = 0; i < indexes.size(); i++) {
-    ind[i] = indexes[i];
-  }
-  _indexes = ind;
 }
 
 void IndexedMesh::render(const RenderContext* rc) const {
@@ -88,13 +52,16 @@ void IndexedMesh::render(const RenderContext* rc) const {
   
   switch (_primitive) {
     case TriangleStrip:
-      gl->drawTriangleStrip(_numIndex, _indexes);
+      gl->drawTriangleStrip(_indexes);
       break;
     case Lines:
-      gl->drawLines(_numIndex, _indexes);
+      gl->drawLines(_indexes);
       break;
     case LineLoop:
-      gl->drawLineLoop(_numIndex, _indexes);
+      gl->drawLineLoop(_indexes);
+      break;
+    case Points:
+      gl->drawPoints(_indexes);
       break;
     default:
       ILogger::instance()->logError("Calling IndexedMesh Render with invalid GLPrimitive");
@@ -102,5 +69,4 @@ void IndexedMesh::render(const RenderContext* rc) const {
   }
   
   postRender(gl); //Calling AbstractRender
-
 }

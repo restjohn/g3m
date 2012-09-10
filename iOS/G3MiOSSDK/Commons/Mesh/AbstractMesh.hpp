@@ -16,15 +16,18 @@
 class Color;
 class Extent;
 
-enum CenterStrategy {
-  NoCenter,
-  AveragedVertex,
-  FirstVertex,
-  GivenCenter
-};
-
 class AbstractMesh: public Mesh{
 protected:
+  
+  const bool        _owner;
+  GLPrimitive       _primitive;
+  Vector3D          _center;
+  const MutableMatrix44D* _translationMatrix;
+  IFloatBuffer*     _vertices;
+  const Color*      _flatColor;
+  IFloatBuffer*     _colors;
+  const float       _colorsIntensity;
+  mutable Extent*   _extent;
   
   Extent* computeExtent() const;
   
@@ -33,52 +36,17 @@ protected:
   //Undo preRender
   void postRender(GL* gl) const;
   
-#ifdef C_CODE
-  const float*         _vertices;
-  const float*         _normals;
-  const float *        _colors;
-  const GLPrimitive    _primitive; 
-#endif
-  
-#ifdef JAVA_CODE
-  private final float[]         _vertices;
-  private final float[]         _normals;
-  private final float[]         _colors;
-  private final GLPrimitive     _primitive; 
-#endif
-  
-  const bool           _owner;
-  const int            _numVertices;
-  const Color *        _flatColor;
-  const float          _colorsIntensity;
-  mutable Extent *     _extent;
-  
-  CenterStrategy       _centerStrategy;
-  Vector3D             _center;
-  
 public:
   
   ~AbstractMesh();
   
-  AbstractMesh(std::vector<MutableVector3D>& vertices,
-               const GLPrimitive primitive,
-               CenterStrategy strategy,
-               Vector3D center,
-               const Color* flatColor = NULL,
-               std::vector<Color>* colors = NULL,
-               const float colorsIntensity = (float)0.0,
-               std::vector<MutableVector3D>* normals = NULL);
-  
-  AbstractMesh(bool owner,
-               const GLPrimitive primitive,
-               CenterStrategy strategy,
-               Vector3D center,
-               const int numVertices,
-               const float vertices[],
-               const Color* flatColor = NULL,
-               const float colors[] = NULL,
-               const float colorsIntensity = (float)0.0,
-               const float normals[] = NULL);
+  AbstractMesh(const GLPrimitive primitive,
+               bool owner,
+               const Vector3D& center,
+               IFloatBuffer* vertices,
+               const Color* flatColor,
+               IFloatBuffer* colors,
+               const float colorsIntensity);
   
   Extent* getExtent() const {
     if (_extent == NULL) {
@@ -87,18 +55,11 @@ public:
     return _extent;
   }
   
-  int getVertexCount() const {
-    return _numVertices;
-  }
+  int getVertexCount() const;
   
-  const Vector3D getVertex(int i) const {
-    const int p = i * 3;
-    return Vector3D(_vertices[p  ] + _center.x(),
-                    _vertices[p+1] + _center.y(),
-                    _vertices[p+2] + _center.z());
-  }
+  const Vector3D getVertex(int i) const;
   
-
+  
 };
 
 #endif

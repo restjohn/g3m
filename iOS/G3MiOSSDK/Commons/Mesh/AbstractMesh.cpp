@@ -13,120 +13,56 @@
 #include "Box.hpp"
 #include "GL.hpp"
 
+#include "IFloatBuffer.hpp"
 
-AbstractMesh::AbstractMesh(bool owner,
-                         const GLPrimitive primitive,
-                         CenterStrategy strategy,
-                         Vector3D center,
-                         const int numVertices,
-                         const float vertices[],
-                         const Color* flatColor,
-                         const float colors[],
-                         const float colorsIntensity,
-                         const float normals[]):
-_owner(owner),
+
+AbstractMesh::AbstractMesh(const GLPrimitive primitive,
+                           bool owner,
+                           const Vector3D& center,
+                           IFloatBuffer* vertices,
+                           const Color* flatColor,
+                           IFloatBuffer* colors,
+                           const float colorsIntensity) :
 _primitive(primitive),
-_numVertices(numVertices),
+_owner(owner),
 _vertices(vertices),
 _flatColor(flatColor),
 _colors(colors),
-_colorsIntensity(colorsIntensity), 
-_normals(normals),
-_extent(NULL),
-_centerStrategy(strategy),
-_center(center)
-{
-  if (strategy!=NoCenter) 
-    printf ("IndexedMesh array constructor: this center Strategy is not yet implemented\n");
-}
-
-
-AbstractMesh::AbstractMesh(std::vector<MutableVector3D>& vertices, 
-                         const GLPrimitive primitive,
-                         CenterStrategy strategy,
-                         Vector3D center,           
-                         const Color* flatColor,
-                         std::vector<Color>* colors,
-                         const float colorsIntensity,
-                         std::vector<MutableVector3D>* normals):
-_owner(true),
-_primitive(primitive),
-_numVertices(vertices.size()),
-_flatColor(flatColor),
 _colorsIntensity(colorsIntensity),
 _extent(NULL),
-_centerStrategy(strategy),
-_center(center)
+_center(center),
+_translationMatrix(center.isNan()? NULL:
+                   new MutableMatrix44D(MutableMatrix44D::createTranslationMatrix(center)))
 {
-  float * vert = new float[3* vertices.size()];
-  int p = 0;
-  
-  switch (strategy) {
-    case NoCenter:
-      for (int i = 0; i < vertices.size(); i++) {
-        vert[p++] = (float) vertices[i].x();
-        vert[p++] = (float) vertices[i].y();
-        vert[p++] = (float) vertices[i].z();
-      }      
-      break;
-      
-    case GivenCenter:
-      for (int i = 0; i < vertices.size(); i++) {
-        vert[p++] = (float) (vertices[i].x() - center.x());
-        vert[p++] = (float) (vertices[i].y() - center.y());
-        vert[p++] = (float) (vertices[i].z() - center.z());
-      }      
-      break;
-      
-    default:
-      printf ("IndexedMesh vector constructor: this center Strategy is not yet implemented\n");
-  }
-  
-  _vertices = vert;
-  
-  if (normals != NULL) {
-    float * norm = new float[3 * vertices.size()];
-    p = 0;
-    for (int i = 0; i < vertices.size(); i++) {
-      norm[p++] = (float) normals->at(i).x();
-      norm[p++] = (float) normals->at(i).y();
-      norm[p++] = (float) normals->at(i).z();
-    }
-    _normals = norm;
-  }
-  else {
-    _normals = NULL;
-  }
-  
-  if (colors != NULL) {
-    float * vertexColor = new float[4 * colors->size()];
-    for (int i = 0; i < colors->size(); i+=4){
-      vertexColor[i] = colors->at(i).getRed();
-      vertexColor[i+1] = colors->at(i).getGreen();
-      vertexColor[i+2] = colors->at(i).getBlue();
-      vertexColor[i+3] = colors->at(i).getAlpha();
-    }
-    _colors = vertexColor;
-  }
-  else {
-    _colors = NULL; 
-  }
+}
+
+int AbstractMesh::getVertexCount() const {
+  return _vertices->size() / 3;
+}
+
+const Vector3D AbstractMesh::getVertex(int i) const {
+  const int p = i * 3;
+  return Vector3D(_vertices->get(p) + _center.x(),
+                  _vertices->get(p+1) + _center.y(),
+                  _vertices->get(p+2) + _center.z());
 }
 
 Extent* AbstractMesh::computeExtent() const {
-  if (_numVertices <= 0) {
+  const int nVertices = getVertexCount();
+  
+  if (nVertices <= 0) {
     return NULL;
   }
   
   double minx=1e10, miny=1e10, minz=1e10;
   double maxx=-1e10, maxy=-1e10, maxz=-1e10;
   
-  for (int i=0; i < _numVertices; i++) {
-    const int p = i * 3;
+  for (int i=0; i < nVertices; i++) {
+    Vector3D v = getVertex(i);
+    const double x = v.x();
+    const double y = v.y();
+    const double z = v.z();
     
-    const double x = _vertices[p  ] + _center.x();
-    const double y = _vertices[p+1] + _center.y();
-    const double z = _vertices[p+2] + _center.z();
     
     if (x < minx) minx = x;
     if (x > maxx) maxx = x;
@@ -158,16 +94,9 @@ void AbstractMesh::preRender(GL* gl) const {
     gl->enableVertexFlatColor(*_flatColor, _colorsIntensity);
   }
   
-  if (_normals == NULL) {
-    gl->disableVertexNormal();
-  }
-  else {
-    gl->enableVertexNormal(_normals);
-  }
-  
   gl->vertexPointer(3, 0, _vertices);
   
-  if (_centerStrategy != NoCenter) {
+  if (_translationMatrix != NULL) {
     gl->pushMatrix();
     gl->multMatrixf(MutableMatrix44D::createTranslationMatrix(_center));
   }
@@ -175,12 +104,12 @@ void AbstractMesh::preRender(GL* gl) const {
 
 void AbstractMesh::postRender(GL* gl) const {
   
-  if (_centerStrategy != NoCenter) {
+  if (_translationMatrix != NULL) {
     gl->popMatrix();
   }
   
   gl->disableVerticesPosition();
-
+  
 }
 
 AbstractMesh::~AbstractMesh()
@@ -188,13 +117,13 @@ AbstractMesh::~AbstractMesh()
 #ifdef C_CODE
   
   if (_owner){
-    delete[] _vertices;
-    if (_normals != NULL) delete[] _normals;
-    if (_colors != NULL) delete[] _colors;
+    delete _vertices;
+    if (_colors != NULL) delete _colors;
     if (_flatColor != NULL) delete _flatColor;
   }
   
   if (_extent != NULL) delete _extent;
+  if (_translationMatrix != NULL) delete _translationMatrix;
   
 #endif
 }
