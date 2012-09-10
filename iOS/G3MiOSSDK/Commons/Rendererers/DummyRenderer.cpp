@@ -28,10 +28,6 @@ DummyRenderer::~DummyRenderer()
 void DummyRenderer::initialize(const InitializationContext* ic)
 {
   int res = 12;
-  //_vertices = new float[res * res * 3];
-  //_numIndices = 2 * (res - 1) * (res + 1);
-  //_index = new int[_numIndices];
-  
 #ifdef C_CODE
   FloatBufferBuilderFromCartesian3D vertices(NoCenter, Vector3D::zero());
 #else
@@ -40,39 +36,29 @@ void DummyRenderer::initialize(const InitializationContext* ic)
   IntBufferBuilder index;
 
   // create vertices
-  
   if (ic != NULL && ic->getPlanet() != NULL)
     _halfSize = ic->getPlanet()->getRadii().x() / 2.0;
   else     
     _halfSize = 7e6;
   
-  //int n = 0;
   for (int j = 0; j < res; j++) {
     for (int i = 0; i < res; i++) {
       
       vertices.add((float)0, 
                    (float)(-_halfSize + i / (float) (res - 1) * 2*_halfSize),
                    (float)(_halfSize - j / (float) (res - 1) * 2*_halfSize));
-//      _vertices[n++] = (float) 0;
-//      _vertices[n++] = (float) (-_halfSize + i / (float) (res - 1) * 2*_halfSize);
-//      _vertices[n++] = (float) (_halfSize - j / (float) (res - 1) * 2*_halfSize);
     }
   }
   
-  //n = 0;
   for (int j = 0; j < res - 1; j++) {
     if (j > 0){
-      //_index[n++] = (char) (j * res);
       index.add(j * res);
     }
     for (int i = 0; i < res; i++) {
       index.add(j * res + i);
       index.add(j * res + i + res);
-//      _index[n++] = (j * res + i);
-//      _index[n++] = (j * res + i + res);
     }
     index.add(j * res + 2 * res - 1);
-    //_index[n++] = (j * res + 2 * res - 1);
   }
   
   _index = index.create();

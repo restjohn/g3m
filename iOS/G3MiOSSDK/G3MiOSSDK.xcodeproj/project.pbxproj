@@ -192,6 +192,7 @@
 		D8A723AC15E4D42B00ABDF07 /* StringBuilder_iOS.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8A723AB15E4D42B00ABDF07 /* StringBuilder_iOS.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		D8A723AE15E4D47E00ABDF07 /* StringBuilder_iOS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8A723AD15E4D47E00ABDF07 /* StringBuilder_iOS.cpp */; };
 		D8CD680D15FDE86F008CD7E7 /* StarsRenderer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8CD74C415F8A46D00B801CC /* StarsRenderer.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		D8CD681115FDEE28008CD7E7 /* CompassRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8CD681015FDEE28008CD7E7 /* CompassRenderer.cpp */; };
 		D8CD6F7A15A6FFAC00279BE7 /* IDownloadListener.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8CD6F7815A6FFAC00279BE7 /* IDownloadListener.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D8CD74C215F89BB900B801CC /* DirectMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8CD74C115F89BB900B801CC /* DirectMesh.cpp */; };
 		D8CD74C615F8A4B800B801CC /* StarsRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8CD74C515F8A4B800B801CC /* StarsRenderer.cpp */; };
@@ -411,6 +412,8 @@
 		D8A723AB15E4D42B00ABDF07 /* StringBuilder_iOS.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = StringBuilder_iOS.hpp; path = Specific/Derived/StringBuilder_iOS.hpp; sourceTree = "<group>"; };
 		D8A723AD15E4D47E00ABDF07 /* StringBuilder_iOS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = StringBuilder_iOS.cpp; path = Specific/Derived/StringBuilder_iOS.cpp; sourceTree = "<group>"; };
 		D8C912D915F9FE78003F92A4 /* FloatBufferBuilderFromColor.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FloatBufferBuilderFromColor.hpp; path = Commons/Basic/FloatBufferBuilderFromColor.hpp; sourceTree = "<group>"; };
+		D8CD680F15FDEE1A008CD7E7 /* CompassRenderer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = CompassRenderer.hpp; path = Commons/Rendererers/CompassRenderer.hpp; sourceTree = "<group>"; };
+		D8CD681015FDEE28008CD7E7 /* CompassRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CompassRenderer.cpp; path = Commons/Rendererers/CompassRenderer.cpp; sourceTree = "<group>"; };
 		D8CD6F7815A6FFAC00279BE7 /* IDownloadListener.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = IDownloadListener.hpp; path = Commons/Downloader/IDownloadListener.hpp; sourceTree = "<group>"; };
 		D8CD74BF15F89B7C00B801CC /* DirectMesh.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = DirectMesh.hpp; path = Commons/Mesh/DirectMesh.hpp; sourceTree = "<group>"; };
 		D8CD74C115F89BB900B801CC /* DirectMesh.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DirectMesh.cpp; path = Commons/Mesh/DirectMesh.cpp; sourceTree = "<group>"; };
@@ -703,6 +706,8 @@
 				CFA71BE715D2F6C500F8C78D /* TilesRenderParameters.hpp */,
 				D8CD74C415F8A46D00B801CC /* StarsRenderer.hpp */,
 				D8CD74C515F8A4B800B801CC /* StarsRenderer.cpp */,
+				D8CD680F15FDEE1A008CD7E7 /* CompassRenderer.hpp */,
+				D8CD681015FDEE28008CD7E7 /* CompassRenderer.cpp */,
 			);
 			name = Renderers;
 			sourceTree = "<group>";
@@ -1077,6 +1082,7 @@
 				CFA1899A15F8D7CA0048BF46 /* FloatBuffer_iOS.cpp in Sources */,
 				CFA1899F15F8D9F80048BF46 /* IntBuffer_iOS.cpp in Sources */,
 				CFA189AF15F926CA0048BF46 /* IFactory.cpp in Sources */,
+				D8CD681115FDEE28008CD7E7 /* CompassRenderer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
