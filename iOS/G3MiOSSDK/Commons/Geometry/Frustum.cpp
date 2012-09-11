@@ -40,6 +40,9 @@ bool Frustum::contains(const Vector3D& point) const {
 }
 
 
+extern bool kk_PrintFrustumIntersects;
+
+
 bool Frustum::touchesWithBox(const Box *box) const
 {
   bool outside;
@@ -62,6 +65,9 @@ bool Frustum::touchesWithBox(const Box *box) const
   
   int __ASK_agustin;
   /* http://www.flipcode.com/archives/Frustum_Culling.shtml */
+    
+  
+  
   
   
   // test with left plane

@@ -66,7 +66,7 @@ MutableMatrix44D MutableMatrix44D::createProjectionMatrix(const FrustumData& dat
 {
   return createProjectionMatrix(data._left, data._right,
                                 data._bottom, data._top,
-                                data._znear, data._zfar);
+                                data._znear, data._zfar+1e10);
 }
 
 MutableMatrix44D MutableMatrix44D::createProjectionMatrix(double left, double right,

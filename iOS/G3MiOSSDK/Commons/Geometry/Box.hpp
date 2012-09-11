@@ -27,11 +27,9 @@ public:
   _upper(upper)
   {}
   
-  bool touches(const Frustum* frustum) const {
-    return frustum->touchesWithBox(this);
-  };
+  bool touches(const Frustum* frustum) const;
   
-  Vector3D getLower() const { return _lower; }
+    Vector3D getLower() const { return _lower; }
   Vector3D getUpper() const { return _upper; }
   
   inline const std::vector<Vector3D> getCorners() const;

@@ -13,6 +13,8 @@
 #include "CameraRenderer.hpp"
 #include "GL.hpp"
 
+bool kk_PrintFrustumIntersects;
+
 
 bool CameraSingleDragHandler::onTouchEvent(const EventContext *eventContext,
                                            const TouchEvent* touchEvent, 
@@ -39,6 +41,8 @@ bool CameraSingleDragHandler::onTouchEvent(const EventContext *eventContext,
 }
 
 
+
+
 void CameraSingleDragHandler::onDown(const EventContext *eventContext,
                                      const TouchEvent& touchEvent, 
                                      CameraContext *cameraContext) 
@@ -55,6 +59,7 @@ void CameraSingleDragHandler::onDown(const EventContext *eventContext,
   _initialPoint = _camera0.pixel2PlanetPoint(pixel).asMutableVector3D();
   
   //printf ("down 1 finger. Initial point = %f %f %f\n", _initialPoint.x(), _initialPoint.y(), _initialPoint.z());
+  kk_PrintFrustumIntersects = true;
 }
 
 
@@ -95,6 +100,8 @@ void CameraSingleDragHandler::onMove(const EventContext *eventContext,
   const double radians = - GMath.asin(_axis.length()/_initialPoint.length()/finalPoint.length());
   _radiansStep = radians - _lastRadians;
   _lastRadians = radians;
+  
+  //printf ("moving 1 finger. Initial point = %f %f %f\n", _initialPoint.x(), _initialPoint.y(), _initialPoint.z());
 }
 
 
@@ -118,6 +125,11 @@ void CameraSingleDragHandler::onUp(const EventContext *eventContext,
   // update gesture
   cameraContext->setCurrentGesture(None);
   _initialPixel = MutableVector2D::nan();
+  
+  
+  //printf ("up 1 finger. Initial point = %f %f %f\n", _initialPoint.x(), _initialPoint.y(), _initialPoint.z());
+  kk_PrintFrustumIntersects = false;
+  
 }
 
 void CameraSingleDragHandler::render(const RenderContext* rc, CameraContext *cameraContext)

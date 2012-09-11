@@ -309,7 +309,7 @@ void G3MWidget::render() {
         (_renderStatisticsTimer->elapsedTime().seconds() > 2)) {
       const double averageTimePerRender = (double) _totalRenderTime / _renderCounter;
       const double fps = 1000.0 / averageTimePerRender;
-      _logger->logInfo("FPS=%f" , fps);
+      //_logger->logInfo("FPS=%f" , fps);
       
       _renderCounter = 0;
       _totalRenderTime = 0;

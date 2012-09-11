@@ -195,6 +195,9 @@ void Camera::calculateCachedValues() {
 
 }*/
 
+extern bool kk_PrintFrustumIntersects;
+
+
 void Camera::render(const RenderContext* rc) const {
 
   GL *gl = rc->getGL();
@@ -230,6 +233,13 @@ void Camera::render(const RenderContext* rc) const {
   }
   
 
+  if (kk_PrintFrustumIntersects) {
+    printf ("\n Camera::render :\n");
+    const Frustum *f = getHalfFrustuminModelCoordinates();
+    //printf ("   Frustum = \n");
+  }
+  
+  
 }
 
 

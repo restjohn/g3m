@@ -16,6 +16,9 @@
 #include "TilesRenderParameters.hpp"
 #include "TileKey.hpp"
 
+#include "Box.hpp"
+
+
 Tile::Tile(TileTexturizer* texturizer,
            Tile* parent,
            const Sector& sector,
@@ -122,6 +125,7 @@ Mesh* Tile::getDebugMesh(const RenderContext* rc,
   return _debugMesh;
 }
 
+
 bool Tile::isVisible(const RenderContext *rc,
                      const TileRenderContext* trc) {
   // test if sector is back oriented with respect to the camera
@@ -134,7 +138,24 @@ bool Tile::isVisible(const RenderContext *rc,
     return false;
   }
   //return extent->touches(rc->getCurrentCamera()->getFrustumInModelCoordinates());
-  return extent->touches(rc->getCurrentCamera()->getHalfFrustuminModelCoordinates());
+  
+
+  extern bool kk_PrintFrustumIntersects;
+
+  if (kk_PrintFrustumIntersects) {
+    Box *box = (Box *) extent;
+    printf ("tile (%.2f, %.2f) -- (%.2f, %.2f)  ", 
+            _sector.lower().latitude().degrees(), _sector.lower().longitude().degrees(), 
+            _sector.upper().latitude().degrees(), _sector.upper().longitude().degrees());
+    printf ("extent (%.1f, %.1f, %.1f) -- (%.1f, %.1f, %.1f):",
+            box->getLower().x(), box->getLower().y(), box->getLower().z(),
+            box->getUpper().x(), box->getUpper().y(), box->getUpper().z());
+  }
+  bool result = extent->touches(rc->getCurrentCamera()->getHalfFrustuminModelCoordinates());
+  if (kk_PrintFrustumIntersects) {
+    if (result) printf ("SI INTERSECTA\n"); else printf ("no intersecta\n");
+  }
+  return result;
 }
 
 bool Tile::meetsRenderCriteria(const RenderContext *rc,

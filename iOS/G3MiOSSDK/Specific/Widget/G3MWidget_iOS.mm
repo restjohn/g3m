@@ -56,6 +56,9 @@
 #include "MathUtils_iOS.hpp"
 #include "ThreadUtils_iOS.hpp"
 
+
+#include "LatLonMeshRenderer.h"
+
 @interface G3MWidget_iOS ()
 @property(nonatomic, getter=isAnimating) BOOL animating;
 @end
@@ -153,6 +156,13 @@
       composite->addRenderer(tr);
     }
   }
+  
+  
+    if (true) {
+      LatLonMeshRenderer *renderer = new LatLonMeshRenderer();
+      composite->addRenderer(renderer);
+    }
+  
   
   for (int i = 0; i < renderers.size(); i++) {
     composite->addRenderer(renderers[i]);

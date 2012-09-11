@@ -10,6 +10,16 @@
 #include "Vector2D.hpp"
 #include "Camera.hpp"
 
+
+extern bool kk_PrintFrustumIntersects;
+
+
+bool Box::touches(const Frustum* frustum) const {
+  return frustum->touchesWithBox(this);
+};
+
+
+
 const std::vector<Vector3D> Box::getCorners() const
 {
 #ifdef C_CODE
