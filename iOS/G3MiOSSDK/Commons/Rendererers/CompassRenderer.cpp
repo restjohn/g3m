@@ -45,16 +45,14 @@ Mesh* CompassRenderer::createMesh(const RenderContext* rc){
   
   Mesh* dMesh = new DirectMesh(TriangleStrip, true, vertices.getCenter(), vertices.create(), flatColor, NULL, 1.0);
   
-  GLTextureId texId = GLTextureId::invalid();
-  if (true){
-    texId = rc->getTexturesHandler()->getGLTextureIdFromFileName(_textureName, _texWidth, _texHeight, true);
+  GLTextureId texId = rc->getTexturesHandler()->getGLTextureIdFromFileName(_textureName, 
+                                                                           _texWidth, _texHeight, 
+                                                                           true);
     if (!texId.isValid()) {
       rc->getLogger()->logError("Can't load file %s", _textureName.c_str());
-      
       //If there's no texture a DirectMesh will be renderized
       return dMesh;
     }
-  }
   
   TextureMapping* texMap = new SimpleTextureMapping(texId,
                                                     texCoor.create(),
@@ -90,7 +88,7 @@ void CompassRenderer::render(const RenderContext* rc){
   gl->loadMatrixf(MutableMatrix44D::identity());
   
   //Bottom right corner
-  Vector3D trans(halfWidth * 0.75, -halfHeight * 0.75, 0);
+  Vector3D trans(halfWidth * 0.75, halfHeight * 0.75, 0);
   MutableMatrix44D T = MutableMatrix44D::createTranslationMatrix(trans);
   
   //Compass orientation

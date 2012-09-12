@@ -196,12 +196,9 @@ void Camera::calculateCachedValues() {
 }*/
 
 void Camera::changeProjectionToZFarValue(double zfar, const RenderContext* rc) const{
-  
-  FrustumData fd(_frustumData);
+  FrustumData fd(getFrustumData());
   fd._zfar = zfar;
-  
-  MutableMatrix44D newProjection = MutableMatrix44D::createProjectionMatrix(fd);
-  rc->getGL()->setProjection(newProjection);
+  rc->getGL()->setProjection(MutableMatrix44D::createProjectionMatrix(fd));
 }
 
 void Camera::resetProjection(const RenderContext* rc) const{
