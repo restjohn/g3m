@@ -168,7 +168,7 @@
   
   
   if (true){
-    CompassRenderer* compass = new CompassRenderer("compass.jpg", 256, 256);
+    CompassRenderer* compass = new CompassRenderer("compass.png", 256, 256);
     composite->addRenderer(compass);
   }
   
