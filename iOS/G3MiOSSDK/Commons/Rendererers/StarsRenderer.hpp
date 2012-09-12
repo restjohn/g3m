@@ -16,6 +16,7 @@ class DirectMesh;
 class StarsRenderer: public Renderer{
   
   int _nStars;
+  double _starsHeight;
   
   DirectMesh* _mesh;
   

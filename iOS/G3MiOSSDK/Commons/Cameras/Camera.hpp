@@ -225,6 +225,9 @@ public:
       _dirtyFlags.setAll(true);
     }
   }
+  
+  void changeProjectionToZFarValue(double zfar, const RenderContext* rc) const;
+  void resetProjection(const RenderContext* rc) const;
     
 private:
   
@@ -413,7 +416,6 @@ private:
                        bottom, top,
                        znear, zfar);
   }
-  
   
   //void calculateCachedValues();
   

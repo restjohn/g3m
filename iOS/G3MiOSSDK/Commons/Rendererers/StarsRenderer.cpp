@@ -22,6 +22,7 @@
 #include "Color.hpp"
 #include "DirectMesh.hpp"
 #include "GL.hpp"
+#include "Camera.hpp"
 
 
 StarsRenderer::~StarsRenderer(){
@@ -35,8 +36,8 @@ void StarsRenderer::initialize(const InitializationContext* ic){
   int todo_set_stars_further_from_origin; 
   
   const Planet * planet = ic->getPlanet();
-  double starsHeight = planet->getRadii().x() * 2.0;
-  Planet starsSphere("stars", Vector3D(starsHeight, starsHeight, starsHeight));
+  _starsHeight = planet->getRadii().x() * 20.0;
+  Planet starsSphere("stars", Vector3D(_starsHeight, _starsHeight, _starsHeight));
   
   FloatBufferBuilderFromGeodetic stars(NoCenter, &starsSphere, Vector3D::zero());
   
@@ -64,6 +65,13 @@ void StarsRenderer::render(const RenderContext* rc){
   
   int todo_change_zfar; //Stars beyond 0,0,0 are not rendered
   int change_frustum;
+  
+  double d = rc->getCurrentCamera()->getCartesianPosition().length();
+  
+  rc->getCurrentCamera()->changeProjectionToZFarValue((d + _starsHeight), rc);
+  
   _mesh->render(rc);
+  
+  rc->getCurrentCamera()->resetProjection(rc);
   
 }
