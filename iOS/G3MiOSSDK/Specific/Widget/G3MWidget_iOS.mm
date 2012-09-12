@@ -169,7 +169,7 @@
   
   if (true){
     CompassRenderer* compass = new CompassRenderer("compass.jpg", 256, 256);
-    renderers.push_back(compass);
+    composite->addRenderer(compass);
   }
   
   

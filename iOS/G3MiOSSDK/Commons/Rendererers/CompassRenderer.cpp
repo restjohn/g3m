@@ -16,6 +16,8 @@
 #include "TexturesHandler.hpp"
 #include "TextureMapping.hpp"
 #include "TexturedMesh.hpp"
+#include "GL.hpp"
+#include "Camera.hpp"
 
 CompassRenderer::~CompassRenderer(){
   if (_mesh != NULL){
@@ -31,7 +33,7 @@ Mesh* CompassRenderer::createMesh(const RenderContext* rc){
   texCoor.add(0,1);
   texCoor.add(0,0);
   
-  const double halfSize = 10;
+  const double halfSize = 70;
   
   FloatBufferBuilderFromCartesian3D vertices(FirstVertex, Vector3D::nan());
   vertices.add(-halfSize, -halfSize, 0);
@@ -42,23 +44,25 @@ Mesh* CompassRenderer::createMesh(const RenderContext* rc){
   Color* flatColor = new Color(Color::white());
   
   Mesh* dMesh = new DirectMesh(TriangleStrip, true, vertices.getCenter(), vertices.create(), flatColor, NULL, 1.0);
+  
+  return dMesh;
 
-  GLTextureId texId = GLTextureId::invalid();
-  if (true){
-    texId = rc->getTexturesHandler()->getGLTextureIdFromFileName(_textureName, _texWidth, _texHeight, true);
-    if (!texId.isValid()) {
-      rc->getLogger()->logError("Can't load file %s", _textureName.c_str());
-      
-      //If there's no texture a DirectMesh will be renderized
-      return dMesh;
-    }
-  }
-  
-  TextureMapping* texMap = new SimpleTextureMapping(texId,
-                                                    texCoor.create(),
-                                                    true);
-  
-  return new TexturedMesh(dMesh, true, texMap, true);
+//  GLTextureId texId = GLTextureId::invalid();
+//  if (true){
+//    texId = rc->getTexturesHandler()->getGLTextureIdFromFileName(_textureName, _texWidth, _texHeight, true);
+//    if (!texId.isValid()) {
+//      rc->getLogger()->logError("Can't load file %s", _textureName.c_str());
+//      
+//      //If there's no texture a DirectMesh will be renderized
+//      return dMesh;
+//    }
+//  }
+//  
+//  TextureMapping* texMap = new SimpleTextureMapping(texId,
+//                                                    texCoor.create(),
+//                                                    true);
+//  
+//  return new TexturedMesh(dMesh, true, texMap, true);
   
 }
 
@@ -67,7 +71,38 @@ void CompassRenderer::render(const RenderContext* rc){
   if (_mesh == NULL){
     _mesh = createMesh(rc);
   }
+//  
+//  rc->getGL()->disableDepthTest();
+//  
+//  _mesh->render(rc);
+//  
+//  rc->getGL()->enableDepthTest();
   
+  GL* gl = rc->getGL();
+  
+  // init modelview matrix
+  int currentViewport[4];
+  gl->getViewport(currentViewport);
+  int halfWidth = currentViewport[2] / 2;
+  int halfHeight = currentViewport[3] / 2;
+  MutableMatrix44D M = MutableMatrix44D::createOrthographicProjectionMatrix(-halfWidth, halfWidth,
+                                                                            -halfHeight, halfHeight,
+                                                                            -halfWidth, halfWidth);
+  gl->setProjection(M);
+  gl->loadMatrixf(MutableMatrix44D::identity());
+  
+  Vector3D trans(halfWidth * 0.75, -halfHeight * 0.75, 0);
+  MutableMatrix44D T = MutableMatrix44D::createTranslationMatrix(trans);
+  gl->multMatrixf(T);
+  
+  gl->enableBlend();
+  gl->setBlendFuncSrcAlpha();
+  
+  gl->pushMatrix();
+  // draw mesh
   _mesh->render(rc);
   
+  gl->popMatrix();
+  
+  gl->disableBlend();
 }
