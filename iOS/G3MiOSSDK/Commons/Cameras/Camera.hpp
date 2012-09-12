@@ -226,8 +226,13 @@ public:
     }
   }
   
+  //For stars renderer
   void changeProjectionToZFarValue(double zfar, const RenderContext* rc) const;
   void resetProjection(const RenderContext* rc) const;
+  
+  //For compass renderer
+  Angle calculateHeading() const;
+  Angle calculatePitch() const;
     
 private:
   
@@ -416,6 +421,7 @@ private:
                        bottom, top,
                        znear, zfar);
   }
+
   
   //void calculateCachedValues();
   

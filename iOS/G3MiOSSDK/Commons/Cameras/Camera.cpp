@@ -354,3 +354,13 @@ Angle Camera::compute3DAngularDistance(const Vector2D& pixel0,
   
   return point0.angleBetween(point1);
 }
+
+Angle Camera::calculateHeading() const{
+  int TODO_CALCULATE_HEADING; //For compass
+  
+}
+
+Angle Camera::calculatePitch() const{
+  int TODO_CALCULATE_PITCH; //For compass
+  
+}

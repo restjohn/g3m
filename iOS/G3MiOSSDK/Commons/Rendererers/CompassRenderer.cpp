@@ -91,10 +91,25 @@ void CompassRenderer::render(const RenderContext* rc){
   gl->setProjection(M);
   gl->loadMatrixf(MutableMatrix44D::identity());
   
+  //Bottom right corner
   Vector3D trans(halfWidth * 0.75, -halfHeight * 0.75, 0);
   MutableMatrix44D T = MutableMatrix44D::createTranslationMatrix(trans);
-  gl->multMatrixf(T);
   
+  //Compass orientation
+  //Angle heading = rc->getCurrentCamera()->calculateHeading();
+  Angle heading = Angle::fromDegrees(20);
+  
+  //Pitch
+  //Angle pitch = rc->getCurrentCamera()->calculatePitch();
+  Angle pitch = Angle::fromDegrees(50);
+  
+  MutableMatrix44D R = MutableMatrix44D::createRotationMatrix(heading, Vector3D(0,0,1));
+  
+  MutableMatrix44D R2 = MutableMatrix44D::createRotationMatrix(pitch, Vector3D(1,0,0));
+  
+  gl->multMatrixf(T.multiply(R).multiply(R2));
+  
+  gl->disableDepthTest();
   gl->enableBlend();
   gl->setBlendFuncSrcAlpha();
   
@@ -105,4 +120,5 @@ void CompassRenderer::render(const RenderContext* rc){
   gl->popMatrix();
   
   gl->disableBlend();
+  gl->enableDepthTest();
 }
