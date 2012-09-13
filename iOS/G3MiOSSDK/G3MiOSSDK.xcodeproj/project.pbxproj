@@ -196,6 +196,7 @@
 		D8CD6F7A15A6FFAC00279BE7 /* IDownloadListener.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8CD6F7815A6FFAC00279BE7 /* IDownloadListener.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		D8CD74C215F89BB900B801CC /* DirectMesh.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8CD74C115F89BB900B801CC /* DirectMesh.cpp */; };
 		D8CD74C615F8A4B800B801CC /* StarsRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8CD74C515F8A4B800B801CC /* StarsRenderer.cpp */; };
+		D8D20A3D1601E030000960CF /* MeshBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8D20A3C1601DEF8000960CF /* MeshBuilder.cpp */; };
 		D8D347BA15E5133B00EDB394 /* IStringBuilder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8D347B915E5133B00EDB394 /* IStringBuilder.cpp */; };
 		D8E0EC1515C1B1CD0010A68A /* StaticImageLayer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8E0EC1415C1B1CD0010A68A /* StaticImageLayer.cpp */; };
 		D8E17DCD15FDF54A00C980E6 /* CompassRenderer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = D8CD680F15FDEE1A008CD7E7 /* CompassRenderer.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -424,6 +425,8 @@
 		D8CD74D815F8D56800B801CC /* FloatBufferBuilderFromCartesian3D.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FloatBufferBuilderFromCartesian3D.hpp; path = Commons/Basic/FloatBufferBuilderFromCartesian3D.hpp; sourceTree = "<group>"; };
 		D8CD74D915F8DBE800B801CC /* FloatBufferBuilderFromCartesian2D.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FloatBufferBuilderFromCartesian2D.hpp; path = Commons/Basic/FloatBufferBuilderFromCartesian2D.hpp; sourceTree = "<group>"; };
 		D8CD74DD15F8DE9500B801CC /* FloatBufferBuilderFromGeodetic.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = FloatBufferBuilderFromGeodetic.hpp; path = Commons/Basic/FloatBufferBuilderFromGeodetic.hpp; sourceTree = "<group>"; };
+		D8D20A3A1601DEDF000960CF /* MeshBuilder.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = MeshBuilder.hpp; path = Commons/Mesh/MeshBuilder.hpp; sourceTree = "<group>"; };
+		D8D20A3C1601DEF8000960CF /* MeshBuilder.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MeshBuilder.cpp; path = Commons/Mesh/MeshBuilder.cpp; sourceTree = "<group>"; };
 		D8D347B915E5133B00EDB394 /* IStringBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IStringBuilder.cpp; path = Commons/Interfaces/IStringBuilder.cpp; sourceTree = "<group>"; };
 		D8E0EC1215C1B1BB0010A68A /* StaticImageLayer.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = StaticImageLayer.hpp; sourceTree = "<group>"; };
 		D8E0EC1415C1B1CD0010A68A /* StaticImageLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StaticImageLayer.cpp; sourceTree = "<group>"; };
@@ -760,6 +763,8 @@
 				D88267F415F613330041FB69 /* AbstractMesh.cpp */,
 				D8CD74BF15F89B7C00B801CC /* DirectMesh.hpp */,
 				D8CD74C115F89BB900B801CC /* DirectMesh.cpp */,
+				D8D20A3A1601DEDF000960CF /* MeshBuilder.hpp */,
+				D8D20A3C1601DEF8000960CF /* MeshBuilder.cpp */,
 			);
 			name = Mesh;
 			sourceTree = "<group>";
@@ -1028,6 +1033,7 @@
 				CF59DF8F15C04AFC002173EC /* ILogger.cpp in Sources */,
 				D8E0EC1515C1B1CD0010A68A /* StaticImageLayer.cpp in Sources */,
 				CFFEC11E15C2E645003FA986 /* IDownloader.cpp in Sources */,
+				D8D20A3D1601E030000960CF /* MeshBuilder.cpp in Sources */,
 				CFFEC12315C2EA5F003FA986 /* Downloader_iOS.mm in Sources */,
 				CFFEC12615C2EBA6003FA986 /* URL.cpp in Sources */,
 				CC596F2215C46D4F008FC230 /* Camera.cpp in Sources */,

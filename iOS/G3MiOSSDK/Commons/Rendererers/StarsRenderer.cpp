@@ -39,6 +39,7 @@ void StarsRenderer::initialize(const InitializationContext* ic){
   
   FloatBufferBuilderFromGeodetic stars(NoCenter, &starsSphere, Vector3D::zero());
   
+  
   for (int i = 0; i < _nStars; i++) {
     float lat = (float)(rand() % 36000) / 10;
     float lon = (float)(rand() % 36000) / 10;
