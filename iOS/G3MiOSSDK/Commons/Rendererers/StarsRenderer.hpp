@@ -18,7 +18,10 @@ class StarsRenderer: public Renderer{
   int _nStars;
   double _starsHeight;
   
-  DirectMesh* _mesh;
+  DirectMesh* _mesh1;
+  DirectMesh* _mesh2;
+  DirectMesh* _mesh3;
+  DirectMesh* _mesh4;
   
 public:
   StarsRenderer(int nStars){

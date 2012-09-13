@@ -142,7 +142,7 @@
   
   //StarsRenderer
   if (true){
-    renderers.push_back(new StarsRenderer(400));
+    renderers.push_back(new StarsRenderer(1000));
   }
   
   composite->addRenderer(cameraRenderer);
