@@ -341,7 +341,7 @@ void Tile::render(const RenderContext* rc,
       }
       
       // render extent
-      if (false)
+      if (true)
         getTessellatorMesh(rc, trc)->getExtent()->render(rc);
       
       statistics->computeTileRendered(this);
