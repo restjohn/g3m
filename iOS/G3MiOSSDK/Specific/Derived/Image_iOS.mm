@@ -8,8 +8,10 @@
 
 #include "Image_iOS.hpp"
 
-Image_iOS::Image_iOS(int width, int height)
-{
+#include "IFactory.hpp"
+#include "IStringBuilder.hpp"
+
+Image_iOS::Image_iOS(int width, int height) {
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
   unsigned char* imageData = new unsigned char[height * width * 4 ];
   
@@ -30,8 +32,7 @@ Image_iOS::Image_iOS(int width, int height)
 }
 
 IImage* Image_iOS::combineWith(const IImage& other,
-                               int width, int height) const
-{
+                               int width, int height) const {
   UIImage* transIm = ((Image_iOS&)other).getUIImage();
   
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -57,7 +58,7 @@ IImage* Image_iOS::combineWith(const IImage& other,
   
   delete[] imageData;
   
-  return new Image_iOS(img);
+  return new Image_iOS(img, NULL);
 }
 
 IImage* Image_iOS::combineWith(const IImage& other,
@@ -98,11 +99,10 @@ IImage* Image_iOS::combineWith(const IImage& other,
   
   delete[] imageData;
   
-  return new Image_iOS(img);
+  return new Image_iOS(img, NULL);
 }
 
-IImage* Image_iOS::subImage(const Rectangle& rect) const
-{
+IImage* Image_iOS::subImage(const Rectangle& rect) const {
   CGRect cropRect = CGRectMake((float) rect._x,
                                (float) rect._y,
                                (float) rect._width,
@@ -111,30 +111,20 @@ IImage* Image_iOS::subImage(const Rectangle& rect) const
   //Cropping image
   CGImageRef imageRef = CGImageCreateWithImageInRect([this->_image CGImage], cropRect);
   
-  Image_iOS* image = new Image_iOS([UIImage imageWithCGImage:imageRef]); //Create IImage
+  Image_iOS* image = new Image_iOS([UIImage imageWithCGImage:imageRef], NULL);
   
   CGImageRelease(imageRef);
   return image;
 }
 
-ByteBuffer* Image_iOS::getEncodedImage() const
-{
-  NSData* readData = UIImagePNGRepresentation(_image);
-  NSUInteger length = [readData length];
+unsigned char* Image_iOS::createByteArrayRGBA8888() const{
+  const int width  = getWidth();
+  const int height = getHeight();
   
-  unsigned char* data = new unsigned char[length];
-  [readData getBytes: data
-              length: length];
+  unsigned char* result = new unsigned char[4 * width * height];
   
-  return new ByteBuffer(data, length);
-}
-
-void Image_iOS::fillWithRGBA8888(unsigned char data[],
-                                 int width,
-                                 int height) const
-{
   CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-  CGContextRef context = CGBitmapContextCreate(data,
+  CGContextRef context = CGBitmapContextCreate(result,
                                                width, height,
                                                8, 4 * width,
                                                colorSpace,
@@ -147,4 +137,36 @@ void Image_iOS::fillWithRGBA8888(unsigned char data[],
   CGContextDrawImage( context, bounds, _image.CGImage );
   
   CGContextRelease(context);
+  
+  return result;
+}
+
+IImage* Image_iOS::scale(int width, int height) const{
+  
+  CGSize newSize = CGSizeMake(width, height);
+  
+  UIGraphicsBeginImageContextWithOptions(newSize, NO, 0.0);
+  [_image drawInRect:CGRectMake(0, 0, newSize.width, newSize.height)];
+  UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();    
+  UIGraphicsEndImageContext();
+  
+  return new Image_iOS(newImage, NULL);
+}
+
+const std::string Image_iOS::description() const {
+  IStringBuilder *isb = IStringBuilder::newStringBuilder();
+  isb->add("Image_iOS ");
+  isb->add(getWidth());
+  isb->add("x");
+  isb->add(getHeight());
+  isb->add(", _image=(");
+  isb->add( [[_image description] cStringUsingEncoding:NSUTF8StringEncoding] );
+  isb->add(")");
+  std::string s = isb->getString();
+  delete isb;
+  return s;
+}
+
+IImage* Image_iOS::copy() const {
+  return new Image_iOS(_image, _sourceBuffer);
 }

@@ -24,12 +24,14 @@ class MutableVector3D;
 
 class MutableMatrix44D{
   
+private:
+  
   //_m23 -> row 2, column 3
   double _m00;
-  double _m01; 
+  double _m01;
   double _m02;
   double _m03;
-  double _m10; 
+  double _m10;
   double _m11;
   double _m12;
   double _m13;
@@ -42,11 +44,16 @@ class MutableMatrix44D{
   double _m32;
   double _m33;
   
+  mutable float * _columnMajorFloatArray;
+  bool _isValid;
+  
   //Contructor parameters in column major order
   MutableMatrix44D(double m00, double m10, double m20, double m30,
-         double m01, double m11, double m21, double m31,
-         double m02, double m12, double m22, double m32,
-         double m03, double m13, double m23, double m33){
+                   double m01, double m11, double m21, double m31,
+                   double m02, double m12, double m22, double m32,
+                   double m03, double m13, double m23, double m33):
+  _isValid(true)
+  {
     _m00  = m00;
     _m01  = m01;
     _m02  = m02;
@@ -66,53 +73,109 @@ class MutableMatrix44D{
     _m31  = m31;
     _m32  = m32;
     _m33  = m33;
+    
+    _columnMajorFloatArray = NULL;
+  }
+  
+  MutableMatrix44D(bool isValid):
+  _isValid(isValid)
+  {
+    _columnMajorFloatArray = NULL;
   }
   
 public:
- 
+  
   //CONTRUCTORS
-  MutableMatrix44D() {
-    _m00  = 0.0;
-    _m01  = 0.0;
-    _m02  = 0.0;
-    _m03  = 0.0;
+  MutableMatrix44D():
+  _isValid(true)
+  {
+    _m00 = 0.0;
+    _m01 = 0.0;
+    _m02 = 0.0;
+    _m03 = 0.0;
     
-    _m10  = 0.0;
-    _m11  = 0.0;
-    _m12  = 0.0;
-    _m13  = 0.0;
+    _m10 = 0.0;
+    _m11 = 0.0;
+    _m12 = 0.0;
+    _m13 = 0.0;
     
-    _m20  = 0.0;
-    _m21  = 0.0;
-    _m22  = 0.0;
-    _m23  = 0.0;
+    _m20 = 0.0;
+    _m21 = 0.0;
+    _m22 = 0.0;
+    _m23 = 0.0;
     
-    _m30  = 0.0;
-    _m31  = 0.0;
-    _m32  = 0.0;
-    _m33  = 0.0;
+    _m30 = 0.0;
+    _m31 = 0.0;
+    _m32 = 0.0;
+    _m33 = 0.0;
+    
+    _columnMajorFloatArray = NULL;
   }
   
-  MutableMatrix44D(const MutableMatrix44D &m){
-    _m00  = m._m00;
-    _m01  = m._m01;
-    _m02  = m._m02;
-    _m03  = m._m03;
+  MutableMatrix44D(const MutableMatrix44D &m):
+  _isValid(m._isValid)
+  {
+    _m00 = m._m00;
+    _m01 = m._m01;
+    _m02 = m._m02;
+    _m03 = m._m03;
     
-    _m10  = m._m10;
-    _m11  = m._m11;
-    _m12  = m._m12;
-    _m13  = m._m13;
+    _m10 = m._m10;
+    _m11 = m._m11;
+    _m12 = m._m12;
+    _m13 = m._m13;
     
-    _m20  = m._m20;
-    _m21  = m._m21;
-    _m22  = m._m22;
-    _m23  = m._m23;
+    _m20 = m._m20;
+    _m21 = m._m21;
+    _m22 = m._m22;
+    _m23 = m._m23;
     
-    _m30  = m._m30;
-    _m31  = m._m31;
-    _m32  = m._m32;
-    _m33  = m._m33;
+    _m30 = m._m30;
+    _m31 = m._m31;
+    _m32 = m._m32;
+    _m33 = m._m33;
+    
+    _columnMajorFloatArray = NULL;
+  }
+  
+  MutableMatrix44D& operator=(const MutableMatrix44D &m)
+  {
+    if (this != &m){
+      _m00 = m._m00;
+      _m01 = m._m01;
+      _m02 = m._m02;
+      _m03 = m._m03;
+      
+      _m10 = m._m10;
+      _m11 = m._m11;
+      _m12 = m._m12;
+      _m13 = m._m13;
+      
+      _m20 = m._m20;
+      _m21 = m._m21;
+      _m22 = m._m22;
+      _m23 = m._m23;
+      
+      _m30 = m._m30;
+      _m31 = m._m31;
+      _m32 = m._m32;
+      _m33 = m._m33;
+      
+      _isValid = m._isValid;
+      
+      if (_columnMajorFloatArray != NULL){
+        delete[] _columnMajorFloatArray;
+        _columnMajorFloatArray = NULL;
+      }
+    }
+    
+    return *this;
+  }
+  
+  ~MutableMatrix44D(){
+    if (_columnMajorFloatArray != NULL){
+      delete[] _columnMajorFloatArray;
+    }
   }
   
   //SPECIAL MATRICES
@@ -125,33 +188,14 @@ public:
   }
   
   static MutableMatrix44D invalid() {
-    return MutableMatrix44D(GMath.NanD(), GMath.NanD(), GMath.NanD(), GMath.NanD(),
-                  GMath.NanD(), GMath.NanD(), GMath.NanD(), GMath.NanD(),
-                  GMath.NanD(), GMath.NanD(), GMath.NanD(), GMath.NanD(),
-                  GMath.NanD(), GMath.NanD(), GMath.NanD(), GMath.NanD());
+    return MutableMatrix44D(false);
   }
   
-  bool isValid() {
-    if (GMath.isNan(_m00)) return false;
-    if (GMath.isNan(_m01)) return false;
-    if (GMath.isNan(_m02)) return false;
-    if (GMath.isNan(_m03)) return false;
-    if (GMath.isNan(_m10)) return false;
-    if (GMath.isNan(_m11)) return false;
-    if (GMath.isNan(_m12)) return false;
-    if (GMath.isNan(_m13)) return false;
-    if (GMath.isNan(_m20)) return false;
-    if (GMath.isNan(_m21)) return false;
-    if (GMath.isNan(_m22)) return false;
-    if (GMath.isNan(_m23)) return false;
-    if (GMath.isNan(_m30)) return false;
-    if (GMath.isNan(_m31)) return false;
-    if (GMath.isNan(_m32)) return false;
-    if (GMath.isNan(_m33)) return false;
-    return true;
+  bool isValid() const {
+    return _isValid;
   }
-
-//  
+  
+  //
   //OPERATIONS
   
   MutableMatrix44D multiply(const MutableMatrix44D& that) const;
@@ -203,44 +247,61 @@ public:
     }
   }
   
-  void copyToColumnMajorFloatArray(float M[16]) const {
-    M[ 0] = (float) _m00;
-    M[ 1] = (float) _m10;
-    M[ 2] = (float) _m20;
-    M[ 3] = (float) _m30;
-    
-    M[ 4] = (float) _m01;
-    M[ 5] = (float) _m11;
-    M[ 6] = (float) _m21;
-    M[ 7] = (float) _m31;
-    
-    M[ 8] = (float) _m02;
-    M[ 9] = (float) _m12;
-    M[10] = (float) _m22;
-    M[11] = (float) _m32;
-    
-    M[12] = (float) _m03;
-    M[13] = (float) _m13;
-    M[14] = (float) _m23;
-    M[15] = (float) _m33;
+#ifdef C_CODE
+  float* getColumnMajorFloatArray() const {
+#else
+  float[] getColumnMajorFloatArray() const {
+#endif
+    if (_columnMajorFloatArray == NULL){
+      _columnMajorFloatArray = new float[16];
+      
+      _columnMajorFloatArray[ 0] = (float) _m00;
+      _columnMajorFloatArray[ 1] = (float) _m10;
+      _columnMajorFloatArray[ 2] = (float) _m20;
+      _columnMajorFloatArray[ 3] = (float) _m30;
+      
+      _columnMajorFloatArray[ 4] = (float) _m01;
+      _columnMajorFloatArray[ 5] = (float) _m11;
+      _columnMajorFloatArray[ 6] = (float) _m21;
+      _columnMajorFloatArray[ 7] = (float) _m31;
+      
+      _columnMajorFloatArray[ 8] = (float) _m02;
+      _columnMajorFloatArray[ 9] = (float) _m12;
+      _columnMajorFloatArray[10] = (float) _m22;
+      _columnMajorFloatArray[11] = (float) _m32;
+      
+      _columnMajorFloatArray[12] = (float) _m03;
+      _columnMajorFloatArray[13] = (float) _m13;
+      _columnMajorFloatArray[14] = (float) _m23;
+      _columnMajorFloatArray[15] = (float) _m33;
+    }
+    return _columnMajorFloatArray;
   }
   
   //OTHER OPERATIONS
   
   void print(const std::string& name, const ILogger* log) const;
   
-  Vector3D unproject(const Vector3D& pixel3D, const int viewport[4]) const;
+  Vector3D unproject(const Vector3D& pixel3D,
+                     const int vpLeft,
+                     const int vpTop,
+                     const int vpWidth,
+                     const int vpHeight) const;
   
-  Vector2D project(const Vector3D& point, const int viewport[4]) const;
+  Vector2D project(const Vector3D& point,
+                   const int vpLeft,
+                   const int vpTop,
+                   const int vpWidth,
+                   const int vpHeight) const;
   
   static MutableMatrix44D createTranslationMatrix(const Vector3D& t);
   
   static MutableMatrix44D createRotationMatrix(const Angle& angle, const Vector3D& p);
   
-  static MutableMatrix44D createGeneralRotationMatrix(const Angle& angle, 
+  static MutableMatrix44D createGeneralRotationMatrix(const Angle& angle,
                                                       const Vector3D& axis, const Vector3D& point);
   
-  static MutableMatrix44D createModelMatrix(const MutableVector3D& pos, 
+  static MutableMatrix44D createModelMatrix(const MutableVector3D& pos,
                                             const MutableVector3D& center,
                                             const MutableVector3D& up);
   

@@ -11,7 +11,8 @@
 
 #include <vector>
 #include "Rectangle.hpp"
-#include "ByteBuffer.hpp"
+
+class IByteBuffer;
 
 class IImage {
 public:
@@ -30,11 +31,11 @@ public:
   
   virtual IImage* subImage(const Rectangle& rect) const = 0;
   
-  virtual ByteBuffer* getEncodedImage() const = 0;
+  virtual IImage* scale(int width, int height) const = 0;
+
+  virtual const std::string description() const = 0;
   
-  virtual void fillWithRGBA8888(unsigned char data[],
-                                int width, int height) const = 0;
-  
+  virtual IImage* copy() const = 0;
 };
 
 #endif

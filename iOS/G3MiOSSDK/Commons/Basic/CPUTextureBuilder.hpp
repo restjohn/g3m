@@ -14,19 +14,26 @@
 class CPUTextureBuilder:public TextureBuilder
 {
 public:
-  const GLTextureId createTextureFromImages(GL * gl,
-                                            const std::vector<const IImage*> images,
-                                            int width,
-                                            int height,
-                                            bool generateMipmap) const;
   
-  const GLTextureId createTextureFromImages(GL * gl,
-                                            const IFactory* factory,
-                                            const std::vector<const IImage*> images,
-                                            const std::vector<const Rectangle*> rectangles,
-                                            int width,
-                                            int height,
-                                            bool generateMipmap) const;
+  //Scales but may return the same image
+  const IImage* createTextureFromImage(GL * gl,
+                                       const IFactory* factory,
+                                       const IImage* image,
+                                       int width,
+                                       int height) const;
+  
+  const IImage* createTextureFromImages(GL * gl,
+                                        const IFactory* factory,
+                                        const std::vector<const IImage*> images,
+                                        int width,
+                                        int height) const;
+  
+  const IImage* createTextureFromImages(GL * gl,
+                                        const IFactory* factory,
+                                        const std::vector<const IImage*> images,
+                                        const std::vector<const Rectangle*> rectangles,
+                                        int width,
+                                        int height) const;
   
 };
 

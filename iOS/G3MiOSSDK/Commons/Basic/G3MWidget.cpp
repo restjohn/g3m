@@ -28,6 +28,7 @@ G3MWidget::G3MWidget(FrameTasksExecutor*              frameTasksExecutor,
                      ILogger*                         logger,
                      GL*                              gl,
                      TexturesHandler*                 texturesHandler,
+                     TextureBuilder*                  textureBuilder,
                      IDownloader*                     downloader,
                      const Planet*                    planet,
                      std::vector<ICameraConstrainer*> cameraConstrainers,
@@ -46,6 +47,7 @@ _threadUtils(threadUtils),
 _logger(logger),
 _gl(gl),
 _texturesHandler(texturesHandler),
+_textureBuilder(textureBuilder),
 _planet(planet),
 _cameraConstrainers(cameraConstrainers),
 _renderer(renderer),
@@ -94,6 +96,7 @@ G3MWidget* G3MWidget::create(FrameTasksExecutor* frameTasksExecutor,
                              ILogger*            logger,
                              GL*                 gl,
                              TexturesHandler*    texturesHandler,
+                             TextureBuilder*     textureBuilder,
                              IDownloader*        downloader,
                              const Planet*       planet,
                              std::vector<ICameraConstrainer*> cameraConstraint,
@@ -109,6 +112,7 @@ G3MWidget* G3MWidget::create(FrameTasksExecutor* frameTasksExecutor,
     logger->logInfo("Creating G3MWidget...");
   }
   
+  IFactory::setInstance(factory);
   IStringUtils::setInstance(stringUtils);
   ILogger::setInstance(logger);
   IThreadUtils::setInstance(threadUtils);
@@ -120,6 +124,7 @@ G3MWidget* G3MWidget::create(FrameTasksExecutor* frameTasksExecutor,
                        logger,
                        gl,
                        texturesHandler,
+                       textureBuilder,
                        downloader,
                        planet,
                        cameraConstraint,
@@ -243,6 +248,7 @@ void G3MWidget::render() {
                    _currentCamera,
                    _nextCamera,
                    _texturesHandler,
+                   _textureBuilder,
                    _downloader,
                    _effectsScheduler,
                    _factory->createTimer());

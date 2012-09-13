@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "GLTextureId.hpp"
+#include "INativeGL.hpp"
 
 class TextureBuilder;
 class IImage;
@@ -60,7 +61,7 @@ public:
   bool isMipmap() const {
     return _isMipmap;
   }
-
+  
   int getWidth() const {
     return _width;
   }
@@ -141,7 +142,6 @@ private:
   
   GL * const _gl;
   const IFactory * const _factory;
-  const TextureBuilder* _textureBuilder;
   
   const bool _verbose;
   
@@ -151,31 +151,19 @@ public:
   
   TexturesHandler(GL* const  gl,
                   const IFactory const * factory,
-                  const TextureBuilder* texBuilder,
                   bool verbose):
   _gl(gl),
   _factory(factory),
-  _textureBuilder(texBuilder),
   _verbose(verbose)
   {
   }
   
   ~TexturesHandler();
   
-  const GLTextureId getGLTextureIdFromFileName(const std::string filename,
-                                               int               textureWidth,
-                                               int               textureHeight,
-                                               const bool        isMipmap);
-  
-  const GLTextureId getGLTextureId(const std::vector<const IImage*> images,
-                                   const TextureSpec& textureSpec);
-  
-  const GLTextureId getGLTextureId(const std::vector<const IImage*> images,
-                                   const std::vector<const Rectangle*> rectangles,
-                                   const TextureSpec& textureSpec);
-  
   const GLTextureId getGLTextureId(const IImage* image,
-                                   const TextureSpec& textureSpec);
+                                   GLFormat format,
+                                   const std::string& name,
+                                   bool hasMipMap);
   
   const GLTextureId getGLTextureIdIfAvailable(const TextureSpec& textureSpec);
   
