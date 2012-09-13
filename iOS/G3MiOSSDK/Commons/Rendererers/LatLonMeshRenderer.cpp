@@ -20,7 +20,7 @@ LatLonMeshRenderer::~LatLonMeshRenderer()
   delete _mesh;
 }
 
-/*
+
 void LatLonMeshRenderer::initialize(const InitializationContext* ic)
 {
 #ifdef C_CODE
@@ -57,9 +57,9 @@ void LatLonMeshRenderer::initialize(const InitializationContext* ic)
                       flatColor);
 #endif
 
-}*/  
+} 
 
-
+/*
  void LatLonMeshRenderer::initialize(const InitializationContext* ic)
  {
  unsigned int numVertices = 4;
@@ -96,7 +96,7 @@ void LatLonMeshRenderer::initialize(const InitializationContext* ic)
  4, vertices, indices, 4, flatColor);
  #endif
  
- }  
+ }  */
 
 
 
