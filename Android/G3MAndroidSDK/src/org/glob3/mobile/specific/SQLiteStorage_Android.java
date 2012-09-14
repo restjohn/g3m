@@ -25,10 +25,10 @@ public class SQLiteStorage_Android
          implements
             IStorage {
 
-   private final String         _databaseName;
-   private final Context        _ctx;
+   private final String   _databaseName;
+   private final Context  _ctx;
 
-   private final SQLiteDatabase _db;
+   private SQLiteDatabase _db;
 
 
    String getPath() {
@@ -174,5 +174,19 @@ public class SQLiteStorage_Android
       cursor.close();
       return result;
    }
+
+
+   public void onResume() {
+
+      if (!_db.isOpen()) {
+         _db = SQLiteDatabase.openOrCreateDatabase(getPath(), null);
+      }
+   }
+
+
+   public void onStop() {
+      _db.close();
+   }
+
 
 }

@@ -25,7 +25,6 @@ import org.glob3.mobile.generated.IFactory;
 import org.glob3.mobile.generated.IImage;
 import org.glob3.mobile.generated.ILogger;
 import org.glob3.mobile.generated.IMathUtils;
-import org.glob3.mobile.generated.IStorage;
 import org.glob3.mobile.generated.IStringBuilder;
 import org.glob3.mobile.generated.IStringUtils;
 import org.glob3.mobile.generated.IThreadUtils;
@@ -71,6 +70,8 @@ public class G3MWidget_Android
    private LayerSet                                       _layerSet;
    private ArrayList<org.glob3.mobile.generated.Renderer> _renderers;
    private UserData                                       _userData;
+
+   private SQLiteStorage_Android                          _storage              = null;
 
 
    public G3MWidget_Android(final Context context) {
@@ -289,7 +290,7 @@ public class G3MWidget_Android
       final NativeGL2_Android nGL = new NativeGL2_Android();
       final GL gl = new GL(nGL);
 
-      final IStorage storage = new SQLiteStorage_Android("g3m.cache", this.getContext());
+      _storage = new SQLiteStorage_Android("g3m.cache", this.getContext());
 
       //      //TESTING DB
       //      if (false) {
@@ -325,7 +326,7 @@ public class G3MWidget_Android
       //		  IDownloader downloader = null;// new CachedDownloader(new Downloader_Android(8), storage);
       final int connectTimeout = 60000;
       final int readTimeout = 60000;
-      final IDownloader downloader = new CachedDownloader(new Downloader_Android(8, connectTimeout, readTimeout), storage);
+      final IDownloader downloader = new CachedDownloader(new Downloader_Android(8, connectTimeout, readTimeout), _storage);
 
       final CompositeRenderer composite = new CompositeRenderer();
 
@@ -379,6 +380,18 @@ public class G3MWidget_Android
 
       _widget.setUserData(userData);
 
+   }
+
+
+   public void resuming() {
+      if (_storage != null) {
+         _storage.onResume();
+      }
+   }
+
+
+   public void stopping() {
+      _storage.onStop();
    }
 
 }

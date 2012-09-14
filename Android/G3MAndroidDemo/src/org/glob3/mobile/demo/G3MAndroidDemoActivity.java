@@ -178,6 +178,7 @@ public class G3MAndroidDemoActivity
    protected void onResume() {
       super.onResume();
       Log.d("Demo", "Activity resumed");
+      _widget.resuming();
    }
 
 
@@ -185,6 +186,7 @@ public class G3MAndroidDemoActivity
    protected void onPause() {
       super.onPause();
       Log.d("Demo", "Activity paused");
+      _widget.stopping();
    }
 
 
