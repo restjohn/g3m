@@ -10,6 +10,7 @@
 #define G3MiOSSDK_MeshBuilder_hpp
 
 class Vector2D;
+class Vector3D;
 class GLTextureId;
 class Mesh;
 
@@ -17,6 +18,8 @@ class MeshBuilder{
 public:
   
   static Mesh* createQuadXYMesh(const Vector2D& max, const Vector2D& min, const GLTextureId& texId);  
+  
+  static Mesh* createEllipsoidMesh(const Vector3D& radii, int resolution, const GLTextureId& texId); 
   
 };
 
