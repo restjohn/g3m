@@ -152,9 +152,9 @@ public class TileTextureBuilder extends RCObject
 
 	  IImage image = _textureBuilder.createTextureFromImages(_gl, _factory, images, rectangles, textureWidth, textureHeight);
 
-	  GLTextureId glTextureId = _texturesHandler.getGLTextureId(image, GLFormat.RGBA, petitionsID, isMipmap);
+	  final IGLTextureId glTextureId = _texturesHandler.getGLTextureId(image, GLFormat.rgba(), petitionsID, isMipmap);
 
-	  if (glTextureId.isValid())
+	  if (glTextureId != null)
 	  {
 		if (!_mesh.setGLTextureIdForLevel(0, glTextureId))
 		{
@@ -162,6 +162,8 @@ public class TileTextureBuilder extends RCObject
 		}
 	  }
 
+	  if (image != null)
+		  image.dispose();
 	}
 
 
@@ -255,7 +257,7 @@ public class TileTextureBuilder extends RCObject
 	checkIsPending(position);
 
 	_status.set(position, PetitionStatus.STATUS_DOWNLOADED);
-	_petitions.get(position).setImage(image.copy());
+	_petitions.get(position).setImage(image.shallowCopy());
 
 	stepDone();
   }
@@ -299,8 +301,8 @@ public class TileTextureBuilder extends RCObject
 	  {
 		if (!fallbackSolved)
 		{
-		  final GLTextureId glTextureId = _texturizer.getTopLevelGLTextureIdForTile(ancestor);
-		  if (glTextureId.isValid())
+		  final IGLTextureId glTextureId = _texturizer.getTopLevelGLTextureIdForTile(ancestor);
+		  if (glTextureId != null)
 		  {
 			_texturesHandler.retainGLTextureId(glTextureId);
 			mapping.setGLTextureId(glTextureId);
@@ -310,7 +312,7 @@ public class TileTextureBuilder extends RCObject
 	  }
 	  else
 	  {
-		if (mapping.getGLTextureId().isValid())
+		if (mapping.getGLTextureId() != null)
 		{
 		  ILogger.instance().logInfo("break (point) on me 3\n");
 		}

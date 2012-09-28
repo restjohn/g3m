@@ -22,6 +22,8 @@
 #include "IThreadUtils.hpp"
 #include "IStringBuilder.hpp"
 
+#include "GLConstants.hpp"
+
 G3MWidget::G3MWidget(FrameTasksExecutor*              frameTasksExecutor,
                      IFactory*                        factory,
                      const IStringUtils*              stringUtils,
@@ -144,12 +146,8 @@ G3MWidget* G3MWidget::create(FrameTasksExecutor* frameTasksExecutor,
 
 void G3MWidget::initializeGL() {
   _gl->enableDepthTest();
-#ifdef C_CODE
-  _gl->enableCullFace(Back);
-#endif
-#ifdef JAVA_CODE
-  _gl.enableCullFace(GLCullFace.Back);
-#endif
+  
+  _gl->enableCullFace(GLCullFace::back());
 }
 
 G3MWidget::~G3MWidget() {

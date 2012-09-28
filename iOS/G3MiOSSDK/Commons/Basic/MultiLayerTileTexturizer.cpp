@@ -299,20 +299,16 @@ public:
                                                                      textureWidth,
                                                                      textureHeight);
       
-#ifdef C_CODE
-      GLTextureId glTextureId = _texturesHandler->getGLTextureId(image, RGBA,
+      const IGLTextureId* glTextureId = _texturesHandler->getGLTextureId(image, GLFormat::rgba(),
                                                                  petitionsID, isMipmap);
-#else
-      GLTextureId glTextureId = _texturesHandler->getGLTextureId(image, GLFormat.RGBA,
-                                                                 petitionsID, isMipmap);
-#endif
       
-      if (glTextureId.isValid()) {
+      if (glTextureId != NULL) {
         if (!_mesh->setGLTextureIdForLevel(0, glTextureId)) {
           _texturesHandler->releaseGLTextureId(glTextureId);
         }
       }
       
+      delete image;
     }
     
 #ifdef C_CODE
@@ -392,7 +388,7 @@ public:
     checkIsPending(position);
     
     _status[position]  = STATUS_DOWNLOADED;
-    _petitions[position]->setImage( image->copy() );
+    _petitions[position]->setImage( image->shallowCopy() );
     
     stepDone();
   }
@@ -430,8 +426,8 @@ public:
       
       if (ancestor != _tile) {
         if (!fallbackSolved) {
-          const GLTextureId glTextureId = _texturizer->getTopLevelGLTextureIdForTile(ancestor);
-          if (glTextureId.isValid()) {
+          const IGLTextureId* glTextureId= _texturizer->getTopLevelGLTextureIdForTile(ancestor);
+          if (glTextureId != NULL) {
             _texturesHandler->retainGLTextureId(glTextureId);
             mapping->setGLTextureId(glTextureId);
             fallbackSolved = true;
@@ -439,7 +435,7 @@ public:
         }
       }
       else {
-        if ( mapping->getGLTextureId().isValid() ) {
+        if ( mapping->getGLTextureId() != NULL ) {
           ILogger::instance()->logInfo("break (point) on me 3\n");
         }
       }
@@ -646,10 +642,10 @@ void MultiLayerTileTexturizer::tileMeshToBeDeleted(Tile* tile,
   }
 }
 
-const GLTextureId MultiLayerTileTexturizer::getTopLevelGLTextureIdForTile(Tile* tile) {
+const const IGLTextureId* MultiLayerTileTexturizer::getTopLevelGLTextureIdForTile(Tile* tile) {
   LeveledTexturedMesh* mesh = (LeveledTexturedMesh*) tile->getTexturizedMesh();
   
-  return (mesh == NULL) ? GLTextureId::invalid() : mesh->getTopLevelGLTextureId();
+  return (mesh == NULL) ? NULL : mesh->getTopLevelGLTextureId();
 }
 
 bool MultiLayerTileTexturizer::tileMeetsRenderCriteria(Tile* tile) {
@@ -677,8 +673,8 @@ void MultiLayerTileTexturizer::ancestorTexturedSolvedChanged(Tile* tile,
     return;
   }
   
-  const GLTextureId glTextureId = ancestorMesh->getTopLevelGLTextureId();
-  if (!glTextureId.isValid()) {
+  const IGLTextureId* glTextureId = ancestorMesh->getTopLevelGLTextureId();
+  if (glTextureId == NULL) {
     return;
   }
   

@@ -89,18 +89,13 @@ Mesh* SingleImageTileTexturizer::texturize(const RenderContext* rc,
                                            Mesh* previousMesh) {
   _renderContext = rc; //SAVING CONTEXT
   
-  if (!_texId.isValid()) {
-#ifdef C_CODE
-    _texId = rc->getTexturesHandler()->getGLTextureId(_image, RGBA,
+  if (_texId == NULL) {
+    _texId = rc->getTexturesHandler()->getGLTextureId(_image, GLFormat::rgba(),
                                                       "SINGLE_IMAGE_TEX", false);
-#else
-    _texId = rc->getTexturesHandler()->getGLTextureId(_image, GLFormat.RGBA,
-                                                      "SINGLE_IMAGE_TEX", false);
-#endif
     
     rc->getFactory()->deleteImage(_image);
     
-    if (!_texId.isValid()) {
+    if (_texId == NULL) {
       rc->getLogger()->logError("Can't upload texture to GPU");
       return NULL;
     }
