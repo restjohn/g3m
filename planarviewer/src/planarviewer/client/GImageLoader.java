@@ -78,6 +78,11 @@ public class GImageLoader {
    }
 
 
+   public static boolean isInLocalCache(final String url) {
+      return _dimensionCache.containsKey(url);
+   }
+
+
    private static void init() {
 
       if (_loadingArea == null) {

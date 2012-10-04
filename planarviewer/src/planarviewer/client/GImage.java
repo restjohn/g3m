@@ -92,6 +92,14 @@ public class GImage
    }
 
 
+   public GImage(final Image image) {
+      super.setUrl(image.getUrl());
+      _dimensions = new GDimension(image.getWidth(), image.getHeight());
+      _aspectRatio = (double) ((_dimensions.getHeight()) / (_dimensions.getWidth()));
+      resize();
+   }
+
+
    public GImage(final String url) {
       super();
       setUrl(url);
@@ -147,7 +155,7 @@ public class GImage
                _aspectRatio = (double) ((_dimensions.getHeight()) / (_dimensions.getWidth()));
             }
             resize();
-            //fireEvent(new FitImageLoadEvent(event.isLoadFailed()));
+            //fireEvent(new GImageLoadEvent(event.isLoadFailed()));
          }
       });
    }

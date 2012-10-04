@@ -33,26 +33,41 @@ class GPlanarPanoramicZoomLevel {
    }
 
 
+   //   GPlanarPanoramicZoomLevel(final int level,
+   //                             final int width,
+   //                             final int height,
+   //                             final int tileWidth,
+   //                             final int tileHeight) {
+   //      _level = level;
+   //
+   //      _width = width;
+   //      _height = height;
+   //
+   //      int widthInTiles = _width / tileWidth;
+   //      if ((widthInTiles * tileWidth) < _width) {
+   //         widthInTiles++;
+   //      }
+   //      _widthInTiles = widthInTiles;
+   //
+   //      int heightInTiles = _height / tileHeight;
+   //      if ((heightInTiles * tileHeight) < _height) {
+   //         heightInTiles++;
+   //      }
+   //      _heightInTiles = heightInTiles;
+   //   }
+
+
    GPlanarPanoramicZoomLevel(final int level,
                              final int width,
                              final int height,
-                             final int tileWidth,
-                             final int tileHeight) {
+                             final int widthInTiles,
+                             final int heightInTiles) {
       _level = level;
 
       _width = width;
       _height = height;
 
-      int widthInTiles = _width / tileWidth;
-      if ((widthInTiles * tileWidth) < _width) {
-         widthInTiles++;
-      }
       _widthInTiles = widthInTiles;
-
-      int heightInTiles = _height / tileHeight;
-      if ((heightInTiles * tileHeight) < _height) {
-         heightInTiles++;
-      }
       _heightInTiles = heightInTiles;
    }
 

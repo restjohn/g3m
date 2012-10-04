@@ -62,7 +62,9 @@ public class GImageLoadEvent
 
 
    public GImage getImage() {
-      return (GImage) getSource();
+      //return (GImage) getSource();
+      return new GImage(getImageUrl());
+      //return (GImage) takeImage();
    }
 
 
