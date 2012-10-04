@@ -23,6 +23,7 @@ public class GPlanarViewerEntryPoint
       super.setCellSpacing(0);
       super.setBorderWidth(0);
       //super.getRowFormatter().setVerticalAlign(1, HasVerticalAlignment.ALIGN_TOP);
+      //super.setHeight("683px");
       //VerticalAlignmentConstant x;
 
       GImageLoader.load("BostonCityFlow.jpg", new OnLoadHandler(0, 0));
@@ -63,19 +64,20 @@ public class GPlanarViewerEntryPoint
       public void imageLoaded(final GImageLoadEvent event) {
 
          if (event.isLoadFailed()) {
-            if (!isCellPresent(_row + 1, _col)) {
-               //setText(_row + 1, _col, "Image failed to load.");
-               GWT.log("Image failed to load.");
-            }
+            GWT.log("Image failed to load.");
+            //            if (!isCellPresent(_row + 1, _col)) {
+            //               setText(_row + 1, _col, "Image failed to load.");
+            //            }
          }
          else {
             //event.getImage().setFixedSize(1024, 683);
             //event.takeImage().setPixelSize(1024, 683);
-            if (!isCellPresent(_row + 1, _col)) {
-               //               setText(_row + 2, _col, "Image dimensions: " + event.getDimensions().getWidth() + " x "
-               //                                       + event.getDimensions().getHeight());
-               GWT.log("Image dimensions: " + event.getDimensions().getWidth() + " x " + event.getDimensions().getHeight());
-            }
+            GWT.log("Image dimensions: " + event.getDimensions().getWidth() + " x " + event.getDimensions().getHeight());
+            //            if (!isCellPresent(_row + 1, _col)) {
+            //               setText(_row + 2, _col, "Image dimensions: " + event.getDimensions().getWidth() + " x "
+            //                                       + event.getDimensions().getHeight());
+
+            //            }
          }
       }
    }
