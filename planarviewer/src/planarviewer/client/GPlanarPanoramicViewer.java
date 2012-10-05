@@ -9,6 +9,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.DragEndEvent;
+import com.google.gwt.event.dom.client.DragEndHandler;
+import com.google.gwt.event.dom.client.DragStartEvent;
+import com.google.gwt.event.dom.client.DragStartHandler;
+import com.google.gwt.event.dom.client.MouseWheelEvent;
+import com.google.gwt.event.dom.client.MouseWheelHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -69,9 +75,9 @@ public class GPlanarPanoramicViewer
 
       private void positionate() {
          tryToLoadImage();
-         final GRectangle bounds = calculateBounds();
+         //final GRectangle bounds = calculateBounds();
          //setBounds(calculateBounds());
-         _image.setFixedSize(bounds._width, bounds._height); //TODO: if not null
+         //_image.setFixedSize(bounds._width, bounds._height); //TODO:
       }
 
 
@@ -293,7 +299,7 @@ public class GPlanarPanoramicViewer
                //_container.setWidget(_y, _x, _image);
                _container.setWidget(_image, _xPos, _yPos);
                GWT.log("Tile-" + _x + "-" + _y);
-               System.out.println("Tile-" + _x + "-" + _y);
+               System.out.print("Tile-" + _x + "-" + _y + " / ");
                System.out.println("Position: (" + _xPos + "," + _yPos + ")");
                //GWT.log("Image dimensions: " + event.getDimensions().getWidth() + " x " + event.getDimensions().getHeight());
             }
@@ -313,12 +319,17 @@ public class GPlanarPanoramicViewer
    private final List<GPlanarPanoramicZoomLevel> _zoomLevels;
    private final int                             _minLevel;
    private final int                             _maxLevel;
-   private final List<Tile>                      _tiles   = new ArrayList<Tile>();
+   private final List<Tile>                      _tiles      = new ArrayList<Tile>();
 
    private int                                   _currentLevel;
    //private final Point                           _offset = new Point(0, 0);
-   private int                                   _offsetX = 0;
-   private int                                   _offsetY = 0;
+   private int                                   _offsetX    = 0;
+   private int                                   _offsetY    = 0;
+
+   private int                                   _dragStartX = 0;
+   private int                                   _dragStartY = 0;
+   private int                                   _dragEndX   = 0;
+   private int                                   _dragEndY   = 0;
 
 
    //   private JLabel                                _zoomInButton;
@@ -353,7 +364,7 @@ public class GPlanarPanoramicViewer
 
       _zoomLevels = readZoomLevels();
 
-      forceDownladLevelOne();
+      forceDownloadLevelOne();
 
       int minLevel = Integer.MAX_VALUE;
       int maxLevel = Integer.MIN_VALUE;
@@ -374,14 +385,90 @@ public class GPlanarPanoramicViewer
       super.setTitle(name);
       super.setVisible(true);
       super.setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
+      Window.enableScrolling(false);
+
+      fillContainer();
+      //updateZoomLevelFromContainerSize(0);
    }
 
 
-   private void forceDownladLevelOne() {
+   private void fillContainer() {
+      super.addMouseWheelHandler(_mouseWheelHandler);
+      super.addDragStartHandler(_dragStartHandler);
+      super.addDragEndHandler(_dragEndHandler);
+
+      //createHUD(container);
+   }
+
+   final MouseWheelHandler _mouseWheelHandler = new MouseWheelHandler() {
+
+                                                 @Override
+                                                 public void onMouseWheel(final MouseWheelEvent event) {
+                                                    System.out.println("MOUSE WHEEL EVENT");
+                                                    System.out.println("WclientX: " + event.getClientX() + ", WclientY: "
+                                                                       + event.getClientY());
+                                                    System.out.println("WscreenX: " + event.getScreenX() + ", WscreenY: "
+                                                                       + event.getScreenY());
+                                                    System.out.println("WdeltaY: " + event.getDeltaY());
+
+                                                    if (event.getDeltaY() < 0) {
+                                                       //setZoomLevel(_currentLevel + 1, event.getClientX(), event.getClientY());
+                                                       setZoomLevel(_currentLevel + 1, event.getX(), event.getY());
+                                                    }
+                                                    else {
+                                                       //setZoomLevel(_currentLevel - 1, event.getClientX(), event.getClientY());
+                                                       setZoomLevel(_currentLevel - 1, event.getX(), event.getY());
+                                                    }
+                                                    event.stopPropagation();
+                                                 }
+                                              };
+
+   final DragStartHandler  _dragStartHandler  = new DragStartHandler() {
+
+                                                 @Override
+                                                 public void onDragStart(final DragStartEvent event) {
+                                                    final int SclientX = event.getNativeEvent().getClientX();
+                                                    final int SclientY = event.getNativeEvent().getClientY();
+                                                    final int SscreenX = event.getNativeEvent().getScreenX();
+                                                    final int SscreenY = event.getNativeEvent().getScreenY();
+                                                    _dragStartX = event.getNativeEvent().getScreenX();
+                                                    _dragStartY = event.getNativeEvent().getScreenY();
+                                                    System.out.println("MOUSE DRAG-START EVENT");
+                                                    System.out.println("SclientX: " + SclientX + ", SclientY: " + SclientY);
+                                                    System.out.println("SscreenX: " + SscreenX + ", SscreenY: " + SscreenY);
+                                                 }
+                                              };
+
+
+   final DragEndHandler    _dragEndHandler    = new DragEndHandler() {
+
+                                                 @Override
+                                                 public void onDragEnd(final DragEndEvent event) {
+                                                    final int EclientX = event.getNativeEvent().getClientX();
+                                                    final int EclientY = event.getNativeEvent().getClientY();
+                                                    final int EscreenX = event.getNativeEvent().getScreenX();
+                                                    final int EscreenY = event.getNativeEvent().getScreenY();
+                                                    _dragEndX = event.getNativeEvent().getScreenX();
+                                                    _dragEndY = event.getNativeEvent().getScreenY();
+                                                    System.out.println("MOUSE DRAG-END EVENT");
+                                                    System.out.println("EclientX: " + EclientX + ", EclientY: " + EclientY);
+                                                    System.out.println("EscreenX: " + EscreenX + ", EscreenY: " + EscreenY);
+                                                    System.out.println("DistanceX: " + (_dragEndX - _dragStartX)
+                                                                       + " / DistanceY: " + (_dragEndY - _dragStartY));
+                                                    //System.out.println("WscreenX: " + event.getScreenX() + ", WscreenY: " + event.getScreenY());
+                                                    final int deltaX = _dragStartX - event.getNativeEvent().getScreenX();
+                                                    final int deltaY = _dragStartY - event.getNativeEvent().getScreenY();
+                                                    setOffset(_offsetX + deltaX, _offsetY + deltaY);
+                                                 }
+                                              };
+
+
+   private void forceDownloadLevelOne() {
 
       final GPlanarPanoramicZoomLevel levelOne = getZoomLevel(1);
 
-      System.out.println("levelOne: " + levelOne.toString());
+      //super.setSize(levelOne.getWidth(), levelOne.getHeight());
+      System.out.println("forceDownloadLevelOne: " + levelOne.toString());
 
       for (int x = 0; x < levelOne.getWidthInTiles(); x++) {
          for (int y = 0; y < levelOne.getHeightInTiles(); y++) {
@@ -524,43 +611,6 @@ public class GPlanarPanoramicViewer
    //      });
    //
    //      frame.setVisible(true);
-   //   }
-
-
-   //   private void fillContainer(final Container container) {
-   //      //      super.get.addMouseWheelHandler(new MouseWheelHandler() {
-   //      //         public void onMouseWheel(final MouseWheelEvent event) {
-   //      //            final Label label = new Label("hola");
-   //      //            final int wheelDelta = EventHandler.getWheelDelta();
-   //      //
-   //      //            int newSize = label.getWidth() + (wheelDelta * label.getZoomMultiplier());
-   //      //            if (newSize < label.getMinSize()) {
-   //      //               newSize = label.getMinSize();
-   //      //            }
-   //      //            else if (newSize > label.getMaxSize()) {
-   //      //               newSize = label.getMaxSize();
-   //      //            }
-   //      //            label.setWidth(newSize);
-   //      //            label.setHeight(newSize);
-   //      //            eventTrackerLabel.setLastEvent("mouseWheel", label);
-   //      //         }
-   //      //      });
-   //
-   //      container.addMouseWheelListener(new MouseWheelListener() {
-   //         @Override
-   //         public void mouseWheelMoved(final MouseWheelEvent e) {
-   //            final Point point = e.getPoint();
-   //
-   //            if (e.getWheelRotation() < 0) {
-   //               setZoomLevel(container, _currentLevel + 1, point.x, point.y);
-   //            }
-   //            else {
-   //               setZoomLevel(container, _currentLevel - 1, point.x, point.y);
-   //            }
-   //         }
-   //      });
-   //
-   //      createHUD(container);
    //   }
 
 
@@ -990,7 +1040,6 @@ public class GPlanarPanoramicViewer
 
 
    private GRectangle getContainerBound() {
-
       //      final int containerWidth = RootPanel.get().getOffsetWidth();
       //      final int containerHeight = RootPanel.get().getOffsetHeight();
       final int containerWidth = Window.getClientWidth();
@@ -1127,10 +1176,10 @@ public class GPlanarPanoramicViewer
       final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
       _offsetX = (containerSize.getWidth() - currentZoomLevel.getWidth()) / 2;
       _offsetY = (containerSize.getHeight() - currentZoomLevel.getHeight()) / 2;
-
+      System.out.println("Updating zoomLevel from container size. ZoomLevel: " + currentZoomLevel);
+      System.out.println("_offsetX: " + _offsetX + " ,_offsetY: " + _offsetY);
       //updateZoomWidgets();
       //recreateTiles(container);
-
       recreateTiles();
    }
 
