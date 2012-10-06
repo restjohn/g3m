@@ -156,6 +156,11 @@ public class GImageLoader {
       return -1;
    }
 
+
+   public static boolean isDownloadingImage(final String url) {
+      return findUrlInPool(url) > -1;
+   }
+
    private static class ImageElementLoader {
 
       ImageElement            _image = DOM.createImg().cast();
