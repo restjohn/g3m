@@ -3,6 +3,7 @@
 package planarviewer.client;
 
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Image;
 
 
@@ -88,8 +89,28 @@ public class GImage
    }
 
 
+   @Override
+   public void onBrowserEvent(final Event e) {
+      //do nothing
+   }
+
+
    public GImage() {
    }
+
+
+   //   @Override
+   //   public HandlerRegistration addDragHandler(final DragHandler handler) {
+   //      return null;
+   //      //do nothing
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addMouseDownHandler(final MouseDownHandler handler) {
+   //      return null;
+   //      //do nothing
+   //   }
 
 
    public GImage(final Image image) {

@@ -6,12 +6,21 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.DragEndEvent;
 import com.google.gwt.event.dom.client.DragEndHandler;
+import com.google.gwt.event.dom.client.DragEvent;
+import com.google.gwt.event.dom.client.DragHandler;
 import com.google.gwt.event.dom.client.DragStartEvent;
 import com.google.gwt.event.dom.client.DragStartHandler;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.HasDragEndHandlers;
+import com.google.gwt.event.dom.client.HasDragHandlers;
 import com.google.gwt.event.dom.client.HasDragStartHandlers;
+import com.google.gwt.event.dom.client.HasMouseDownHandlers;
+import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
 import com.google.gwt.event.dom.client.HasMouseWheelHandlers;
+import com.google.gwt.event.dom.client.MouseDownEvent;
+import com.google.gwt.event.dom.client.MouseDownHandler;
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseWheelEvent;
 import com.google.gwt.event.dom.client.MouseWheelHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -25,10 +34,12 @@ public class Container
             Composite
          implements
             HasClickHandlers,
-            // HasDragHandlers,
+            HasDragHandlers,
             HasMouseWheelHandlers,
             HasDragStartHandlers,
-            HasDragEndHandlers
+            HasDragEndHandlers,
+            HasMouseDownHandlers,
+            HasMouseMoveHandlers
 //ClickHandler,
 //DragStartHandler,
 //DragEndHandler,
@@ -59,10 +70,11 @@ public class Container
    }
 
 
-   //   @Override
-   //   public HandlerRegistration addDragHandler(final DragHandler handler) {
-   //      return addDomHandler(handler, DragEvent.getType());
-   //   }
+   @Override
+   public HandlerRegistration addDragHandler(final DragHandler handler) {
+      return addDomHandler(handler, DragEvent.getType());
+   }
+
 
    @Override
    public HandlerRegistration addDragStartHandler(final DragStartHandler handler) {
@@ -79,6 +91,18 @@ public class Container
    @Override
    public HandlerRegistration addMouseWheelHandler(final MouseWheelHandler handler) {
       return addDomHandler(handler, MouseWheelEvent.getType());
+   }
+
+
+   @Override
+   public HandlerRegistration addMouseMoveHandler(final MouseMoveHandler handler) {
+      return addDomHandler(handler, MouseMoveEvent.getType());
+   }
+
+
+   @Override
+   public HandlerRegistration addMouseDownHandler(final MouseDownHandler handler) {
+      return addDomHandler(handler, MouseDownEvent.getType());
    }
 
 
@@ -150,5 +174,11 @@ public class Container
                        final int height) {
       super.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
    }
+
+
+   public void clear() {
+      panel.clear();
+   }
+
 
 }
