@@ -21,8 +21,12 @@ import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseWheelEvent;
 import com.google.gwt.event.dom.client.MouseWheelHandler;
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Image;
@@ -39,6 +43,8 @@ public class GPlanarPanoramicViewer
 
    private static final int HORIZONTAL_INCREMENT = GPlanarPanoramicZoomLevel.TILE_WIDTH / 3;
    private static final int VERTICAL_INCREMENT   = GPlanarPanoramicZoomLevel.TILE_HEIGHT / 3;
+   private static final int BUTTONEXTEND         = 20;
+   private static final int BUTTONMARGIN         = 2;
 
 
    private class Tile {
@@ -132,6 +138,15 @@ public class GPlanarPanoramicViewer
       }
 
 
+      private void tryToLoadImage(final OnLoadImageHandler handler) {
+         _removeWhileLoading = false;
+         if (GImageLoader.isDownloadingImage(_tileUrl)) {
+            return;
+         }
+         GImageLoader.load(_tileUrl, handler);//TODO 
+      }
+
+
       //      private void containerRepaint() {
       //         final Container parent = getParent();
       //         if (parent != null) {
@@ -141,77 +156,19 @@ public class GPlanarPanoramicViewer
       //      }
 
 
-      public void paint() {
-
-         if (_image == null) {
-            final Tile ancestor = getNearestAncestorWithTextureInCache();
-            if (ancestor != null) {
-               paintAncestor(ancestor);
-               System.out.println("Debería pintar ancestor: Tile-" + ancestor._x + "-" + ancestor._y);
-            }
-         }
-         else {
-            //_container.setWidget(_y, _x, _image);
-            //final GRectangle bounds = calculateBounds();
-            System.out.println("Pintando: " + asString());
-            _container.setWidget(_image, _xPos, _yPos); //TODO
-         }
-      }
-
-
-      private void paintAncestor(final Tile ancestor) {
+      private void paintAncestor() {
          //TODO
+         final Tile ancestor = getNearestAncestorWithTextureInCache();
+         if (ancestor != null) {
+            System.out.println("Ancestor: " + ancestor.tileAsString());
+            final int scale = (int) Math.pow(2, _zoomLevel.getLevel() - ancestor._zoomLevel.getLevel());
+            System.out.println("Scale: " + scale);
+            final GDimension newSize = new GDimension(_pixelsBounds.getSize().getWidth() * scale,
+                     _pixelsBounds.getSize().getHeight() * scale);
+            ancestor.tryToLoadImage(new OnLoadImageHandler(newSize));
+         }
+
       }
-
-
-      //      public void paint(final Graphics g) {
-      //         final Graphics2D g2d = (Graphics2D) g;
-      //
-      //         if (_image == null) {
-      //            final Tile ancestor = getNearestAncestorWithTextureInCache();
-      //            if (ancestor != null) {
-      //               paintAncestor(g2d, ancestor);
-      //            }
-      //         }
-      //         else {
-      //            g2d.drawImage(_image, 0, 0, null);
-      //         }
-      //
-      //         if (_debug) {
-      //            renderDebug(g2d);
-      //         }
-      //
-      //      }
-
-
-      //      private void paintAncestor(final Graphics2D g2d,
-      //                                 final Tile ancestor) {
-      //
-      //         // final RenderingHints renderHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-      //         // renderHints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-      //         // g2d.setRenderingHints(renderHints);
-      //
-      //         ancestor.tryToLoadImage();
-      //
-      //         final double scale = Math.pow(2, _zoomLevel.getLevel() - ancestor._zoomLevel.getLevel());
-      //
-      //         final Rectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
-      //
-      //         final IVector2 lower = _pixelsBounds._lower.sub(scaledAncestorBounds._lower).div(scale);
-      //         final IVector2 upper = _pixelsBounds._upper.sub(scaledAncestorBounds._lower).div(scale);
-      //
-      //         final int sx1 = Math.round((float) lower.x());
-      //         final int sy1 = Math.round((float) lower.y());
-      //         final int sx2 = Math.round((float) upper.x());
-      //         final int sy2 = Math.round((float) upper.y());
-      //         g2d.drawImage( //
-      //                  ancestor._image, //
-      //                  0, 0, //
-      //                  GPlanarPanoramicZoomLevel.TILE_WIDTH, GPlanarPanoramicZoomLevel.TILE_HEIGHT, //
-      //                  sx1, sy1, //
-      //                  sx2, sy2, //
-      //                  null);
-      //      }
 
 
       private boolean hasTextureInCache() {
@@ -261,9 +218,11 @@ public class GPlanarPanoramicViewer
          //         }
          //_image.removeFromParent();
          if (_image != null) {
+            _image.setVisible(false);
             _container.remove(_image);
             _image.removeFromParent();
-            System.out.println("Borrando: " + asString());
+            //_container.clear();
+            System.out.println("Borrando: " + tileAsString());
          }
          if (GImageLoader.isDownloadingImage(_tileUrl)) {
             _removeWhileLoading = true;
@@ -276,7 +235,7 @@ public class GPlanarPanoramicViewer
       }
 
 
-      private String asString() {
+      private String tileAsString() {
          final String str = "Tile-" + _x + "-" + _y + " | " + "pos: (" + _xPos + "," + _yPos + ")";
          return str;
       }
@@ -285,15 +244,16 @@ public class GPlanarPanoramicViewer
                implements
                   IImageLoadHandler {
 
-         //final int _xPos, _yPos;
-         //         public OnLoadImageHandler(final int xPos,
-         //                                   final int yPos) {
-         //            _xPos = xPos;
-         //            _yPos = yPos;
-         //         }
+         final GDimension _imgSize;
+
 
          public OnLoadImageHandler() {
+            this(null);
+         }
 
+
+         public OnLoadImageHandler(final GDimension imgSize) {
+            _imgSize = imgSize;
          }
 
 
@@ -302,7 +262,8 @@ public class GPlanarPanoramicViewer
 
             if (event.isLoadFailed()) {
                //GWT.log("Image failed to load.");
-               System.out.println("Image failed to load.");
+               System.out.println("Image failed to load: Paint ANCESTOR.");
+               paintAncestor();
             }
             else {
                if (_removeWhileLoading) {
@@ -312,6 +273,9 @@ public class GPlanarPanoramicViewer
                //_image = new GImage(_tileUrl);
                //_image = new GImage(event.takeImage());
                _image = event.getImage();
+               if (_imgSize != null) {
+                  _image.setSize(_imgSize);
+               }
                _image.unsinkEvents(Event.DRAGDROP);
                _image.unsinkEvents(Event.CLICK);
                _image.unsinkEvents(Event.MOUSEDOWN);
@@ -319,8 +283,7 @@ public class GPlanarPanoramicViewer
                _image.unsinkEvents(Event.SELECT);
                _container.setWidget(_image, _xPos, _yPos);
                //GWT.log("Tile-" + _x + "-" + _y);
-               System.out.println("Loaded: " + asString());
-               //createHUD(); // TODO: temporal, quitar luego
+               System.out.println("Loaded: " + tileAsString());
             }
          }
       }
@@ -345,26 +308,12 @@ public class GPlanarPanoramicViewer
    private int                                   _offsetX           = 0;
    private int                                   _offsetY           = 0;
 
-   private final int                             _dragStartX        = 0;
-   private final int                             _dragStartY        = 0;
-   private final int                             _dragEndX          = 0;
-   private final int                             _dragEndY          = 0;
-
    private int                                   _dragLastXPosition = 0;
    private int                                   _dragLastYPosition = 0;
    private boolean                               _isDragging        = false;
 
    private PushButton                            _buttonZoomIn;
    private PushButton                            _buttonZoomOut;
-
-
-   //   private JLabel                                _zoomInButton;
-   //   private JLabel                                _zoomOutButton;
-   //   private JSlider                               _zoomSlider;
-   //
-   //   private Point                                 _dragLastPosition;
-   //
-   //private ILoader.LoadID                        _loadID;
 
 
    public GPlanarPanoramicViewer(final String url,
@@ -416,12 +365,26 @@ public class GPlanarPanoramicViewer
 
 
    private void fillContainer() {
+
       super.addMouseWheelHandler(_mouseWheelHandler);
       super.addDragStartHandler(_dragStartHandler);
       super.addDragEndHandler(_dragEndHandler);
       //super.addDragHandler(_dragHandler);
-      super.addMouseDownHandler(_mouseDownHandler);
+      //super.addMouseDownHandler(_mouseDownHandler);
       //super.addMouseMoveHandler(_mouseMoveHandler);
+      //super.addMouseUpHandler(_mouseUpHandler);
+
+      Window.addResizeHandler(new ResizeHandler() {
+
+         @Override
+         public void onResize(final ResizeEvent event) {
+            System.out.println("RESIZE EVENT !");
+            //recreateTiles();
+            setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
+            updateZoomLevelFromContainerSize(0);
+            recreateZoomWidtgets();
+         }
+      });
 
       createHUD();
    }
@@ -431,12 +394,6 @@ public class GPlanarPanoramicViewer
                                                  @Override
                                                  public void onMouseWheel(final MouseWheelEvent event) {
                                                     System.out.println("MOUSE WHEEL EVENT");
-                                                    //                                                    System.out.println("WclientX: " + event.getClientX() + ", WclientY: "
-                                                    //                                                                       + event.getClientY());
-                                                    //                                                    System.out.println("WscreenX: " + event.getScreenX() + ", WscreenY: "
-                                                    //                                                                       + event.getScreenY());
-                                                    //                                                    System.out.println("WdeltaY: " + event.getDeltaY());
-
                                                     if (event.getDeltaY() < 0) {
                                                        //setZoomLevel(_currentLevel + 1, event.getClientX(), event.getClientY());
                                                        setZoomLevel(_currentLevel + 1, event.getX(), event.getY());
@@ -453,16 +410,12 @@ public class GPlanarPanoramicViewer
 
                                                  @Override
                                                  public void onDragStart(final DragStartEvent event) {
-                                                    final int SclientX = event.getNativeEvent().getClientX();
-                                                    //                                                    final int SclientY = event.getNativeEvent().getClientY();
-                                                    //                                                    final int SscreenX = event.getNativeEvent().getScreenX();
-                                                    //                                                    final int SscreenY = event.getNativeEvent().getScreenY();
-                                                    //                                                    _dragStartX = event.getNativeEvent().getScreenX();
-                                                    //                                                    _dragStartY = event.getNativeEvent().getScreenY();
                                                     System.out.println("MOUSE DRAG-START EVENT");
-                                                    //                                                    System.out.println("SclientX: " + SclientX + ", SclientY: " + SclientY);
-                                                    //                                                    System.out.println("SscreenX: " + SscreenX + ", SscreenY: " + SscreenY);
-                                                    _isDragging = true;
+                                                    _dragLastXPosition = event.getNativeEvent().getScreenX();
+                                                    _dragLastYPosition = event.getNativeEvent().getScreenY();
+                                                    System.out.println("pos: (" + _dragLastXPosition + "," + _dragLastYPosition
+                                                                       + ")");
+                                                    //_isDragging = true;
                                                  }
                                               };
 
@@ -471,28 +424,13 @@ public class GPlanarPanoramicViewer
 
                                                  @Override
                                                  public void onDragEnd(final DragEndEvent event) {
-                                                    //                                                    final int EclientX = event.getNativeEvent().getClientX();
-                                                    //                                                    final int EclientY = event.getNativeEvent().getClientY();
-                                                    //                                                    final int EscreenX = event.getNativeEvent().getScreenX();
-                                                    //                                                    final int EscreenY = event.getNativeEvent().getScreenY();
-                                                    //                                                    _dragEndX = event.getNativeEvent().getScreenX();
-                                                    //                                                    _dragEndY = event.getNativeEvent().getScreenY();
                                                     System.out.println("MOUSE DRAG-END EVENT");
-                                                    //                                                    System.out.println("EclientX: " + EclientX + ", EclientY: " + EclientY);
-                                                    //                                                    System.out.println("EscreenX: " + EscreenX + ", EscreenY: " + EscreenY);
-                                                    //                                                    System.out.println("DistanceX: " + (_dragEndX - _dragStartX)
-                                                    //                                                                       + " / DistanceY: " + (_dragEndY - _dragStartY));
-                                                    //                                                    //System.out.println("WscreenX: " + event.getScreenX() + ", WscreenY: " + event.getScreenY());
-                                                    //                                                    final int deltaX = event.getNativeEvent().getScreenX() - _dragStartX;
-                                                    //                                                    final int deltaY = event.getNativeEvent().getScreenY() - _dragStartY;
-                                                    //                                                    setOffset(_offsetX + deltaX, _offsetY + deltaY);
-
                                                     final int deltaX = event.getNativeEvent().getScreenX() - _dragLastXPosition;
                                                     final int deltaY = event.getNativeEvent().getScreenY() - _dragLastYPosition;
 
                                                     System.out.println("delta: (" + deltaX + "," + deltaY + ")");
                                                     setOffset(_offsetX + deltaX, _offsetY + deltaY);
-                                                    _isDragging = false;
+                                                    //_isDragging = false;
                                                  }
                                               };
 
@@ -505,15 +443,17 @@ public class GPlanarPanoramicViewer
                                                                        + event.getNativeEvent().getScreenY() + ")");
                                                     final int deltaX = event.getNativeEvent().getScreenX() - _dragLastXPosition;
                                                     final int deltaY = event.getNativeEvent().getScreenY() - _dragLastYPosition;
+                                                    final int deltaCX = event.getNativeEvent().getClientX() - _dragLastXPosition;
+                                                    final int deltaCY = event.getNativeEvent().getClientY() - _dragLastYPosition;
 
-                                                    System.out.println("delta: (" + deltaX + "," + deltaY + ")");
-                                                    setOffset(_offsetX + deltaX, _offsetY + deltaY);
+                                                    System.out.println("deltaScreen: (" + deltaX + "," + deltaY + ")");
+                                                    System.out.println("deltaClient: (" + deltaCX + "," + deltaCY + ")");
+                                                    //setOffset(_offsetX + deltaX, _offsetY + deltaY);
                                                  }
                                               };
 
    //                                            @Override
    //   public void dragMouseMoved(DragSourceDragEvent dsde) {
-   //      // TODO Auto-generated method stub
    //      
    //   }
    //
@@ -521,7 +461,6 @@ public class GPlanarPanoramicViewer
    //
    //                                                         @Override
    //                                                         public void dragMouseMoved(final DragSourceDragEvent dsde) {
-   //                                                            // TODO Auto-generated method stub
    //                                                            System.out.println("DRAG-MOVE EVENT");
    //                                                         }
    //                                                      };
@@ -530,14 +469,14 @@ public class GPlanarPanoramicViewer
 
                                                  @Override
                                                  public void onMouseMove(final MouseMoveEvent event) {
-                                                    // TODO Auto-generated method stub
                                                     if (_isDragging) {
                                                        System.out.println("ON-MOUSE-MOVE EVENT");
                                                        final int deltaX = event.getNativeEvent().getScreenX()
                                                                           - _dragLastXPosition;
                                                        final int deltaY = event.getNativeEvent().getScreenY()
                                                                           - _dragLastYPosition;
-
+                                                       _dragLastXPosition = event.getNativeEvent().getScreenX();
+                                                       _dragLastYPosition = event.getNativeEvent().getScreenY();
                                                        System.out.println("delta: (" + deltaX + "," + deltaY + ")");
                                                        setOffset(_offsetX + deltaX, _offsetY + deltaY);
                                                     }
@@ -549,13 +488,21 @@ public class GPlanarPanoramicViewer
 
                                                  @Override
                                                  public void onMouseDown(final MouseDownEvent event) {
-                                                    //                                                    _dragLastXPosition = event.getX();
-                                                    //                                                    _dragLastYPosition = event.getY();
                                                     System.out.println("MOUSE-DOWN EVENT");
                                                     _dragLastXPosition = event.getNativeEvent().getScreenX();
                                                     _dragLastYPosition = event.getNativeEvent().getScreenY();
                                                     System.out.println("pos: (" + _dragLastXPosition + "," + _dragLastYPosition
                                                                        + ")");
+                                                    _isDragging = true;
+                                                 }
+                                              };
+
+   final MouseUpHandler    _mouseUpHandler    = new MouseUpHandler() {
+
+                                                 @Override
+                                                 public void onMouseUp(final MouseUpEvent event) {
+                                                    System.out.println("MOUSE-UP EVENT");
+                                                    _isDragging = false;
                                                  }
                                               };
 
@@ -601,7 +548,7 @@ public class GPlanarPanoramicViewer
 
       //TODO: read file from url and parse with json
 
-      //now hack for test viewer code
+      //now hack for test viewer 
       final List<GPlanarPanoramicZoomLevel> result = new ArrayList<GPlanarPanoramicZoomLevel>();
 
       final GPlanarPanoramicZoomLevel level1 = new GPlanarPanoramicZoomLevel(1, 2430, 210, 10, 1);
@@ -637,11 +584,10 @@ public class GPlanarPanoramicViewer
 
 
    private void createHUD() {
-      final int buttonExtent = 20;
-      final int margin = 2;
-
-      createNavigationButtons(buttonExtent, margin);
-      createZoomWidgets(buttonExtent, margin);
+      //      final int buttonExtent = 20;
+      //      final int margin = 2;
+      createNavigationButtons(BUTTONEXTEND, BUTTONMARGIN);
+      createZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
    }
 
 
@@ -715,6 +661,13 @@ public class GPlanarPanoramicViewer
 
    private String asCssString(final int value) {
       return Integer.toString(value) + "px";
+   }
+
+
+   private void recreateZoomWidtgets() {
+      super.remove(_buttonZoomIn);
+      super.remove(_buttonZoomOut);
+      createZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
    }
 
 
@@ -804,15 +757,14 @@ public class GPlanarPanoramicViewer
       _offsetX = offsetX;
       _offsetY = offsetY;
 
-      //layoutTiles();
       //updateTilesGrid();
+      //layoutTiles();
       recreateTiles(); // ??
    }
 
 
    private void updateTilesGrid() {
 
-      //removeNotVisibleTiles(container);
       removeNotVisibleTiles();
 
       final List<Tile> tilesToCreate = new ArrayList<Tile>();
@@ -944,6 +896,7 @@ public class GPlanarPanoramicViewer
          }
       }
       System.out.println("Level: " + currentZoomLevel.getLevel() + ", NUM Tiles: " + _tiles.size());
+      System.out.println("Width: " + containerBounds.getWidth() + ", Height: " + containerBounds.getHeight());
    }
 
 

@@ -16,11 +16,14 @@ import com.google.gwt.event.dom.client.HasDragHandlers;
 import com.google.gwt.event.dom.client.HasDragStartHandlers;
 import com.google.gwt.event.dom.client.HasMouseDownHandlers;
 import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
+import com.google.gwt.event.dom.client.HasMouseUpHandlers;
 import com.google.gwt.event.dom.client.HasMouseWheelHandlers;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
 import com.google.gwt.event.dom.client.MouseMoveHandler;
+import com.google.gwt.event.dom.client.MouseUpEvent;
+import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseWheelEvent;
 import com.google.gwt.event.dom.client.MouseWheelHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -39,6 +42,7 @@ public class Container
             HasDragStartHandlers,
             HasDragEndHandlers,
             HasMouseDownHandlers,
+            HasMouseUpHandlers,
             HasMouseMoveHandlers
 //ClickHandler,
 //DragStartHandler,
@@ -103,6 +107,12 @@ public class Container
    @Override
    public HandlerRegistration addMouseDownHandler(final MouseDownHandler handler) {
       return addDomHandler(handler, MouseDownEvent.getType());
+   }
+
+
+   @Override
+   public HandlerRegistration addMouseUpHandler(final MouseUpHandler handler) {
+      return addDomHandler(handler, MouseUpEvent.getType());
    }
 
 

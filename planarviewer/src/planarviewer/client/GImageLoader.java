@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.ImageElement;
@@ -99,11 +98,11 @@ public class GImageLoader {
                boolean success;
                if (Event.ONLOAD == event.getTypeInt()) {
                   success = true;
-                  GWT.log("Init OK ");
+                  //GWT.log("Init OK ");
                }
                else if (Event.ONERROR == event.getTypeInt()) {
                   success = false;
-                  GWT.log("Init ERROR ");
+                  //GWT.log("Init ERROR ");
                }
                else {
                   return;

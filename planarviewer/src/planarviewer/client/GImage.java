@@ -294,6 +294,13 @@ public class GImage
    }
 
 
+   public void setSize(final GDimension size) {
+      _fixedWidth = size.getWidth();
+      _fixedHeight = size.getHeight();
+      resize();
+   }
+
+
    private void setHeight(final Integer px) {
       if (px == null) {
          setHeight("");
