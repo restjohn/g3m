@@ -386,6 +386,7 @@ public class GPlanarPanoramicViewer
          }
       });
 
+      DOM.setIntStyleAttribute(this.getElement(), "border", 0);
       createHUD();
    }
 
