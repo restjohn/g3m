@@ -381,7 +381,7 @@ public class GPlanarPanoramicViewer
             System.out.println("RESIZE EVENT !");
             //recreateTiles();
             setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
-            updateZoomLevelFromContainerSize(0);
+            updateZoomLevelFromContainerSize(_currentLevel);
             recreateZoomWidtgets();
          }
       });
