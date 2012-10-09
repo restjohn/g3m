@@ -29,6 +29,7 @@ import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.PushButton;
 
@@ -165,7 +166,15 @@ public class GPlanarPanoramicViewer
             System.out.println("Scale: " + scale);
             final GDimension newSize = new GDimension(_pixelsBounds.getSize().getWidth() * scale,
                      _pixelsBounds.getSize().getHeight() * scale);
-            ancestor.tryToLoadImage(new OnLoadImageHandler(newSize));
+            initializePixelsBounds();
+            final GRectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
+            final int left = (_pixelsBounds._x - (scaledAncestorBounds._width * scale));
+            final int top = (_pixelsBounds._y - (scaledAncestorBounds._height));
+            System.out.println("left: " + left + ", top: " + top);
+            //            final GAxisAlignedRectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
+            //            final IVector2 lower = _pixelsBounds._lower.sub(scaledAncestorBounds._lower).div(scale);
+            //            final IVector2 upper = _pixelsBounds._upper.sub(scaledAncestorBounds._lower).div(scale);
+            ancestor.tryToLoadImage(new OnLoadImageHandler(left, top, newSize));
          }
 
       }
@@ -244,15 +253,21 @@ public class GPlanarPanoramicViewer
                implements
                   IImageLoadHandler {
 
-         final GDimension _imgSize;
+         private final GDimension _imgSize;
+         private final int        _left;
+         private final int        _top;
 
 
          public OnLoadImageHandler() {
-            this(null);
+            this(0, 0, null);
          }
 
 
-         public OnLoadImageHandler(final GDimension imgSize) {
+         public OnLoadImageHandler(final int left,
+                                   final int top,
+                                   final GDimension imgSize) {
+            _left = left;
+            _top = top;
             _imgSize = imgSize;
          }
 
@@ -274,14 +289,23 @@ public class GPlanarPanoramicViewer
                //_image = new GImage(event.takeImage());
                _image = event.getImage();
                if (_imgSize != null) {
+                  //_image.setVisibleRect(0, 0, _imgSize.getWidth(), _imgSize.getHeight());
+                  //_image.setSize(_imgSize);
+                  //_image.setFixedSize(_imgSize.getWidth() * 2, _imgSize.getHeight() * 2);
+                  final AbsolutePanel testPanel = new AbsolutePanel();
                   _image.setSize(_imgSize);
+                  testPanel.add(_image, _left, _top);
+                  testPanel.setPixelSize(_imgSize.getWidth(), _imgSize.getHeight());
+                  _container.setWidget(testPanel, _xPos, _yPos);
                }
-               _image.unsinkEvents(Event.DRAGDROP);
-               _image.unsinkEvents(Event.CLICK);
-               _image.unsinkEvents(Event.MOUSEDOWN);
-               _image.unsinkEvents(Event.MOUSEDRAG);
-               _image.unsinkEvents(Event.SELECT);
-               _container.setWidget(_image, _xPos, _yPos);
+               else {
+                  _image.unsinkEvents(Event.DRAGDROP);
+                  _image.unsinkEvents(Event.CLICK);
+                  _image.unsinkEvents(Event.MOUSEDOWN);
+                  _image.unsinkEvents(Event.MOUSEDRAG);
+                  _image.unsinkEvents(Event.SELECT);
+                  _container.setWidget(_image, _xPos, _yPos);
+               }
                //GWT.log("Tile-" + _x + "-" + _y);
                System.out.println("Loaded: " + tileAsString());
             }
@@ -379,7 +403,6 @@ public class GPlanarPanoramicViewer
          @Override
          public void onResize(final ResizeEvent event) {
             System.out.println("RESIZE EVENT !");
-            //recreateTiles();
             setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
             updateZoomLevelFromContainerSize(_currentLevel);
             recreateZoomWidtgets();
