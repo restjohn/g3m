@@ -354,6 +354,9 @@ public class GPlanarPanoramicViewer
    private int                                   _dragLastYPosition = 0;
    private boolean                               _isDragging        = false;
 
+   private PushButton                            _buttonZoomIn;
+   private PushButton                            _buttonZoomOut;
+
 
    //   private JLabel                                _zoomInButton;
    //   private JLabel                                _zoomOutButton;
@@ -700,50 +703,44 @@ public class GPlanarPanoramicViewer
    }
 
 
-   //
-   //   private void setLook(final JComponent widget) {
-   //      if (_debug) {
-   //         widget.setBorder(new LineBorder(Color.RED, 1));
-   //      }
-   //      widget.setCursor(new Cursor(Cursor.HAND_CURSOR));
-   //   }
-   //
-
    private void createZoomWidgets(final int buttonExtent,
                                   final int margin) {
 
       final String buttonSize = asCssString(buttonExtent);
+      final int rightPosition = getContainerSize().getWidth() - (buttonExtent * 2) - margin;
 
       // zoom-in button
       final Image imgZoomIn = new Image("./IMG/zoom-in.png");
       imgZoomIn.setSize(buttonSize, buttonSize);
-      final PushButton buttonZoomIn = new PushButton(imgZoomIn);
-      buttonZoomIn.addClickHandler(new ClickHandler() {
+      _buttonZoomIn = new PushButton(imgZoomIn);
+      _buttonZoomIn.addClickHandler(new ClickHandler() {
 
          @Override
          public void onClick(final ClickEvent event) {
             setZoomLevel(_currentLevel + 1);
          }
       });
-      buttonZoomIn.setSize(buttonSize, buttonSize);
-      DOM.setIntStyleAttribute(buttonZoomIn.getElement(), "zIndex", 101);
-      super.setWidget(buttonZoomIn, margin + buttonExtent, margin + (buttonExtent * 4) + 0);
+      _buttonZoomIn.setSize(buttonSize, buttonSize);
+      DOM.setIntStyleAttribute(_buttonZoomIn.getElement(), "zIndex", 101);
+      //super.setWidget(_buttonZoomIn, margin + buttonExtent, margin + (buttonExtent * 4));
+      super.setWidget(_buttonZoomIn, rightPosition, margin);
 
       // zoom-out button
       final Image imgZoomOut = new Image("./IMG/zoom-out.png");
       imgZoomOut.setSize(buttonSize, buttonSize);
-      final PushButton buttonZoomOut = new PushButton(imgZoomOut);
-      buttonZoomOut.addClickHandler(new ClickHandler() {
+      _buttonZoomOut = new PushButton(imgZoomOut);
+      _buttonZoomOut.addClickHandler(new ClickHandler() {
 
          @Override
          public void onClick(final ClickEvent event) {
             setZoomLevel(_currentLevel - 1);
          }
       });
-      buttonZoomOut.setSize(buttonSize, buttonSize);
-      DOM.setIntStyleAttribute(buttonZoomOut.getElement(), "zIndex", 101);
+      _buttonZoomOut.setSize(buttonSize, buttonSize);
+      DOM.setIntStyleAttribute(_buttonZoomOut.getElement(), "zIndex", 101);
       //super.setWidget(buttonZoomOut, margin + buttonExtent, margin + (buttonExtent * 5) + _zoomSlider.getHeight());
-      super.setWidget(buttonZoomOut, margin + buttonExtent, margin + (buttonExtent * 5) + 40);
+      //super.setWidget(_buttonZoomOut, margin + buttonExtent, margin + (buttonExtent * 5) + 40);
+      super.setWidget(_buttonZoomOut, rightPosition, margin + (buttonExtent * 2));
    }
 
 
@@ -778,15 +775,12 @@ public class GPlanarPanoramicViewer
       _offsetX = (int) (targetXForNewZoom - targetX) * -1;
       _offsetY = (int) (targetYForNewZoom - targetY) * -1;
 
-      //updateZoomWidgets();
-
-      //recreateTiles(container);
+      updateZoomWidgets();
       recreateTiles();
    }
 
 
-   private void setOffset(//final Container container,
-                          final int offsetX,
+   private void setOffset(final int offsetX,
                           final int offsetY) {
 
       if ((offsetX == _offsetX) && (offsetY == _offsetY)) {
@@ -797,9 +791,8 @@ public class GPlanarPanoramicViewer
       _offsetY = offsetY;
 
       //layoutTiles();
-      //updateTilesGrid(container);
       //updateTilesGrid();
-      recreateTiles();
+      recreateTiles(); // ??
    }
 
 
@@ -880,12 +873,11 @@ public class GPlanarPanoramicViewer
    }
 
 
-   //   private void updateZoomWidgets() {
-   //      _zoomInButton.setEnabled(_currentLevel < _maxLevel);
-   //      _zoomOutButton.setEnabled(_currentLevel > _minLevel);
-   //
-   //      _zoomSlider.setValue(_currentLevel);
-   //   }
+   private void updateZoomWidgets() {
+      _buttonZoomIn.setEnabled(_currentLevel < _maxLevel);
+      _buttonZoomOut.setEnabled(_currentLevel > _minLevel);
+      //_zoomSlider.setValue(_currentLevel);
+   }
 
 
    private void recreateTiles() {
@@ -907,11 +899,11 @@ public class GPlanarPanoramicViewer
    }
 
 
-   private void addTiles() {
-      for (final Tile tile : _tiles) {
-         //container.add(tile);
-      }
-   }
+   //   private void addTiles() {
+   //      for (final Tile tile : _tiles) {
+   //         //container.add(tile);
+   //      }
+   //   }
 
 
    private void layoutTiles() {
@@ -997,8 +989,8 @@ public class GPlanarPanoramicViewer
       _offsetY = (containerSize.getHeight() - currentZoomLevel.getHeight()) / 2;
       System.out.println("Updating zoomLevel from container size. ZoomLevel: " + currentZoomLevel);
       System.out.println("_offsetX: " + _offsetX + " ,_offsetY: " + _offsetY);
-      //updateZoomWidgets();
-      //recreateTiles(container);
+
+      updateZoomWidgets();
       recreateTiles();
    }
 
