@@ -511,6 +511,21 @@ public class GPlanarPanoramicViewer
                                                  }
                                               };
 
+   //                                            @Override
+   //   public void dragMouseMoved(DragSourceDragEvent dsde) {
+   //      // TODO Auto-generated method stub
+   //      
+   //   }
+   //
+   //   final DragSourceMotionListener _dragSourceListener = new DragSourceMotionListener() {
+   //
+   //                                                         @Override
+   //                                                         public void dragMouseMoved(final DragSourceDragEvent dsde) {
+   //                                                            // TODO Auto-generated method stub
+   //                                                            System.out.println("DRAG-MOVE EVENT");
+   //                                                         }
+   //                                                      };
+
    final MouseMoveHandler  _mouseMoveHandler  = new MouseMoveHandler() {
 
                                                  @Override
@@ -612,7 +627,7 @@ public class GPlanarPanoramicViewer
 
       for (int i = _minLevel + 1; i < _maxLevel; i++) {
          final GPlanarPanoramicZoomLevel currentLevel = getZoomLevel(i);
-         if ((currentLevel.getWidth() <= currentWidth) || (currentLevel.getHeight() <= currentHeight)) {
+         if ((currentLevel.getWidth() <= currentWidth) && (currentLevel.getHeight() <= currentHeight)) {
             result = i;
          }
       }
@@ -722,8 +737,8 @@ public class GPlanarPanoramicViewer
       });
       _buttonZoomIn.setSize(buttonSize, buttonSize);
       DOM.setIntStyleAttribute(_buttonZoomIn.getElement(), "zIndex", 101);
-      //super.setWidget(_buttonZoomIn, margin + buttonExtent, margin + (buttonExtent * 4));
-      super.setWidget(_buttonZoomIn, rightPosition, margin);
+      //super.setWidget(_buttonZoomIn, margin + buttonExtent, margin + (buttonExtent * 4)); // at client left position
+      super.setWidget(_buttonZoomIn, rightPosition, margin); // at client right position
 
       // zoom-out button
       final Image imgZoomOut = new Image("./IMG/zoom-out.png");
@@ -738,9 +753,8 @@ public class GPlanarPanoramicViewer
       });
       _buttonZoomOut.setSize(buttonSize, buttonSize);
       DOM.setIntStyleAttribute(_buttonZoomOut.getElement(), "zIndex", 101);
-      //super.setWidget(buttonZoomOut, margin + buttonExtent, margin + (buttonExtent * 5) + _zoomSlider.getHeight());
-      //super.setWidget(_buttonZoomOut, margin + buttonExtent, margin + (buttonExtent * 5) + 40);
-      super.setWidget(_buttonZoomOut, rightPosition, margin + (buttonExtent * 2));
+      //super.setWidget(_buttonZoomOut, margin + buttonExtent, margin + (buttonExtent * 5) + 40); // at client left position
+      super.setWidget(_buttonZoomOut, rightPosition, margin + (buttonExtent * 2)); // at client right position
    }
 
 

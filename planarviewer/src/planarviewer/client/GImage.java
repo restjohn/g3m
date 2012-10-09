@@ -458,4 +458,13 @@ public class GImage
    //                                              }
    //                                           };
 
+   //   final DragSourceMotionListener _dragSourceListener = new DragSourceMotionListener() {
+   //
+   //      @Override
+   //      public void dragMouseMoved(final DragSourceDragEvent dsde) {
+   //         // TODO Auto-generated method stub
+   //         System.out.println("DRAG-MOVE EVENT");
+   //      }
+   //   };
+
 }
