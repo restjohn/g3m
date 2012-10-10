@@ -2,10 +2,7 @@
 
 package planarviewer.client;
 
-import java.io.IOException;
-
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -23,15 +20,8 @@ public class GPlanarViewerEntryPoint
 
       final String imgUrl = "./IMG/caminomontana";
 
-      try {
-         final GPlanarPanoramicViewer viewer = new GPlanarPanoramicViewer(imgUrl, "caminomontana");
-         RootPanel.get().add(viewer);
-      }
-      catch (final IOException e) {
-         // TODO Auto-generated catch block
-         //e.printStackTrace();
-         GWT.log("error al crear el viewer !");
-      }
+      final GPlanarPanoramicViewer viewer = new GPlanarPanoramicViewer(imgUrl, "caminomontana", true);
+      RootPanel.get().add(viewer);
 
    }
 
