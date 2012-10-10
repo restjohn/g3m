@@ -161,19 +161,24 @@ public class GPlanarPanoramicViewer
          //TODO
          final Tile ancestor = getNearestAncestorWithTextureInCache();
          if (ancestor != null) {
-            System.out.println("Ancestor: " + ancestor.toString());
+
             final int scale = (int) Math.pow(2, _zoomLevel.getLevel() - ancestor._zoomLevel.getLevel());
-            System.out.println("Scale: " + scale);
             final GDimension newSize = new GDimension(_pixelsBounds.getSize().getWidth() * scale,
                      _pixelsBounds.getSize().getHeight() * scale);
-            initializePixelsBounds();
+
+            if (_debug) {
+               System.out.println("Ancestor: " + ancestor.toString());
+               System.out.println("Scale: " + scale);
+               System.out.println("newSize: " + newSize.toString());
+            }
+
             final GRectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
-            final int left = (_pixelsBounds._x - (scaledAncestorBounds._width * scale));
-            final int top = (_pixelsBounds._y - (scaledAncestorBounds._height));
-            System.out.println("left: " + left + ", top: " + top);
-            //            final GAxisAlignedRectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
-            //            final IVector2 lower = _pixelsBounds._lower.sub(scaledAncestorBounds._lower).div(scale);
-            //            final IVector2 upper = _pixelsBounds._upper.sub(scaledAncestorBounds._lower).div(scale);
+            final int left = (_pixelsBounds._x - (scaledAncestorBounds._width * ancestor._x));
+            final int top = (_pixelsBounds._y - (scaledAncestorBounds._height * ancestor._y));
+            if (_debug) {
+               System.out.println("left: " + left + ", top: " + top);
+            }
+
             ancestor.tryToLoadImage(new OnLoadImageHandler(left, top, newSize));
          }
 
@@ -535,21 +540,21 @@ public class GPlanarPanoramicViewer
                                               };
 
 
-   private void forceDownloadLevelOne() { //TODO
-
-      final GPlanarPanoramicZoomLevel levelOne = getZoomLevel(1);
-
-      if (_debug) {
-         System.out.println("forceDownloadLevelOne: " + levelOne.toString());
-      }
-
-      for (int x = 0; x < levelOne.getWidthInTiles(); x++) {
-         for (int y = 0; y < levelOne.getHeightInTiles(); y++) {
-            final Tile tile = new Tile(this, levelOne, x, y);
-            tile.tryToLoadImage(); // level one has maximum priority for downloading
-         }
-      }
-   }
+   //   private void forceDownloadLevelOne() { //TODO
+   //
+   //      final GPlanarPanoramicZoomLevel levelOne = getZoomLevel(1);
+   //
+   //      if (_debug) {
+   //         System.out.println("forceDownloadLevelOne: " + levelOne.toString());
+   //      }
+   //
+   //      for (int x = 0; x < levelOne.getWidthInTiles(); x++) {
+   //         for (int y = 0; y < levelOne.getHeightInTiles(); y++) {
+   //            final Tile tile = new Tile(this, levelOne, x, y);
+   //            tile.tryToLoadImage(); // level one has maximum priority for downloading
+   //         }
+   //      }
+   //   }
 
 
    private GPlanarPanoramicZoomLevel getCurrentZoomLevel() {
