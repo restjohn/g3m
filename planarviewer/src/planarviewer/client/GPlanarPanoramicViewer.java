@@ -5,7 +5,6 @@ package planarviewer.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.gargoylesoftware.htmlunit.javascript.host.Event;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -293,18 +292,34 @@ public class GPlanarPanoramicViewer
                   //_image.setVisibleRect(0, 0, _imgSize.getWidth(), _imgSize.getHeight());
                   //_image.setSize(_imgSize);
                   //_image.setFixedSize(_imgSize.getWidth() * 2, _imgSize.getHeight() * 2);
-                  final AbsolutePanel testPanel = new AbsolutePanel();
+                  final AbsolutePanel cropPanel = new AbsolutePanel();
                   _image.setSize(_imgSize);
-                  testPanel.add(_image, _left, _top);
-                  testPanel.setPixelSize(_imgSize.getWidth(), _imgSize.getHeight());
-                  _container.setWidget(testPanel, _xPos, _yPos);
+                  cropPanel.add(_image, _left, _top);
+                  cropPanel.setPixelSize(_imgSize.getWidth(), _imgSize.getHeight());
+                  _container.setWidget(cropPanel, _xPos, _yPos);
                }
                else {
-                  _image.unsinkEvents(Event.DRAGDROP);
-                  _image.unsinkEvents(Event.CLICK);
-                  _image.unsinkEvents(Event.MOUSEDOWN);
-                  _image.unsinkEvents(Event.MOUSEDRAG);
-                  _image.unsinkEvents(Event.SELECT);
+                  //                  _image.unsinkEvents(Event.DRAGDROP);
+                  //                  _image.unsinkEvents(Event.CLICK);
+                  //                  _image.unsinkEvents(Event.MOUSEDOWN);
+                  //                  _image.unsinkEvents(Event.MOUSEDRAG);
+                  //                  _image.unsinkEvents(Event.SELECT);
+                  _image.addMouseDownHandler(new MouseDownHandler() {
+
+                     @Override
+                     public void onMouseDown(final MouseDownEvent evt) {
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                     }
+                  });
+                  _image.addDragStartHandler(new DragStartHandler() {
+
+                     @Override
+                     public void onDragStart(final DragStartEvent evt) {
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                     }
+                  });
                   _container.setWidget(_image, _xPos, _yPos);
                }
                if (_debug) {
