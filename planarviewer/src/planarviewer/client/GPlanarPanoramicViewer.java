@@ -14,6 +14,8 @@ import com.google.gwt.event.dom.client.DragEvent;
 import com.google.gwt.event.dom.client.DragHandler;
 import com.google.gwt.event.dom.client.DragStartEvent;
 import com.google.gwt.event.dom.client.DragStartHandler;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -316,6 +318,14 @@ public class GPlanarPanoramicViewer
 
                      @Override
                      public void onDragStart(final DragStartEvent evt) {
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                     }
+                  });
+                  _image.addDropHandler(new DropHandler() {
+
+                     @Override
+                     public void onDrop(final DropEvent evt) {
                         evt.preventDefault();
                         evt.stopPropagation();
                      }
