@@ -173,20 +173,13 @@ public class GPlanarPanoramicViewer
                System.out.println("newSize: " + newSize.toString());
             }
 
-            final GRectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
-            //            final GRectangle scaledAncestorBounds = new GRectangle(_pixelsBounds._x, _pixelsBounds._y, _pixelsBounds._width
-            //                                                                                                       * scale,
-            //                     _pixelsBounds._height * scale);
-
-            final int left = (_pixelsBounds._x - (scaledAncestorBounds._width * ancestor._x));
-            final int top = (_pixelsBounds._y - (scaledAncestorBounds._height * ancestor._y));
-            //            final int left = (ancestor._pixelsBounds._x - (_pixelsBounds._x));
-            //            final int top = (ancestor._pixelsBounds._y - (_pixelsBounds._y));
-
-            //            final int lowerX = Math.round((_pixelsBounds.getLowerX() - scaledAncestorBounds.getLowerX()));
-            //            final int upperY = Math.round((_pixelsBounds.getUpperY() - scaledAncestorBounds.getLowerY()));
-            //            final int left = lowerX;
-            //            final int top = upperY;
+            //            final GRectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
+            //            final int left = (_pixelsBounds._x - (scaledAncestorBounds._width * ancestor._x));
+            //            final int top = (_pixelsBounds._y - (scaledAncestorBounds._height * ancestor._y));
+            final int scaledAncestorX = ancestor._pixelsBounds._x * scale;
+            final int scaledAncestorY = ancestor._pixelsBounds._y * scale;
+            final int left = (scaledAncestorX - _pixelsBounds._x);
+            final int top = (scaledAncestorY - _pixelsBounds._y);
 
 
             if (_debug) {
