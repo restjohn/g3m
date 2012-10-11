@@ -172,8 +172,21 @@ public class GPlanarPanoramicViewer
             }
 
             final GRectangle scaledAncestorBounds = ancestor._pixelsBounds.scale(scale);
+            //            final GRectangle scaledAncestorBounds = new GRectangle(_pixelsBounds._x, _pixelsBounds._y, _pixelsBounds._width
+            //                                                                                                       * scale,
+            //                     _pixelsBounds._height * scale);
+
             final int left = (_pixelsBounds._x - (scaledAncestorBounds._width * ancestor._x));
             final int top = (_pixelsBounds._y - (scaledAncestorBounds._height * ancestor._y));
+            //            final int left = (ancestor._pixelsBounds._x - (_pixelsBounds._x));
+            //            final int top = (ancestor._pixelsBounds._y - (_pixelsBounds._y));
+
+            //            final int lowerX = Math.round((_pixelsBounds.getLowerX() - scaledAncestorBounds.getLowerX()));
+            //            final int upperY = Math.round((_pixelsBounds.getUpperY() - scaledAncestorBounds.getLowerY()));
+            //            final int left = lowerX;
+            //            final int top = upperY;
+
+
             if (_debug) {
                System.out.println("left: " + left + ", top: " + top);
             }
@@ -274,9 +287,10 @@ public class GPlanarPanoramicViewer
          public void imageLoaded(final GImageLoadEvent event) {
 
             if (event.isLoadFailed()) {
-               GWT.log("Image failed to load: " + toString());
+               GWT.log("Image failed to load: " + "Level: " + _currentLevel + " " + tileToString());
                if (_debug) {
-                  System.out.println("Image failed to load: Paint ANCESTOR.");
+                  System.out.println("Image failed to load: " + "Level: " + _currentLevel + " " + tileToString());
+                  System.out.println("Paint ANCESTOR.");
                }
                paintAncestor();
             }
@@ -295,31 +309,38 @@ public class GPlanarPanoramicViewer
                   final AbsolutePanel cropPanel = new AbsolutePanel();
                   _image.setSize(_imgSize);
                   cropPanel.add(_image, _left, _top);
-                  cropPanel.setPixelSize(_imgSize.getWidth(), _imgSize.getHeight());
+                  //cropPanel.setPixelSize(_imgSize.getWidth(), _imgSize.getHeight());
+                  cropPanel.setPixelSize(GPlanarPanoramicZoomLevel.TILE_WIDTH, GPlanarPanoramicZoomLevel.TILE_HEIGHT);
                   _container.setWidget(cropPanel, _xPos, _yPos);
                }
                else {
                   //                  _image.unsinkEvents(Event.DRAGDROP);
                   //                  _image.unsinkEvents(Event.CLICK);
-                  //                  _image.unsinkEvents(Event.MOUSEDOWN);
+                  //                  _image.unsinkEvents(Event.MOUSEEVENTS);
                   //                  _image.unsinkEvents(Event.MOUSEDRAG);
                   //                  _image.unsinkEvents(Event.SELECT);
                   _image.addMouseDownHandler(new MouseDownHandler() {
 
                      @Override
                      public void onMouseDown(final MouseDownEvent evt) {
+                        System.out.println("POS SI SALTA EL MOUSEDOWN");
                         evt.preventDefault();
-                        evt.stopPropagation();
                      }
                   });
-                  _image.addDragStartHandler(new DragStartHandler() {
-
-                     @Override
-                     public void onDragStart(final DragStartEvent evt) {
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                     }
-                  });
+                  //                  _image.addDragStartHandler(new DragStartHandler() {
+                  //
+                  //                     @Override
+                  //                     public void onDragStart(final DragStartEvent evt) {
+                  //                        evt.preventDefault();
+                  //                     }
+                  //                  });
+                  //                  _image.addDropHandler(new DropHandler() {
+                  //
+                  //                     @Override
+                  //                     public void onDrop(final DropEvent evt) {
+                  //                        evt.preventDefault();
+                  //                     }
+                  //                  });
                   _container.setWidget(_image, _xPos, _yPos);
                }
                if (_debug) {
@@ -415,12 +436,13 @@ public class GPlanarPanoramicViewer
                System.out.println("RESIZE EVENT !");
             }
             setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
-            updateZoomLevelFromContainerSize(_currentLevel);
+            //updateZoomLevelFromContainerSize(_currentLevel);
+            recreateTiles();
             recreateZoomWidtgets(BUTTONEXTEND, BUTTONMARGIN);
          }
       });
 
-      DOM.setIntStyleAttribute(this.getElement(), "border", 0);
+      //DOM.setIntStyleAttribute(this.getElement(), "border", 0);
       createHUD();
    }
 

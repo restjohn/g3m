@@ -94,16 +94,36 @@ public class GRectangle {
 
 
    public double getCenterY() {
-      return getY() + (getHeight() / 2.0);
+      return getY() - (getHeight() / 2.0);
    }
 
 
    public GRectangle scale(final double scale) {
       final int width = (int) (_width * scale);
       final int height = (int) (_height * scale);
-      final int x = (int) (getCenterX() - (getWidth() / 2.0));
-      final int y = (int) (getCenterY() - (getHeight() / 2.0));
+      final int x = (int) (getCenterX() - (width / 2.0));
+      final int y = (int) (getCenterY() + (height / 2.0));
       return new GRectangle(x, y, width, height);
+   }
+
+
+   public int getLowerX() {
+      return _x;
+   }
+
+
+   public int getLowerY() {
+      return (int) (_y - getHeight());
+   }
+
+
+   public int getUpperX() {
+      return (int) (_x + getWidth());
+   }
+
+
+   public int getUpperY() {
+      return _y;
    }
 
 
