@@ -1030,9 +1030,6 @@ public class GPlanarPanoramicViewer
             if (tile.touches(containerBounds)) {
                _tiles.add(tile);
             }
-            else {
-               System.out.println("NO TOUCH");
-            }
          }
       }
       if (_debug) {
