@@ -94,7 +94,8 @@ public class GRectangle {
 
 
    public double getCenterY() {
-      return getY() - (getHeight() / 2.0);
+      //return getY() - (getHeight() / 2.0);
+      return getY() + (getHeight() / 2.0);
    }
 
 
