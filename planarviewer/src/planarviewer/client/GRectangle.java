@@ -3,6 +3,7 @@
 package planarviewer.client;
 
 
+
 public class GRectangle {
 
    /**
@@ -193,5 +194,6 @@ public class GRectangle {
    public String toString() {
       return getClass().getName() + "[x=" + _x + ",y=" + _y + ",width=" + _width + ",height=" + _height + "]";
    }
+
 
 }

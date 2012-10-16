@@ -2,20 +2,6 @@
 
 package planarviewer.client;
 
-import com.google.gwt.event.dom.client.DragEndHandler;
-import com.google.gwt.event.dom.client.DragEnterHandler;
-import com.google.gwt.event.dom.client.DragHandler;
-import com.google.gwt.event.dom.client.DragLeaveHandler;
-import com.google.gwt.event.dom.client.DragOverHandler;
-import com.google.gwt.event.dom.client.DragStartHandler;
-import com.google.gwt.event.dom.client.DropHandler;
-import com.google.gwt.event.dom.client.MouseDownHandler;
-import com.google.gwt.event.dom.client.MouseMoveHandler;
-import com.google.gwt.event.dom.client.MouseOutHandler;
-import com.google.gwt.event.dom.client.MouseOverHandler;
-import com.google.gwt.event.dom.client.MouseUpHandler;
-import com.google.gwt.event.dom.client.MouseWheelHandler;
-import com.google.gwt.event.shared.GwtEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.Image;
@@ -341,102 +327,102 @@ public class GImage
    // just override methods trying to avoid handlers adding, but..
 
 
-   @Override
-   public HandlerRegistration addDragEndHandler(final DragEndHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addDragEnterHandler(final DragEnterHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addDragLeaveHandler(final DragLeaveHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addDragHandler(final DragHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addDragOverHandler(final DragOverHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addDragStartHandler(final DragStartHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addDropHandler(final DropHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addMouseDownHandler(final MouseDownHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public void fireEvent(final GwtEvent<?> event) {
-      // TODO Auto-generated method stub
-
-   }
-
-
-   @Override
-   public HandlerRegistration addMouseUpHandler(final MouseUpHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addMouseOutHandler(final MouseOutHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addMouseOverHandler(final MouseOverHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addMouseMoveHandler(final MouseMoveHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
-
-
-   @Override
-   public HandlerRegistration addMouseWheelHandler(final MouseWheelHandler handler) {
-      // TODO Auto-generated method stub
-      return null;
-   }
+   //   @Override
+   //   public HandlerRegistration addDragEndHandler(final DragEndHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addDragEnterHandler(final DragEnterHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addDragLeaveHandler(final DragLeaveHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addDragHandler(final DragHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addDragOverHandler(final DragOverHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addDragStartHandler(final DragStartHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addDropHandler(final DropHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addMouseDownHandler(final MouseDownHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public void fireEvent(final GwtEvent<?> event) {
+   //      // TODO Auto-generated method stub
+   //
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addMouseUpHandler(final MouseUpHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addMouseOutHandler(final MouseOutHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addMouseOverHandler(final MouseOverHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addMouseMoveHandler(final MouseMoveHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
+   //
+   //
+   //   @Override
+   //   public HandlerRegistration addMouseWheelHandler(final MouseWheelHandler handler) {
+   //      // TODO Auto-generated method stub
+   //      return null;
+   //   }
 
    //   final DragStartHandler dragStartHandler = new DragStartHandler() {
    //

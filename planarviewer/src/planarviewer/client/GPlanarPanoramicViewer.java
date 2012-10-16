@@ -314,6 +314,8 @@ public class GPlanarPanoramicViewer
                   //                  _image.unsinkEvents(Event.MOUSEEVENTS);
                   //                  _image.unsinkEvents(Event.MOUSEDRAG);
                   //                  _image.unsinkEvents(Event.SELECT);
+                  //                  _image.sinkEvents(Event.MOUSEDOWN);
+                  //                  _image.sinkEvents(Event.DRAGDROP);
                   _image.addMouseDownHandler(new MouseDownHandler() {
 
                      @Override
@@ -322,10 +324,37 @@ public class GPlanarPanoramicViewer
                         evt.preventDefault();
                      }
                   });
+
+                  //                  _image.addAttachHandler(new AttachEvent.Handler() {
+                  //
+                  //                     @Override
+                  //                     public void onAttachOrDetach(final AttachEvent evt) {
+                  //                        System.out.println("POS SI SALTA EL ATTACH");
+                  //
+                  //                     }
+                  //                  });
+                  //                  _image.addTouchStartHandler(new TouchStartHandler() {
+                  //
+                  //                     @Override
+                  //                     public void onTouchStart(final TouchStartEvent evt) {
+                  //                        System.out.println("POS SI SALTA EL TOUCH START");
+                  //                        evt.preventDefault();
+                  //                     }
+                  //                  });
+                  _image.addDragStartHandler(new DragStartHandler() {
+
+                     @Override
+                     public void onDragStart(final DragStartEvent evt) {
+                        System.out.println("POS SI SALTA EL DRAG START");
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                     }
+                  });
                   _image.addDropHandler(new DropHandler() {
 
                      @Override
                      public void onDrop(final DropEvent evt) {
+                        System.out.println("POS SI SALTA EL DROP START");
                         evt.preventDefault();
                         evt.stopPropagation();
                      }
@@ -413,6 +442,15 @@ public class GPlanarPanoramicViewer
       super.addMouseWheelHandler(_mouseWheelHandler);
       super.addDragStartHandler(_dragStartHandler);
       super.addDragEndHandler(_dragEndHandler);
+
+      //      super.addAttachHandler(new AttachEvent.Handler() {
+      //
+      //         @Override
+      //         public void onAttachOrDetach(final AttachEvent event) {
+      //            System.out.println("AÑADO WIDGET ! " + event.getSource().getClass().toString());
+      //         }
+      //      });
+
       //super.addDragHandler(_dragHandler);
       //super.addMouseDownHandler(_mouseDownHandler);
       //super.addMouseMoveHandler(_mouseMoveHandler);
@@ -422,9 +460,6 @@ public class GPlanarPanoramicViewer
 
          @Override
          public void onResize(final ResizeEvent event) {
-            if (_debug) {
-               System.out.println("RESIZE EVENT !");
-            }
             setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
             //updateZoomLevelFromContainerSize(_currentLevel);
             recreateTiles();
@@ -435,6 +470,7 @@ public class GPlanarPanoramicViewer
       //DOM.setIntStyleAttribute(this.getElement(), "border", 0);
       createHUD();
    }
+
 
    final MouseWheelHandler _mouseWheelHandler = new MouseWheelHandler() {
 
