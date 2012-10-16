@@ -5,13 +5,23 @@ package org.glob3.mobile.specific;
 import org.glob3.mobile.generated.IMathUtils;
 
 
-public class MathUtils_WebGL
+public final class MathUtils_WebGL
          extends
             IMathUtils {
 
+   private static final double PI      = Math.PI;
+   private static final double HALF_PI = PI / 2;
+
+
    @Override
    public double pi() {
-      return Math.PI;
+      return PI;
+   }
+
+
+   @Override
+   public double halfPi() {
+      return HALF_PI;
    }
 
 
@@ -251,5 +261,6 @@ public class MathUtils_WebGL
    public float log(final float v) {
       return (float) Math.log(v);
    }
+
 
 }

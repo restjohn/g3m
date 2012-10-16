@@ -25,6 +25,9 @@ package org.glob3.mobile.generated;
 //class IGLTextureId;
 
 
+//C++ TO JAVA CONVERTER NOTE: Java has no need of forward class declarations:
+//class MutableMatrix44D;
+
 public abstract class INativeGL
 {
 
@@ -56,9 +59,19 @@ public abstract class INativeGL
 //ORIGINAL LINE: virtual void uniform1i(IGLUniformID* loc, int v) const = 0;
   public abstract void uniform1i(IGLUniformID loc, int v);
 
+//  virtual void uniformMatrix4fv(IGLUniformID* location,
+//                                bool transpose,
+//                                const IFloatBuffer* buffer) const = 0;
+
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
-//ORIGINAL LINE: virtual void uniformMatrix4fv(IGLUniformID* location, int count, boolean transpose, const float value[]) const = 0;
-  public abstract void uniformMatrix4fv(IGLUniformID location, int count, boolean transpose, float[] value);
+//ORIGINAL LINE: virtual void uniformMatrix4fv(IGLUniformID* location, boolean transpose, const MutableMatrix44D* matrix) const = 0;
+  public abstract void uniformMatrix4fv(IGLUniformID location, boolean transpose, MutableMatrix44D matrix);
+
+
+//  virtual void uniformMatrix4fv(IGLUniformID* location,
+//                                int count,
+//                                bool transpose,
+//                                const float value[]) const = 0;
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: virtual void clearColor(float red, float green, float blue, float alpha) const = 0;
@@ -108,9 +121,10 @@ public abstract class INativeGL
 //ORIGINAL LINE: virtual void bindTexture(int target, const IGLTextureId* texture) const = 0;
   public abstract void bindTexture(int target, IGLTextureId texture);
 
+  /* delete texture and answer if the textureId can be recycled */
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
-//ORIGINAL LINE: virtual void deleteTextures(int n, const IGLTextureId* textures[]) const = 0;
-  public abstract void deleteTextures(int n, IGLTextureId[] textures);
+//ORIGINAL LINE: virtual boolean deleteTexture(const IGLTextureId* texture) const = 0;
+  public abstract boolean deleteTexture(IGLTextureId texture);
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: virtual void enableVertexAttribArray(int location) const = 0;

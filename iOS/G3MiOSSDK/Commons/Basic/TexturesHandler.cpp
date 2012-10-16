@@ -18,10 +18,16 @@
 
 const std::string TextureSpec::description() const {
   IStringBuilder *isb = IStringBuilder::newStringBuilder();
-  isb->add("(")->add(_id)->add(" ")->add(_width)->add("x")->add(_height)->add(")");
-  std::string s = isb->getString();
+  isb->addString("(");
+  isb->addString(_id);
+  isb->addString(" ");
+  isb->addInt(_width);
+  isb->addString("x");
+  isb->addInt(_height);
+  isb->addString(")");
+  const std::string s = isb->getString();
   delete isb;
-  return s;  
+  return s;
 }
 
 
@@ -35,7 +41,7 @@ public:
   public final TextureSpec _textureSpec;
   public IGLTextureId _glTextureId;
 #endif
-
+  
   long _referenceCounter;
   
   TextureHolder(const TextureSpec& textureSpec) :
@@ -67,10 +73,14 @@ public:
   
   const std::string description() const {
     IStringBuilder *isb = IStringBuilder::newStringBuilder();
-    isb->add("(#")->add(_glTextureId->description())->add(", counter=")->add(_referenceCounter)->add(")");
-    std::string s = isb->getString();
+    isb->addString("(#");
+    isb->addString(_glTextureId->description());
+    isb->addString(", counter=");
+    isb->addInt(_referenceCounter);
+    isb->addString(")");
+    const std::string s = isb->getString();
     delete isb;
-    return s;  
+    return s;
   }
 };
 
@@ -108,12 +118,12 @@ const IGLTextureId* TexturesHandler::getGLTextureIdIfAvailable(const TextureSpec
 
 
 const IGLTextureId* TexturesHandler::getGLTextureId(const IImage* image,
-                                                  int format,
-                                                  const std::string& name,
-                                                  bool hasMipMap) {
+                                                    int format,
+                                                    const std::string& name,
+                                                    bool hasMipMap) {
   
-  TextureSpec textureSpec(name, 
-                          image->getWidth(), 
+  TextureSpec textureSpec(name,
+                          image->getWidth(),
                           image->getHeight(),
                           hasMipMap);
   
@@ -140,7 +150,7 @@ const IGLTextureId* TexturesHandler::getGLTextureId(const IImage* image,
 }
 
 void TexturesHandler::retainGLTextureId(const IGLTextureId* glTextureId) {
-  if (glTextureId== NULL) {
+  if (glTextureId == NULL) {
     return;
   }
   
@@ -160,7 +170,7 @@ void TexturesHandler::retainGLTextureId(const IGLTextureId* glTextureId) {
 }
 
 void TexturesHandler::releaseGLTextureId(const IGLTextureId* glTextureId) {
-  if (glTextureId== NULL) {
+  if (glTextureId == NULL) {
     return;
   }
   

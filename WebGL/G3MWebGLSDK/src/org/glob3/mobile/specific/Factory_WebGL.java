@@ -14,7 +14,7 @@ import org.glob3.mobile.generated.ITimer;
 import com.google.gwt.core.client.JavaScriptObject;
 
 
-public class Factory_WebGL
+public final class Factory_WebGL
          extends
             IFactory {
 
@@ -65,9 +65,18 @@ public class Factory_WebGL
    @Override
    public IImage createImageFromSize(final int width,
                                      final int height) {
-      /// TODO this method must be implemented
-      throw new RuntimeException("NOT IMPLEMENTED IMAGE FROM SIZE");
+      return new Image_WebGL(jsCreateImageFromSize(width, height));
    }
+
+
+   private native JavaScriptObject jsCreateImageFromSize(final int width,
+                                                         final int height) /*-{
+		var img = new Image();
+		img.width = width;
+		img.height = height;
+
+		return img;
+   }-*/;
 
 
    @Override
@@ -98,7 +107,28 @@ public class Factory_WebGL
    @Override
    public IByteBuffer createByteBuffer(final byte[] data,
                                        final int length) {
-      return new ByteBuffer_WebGL(data);
+      return new ByteBuffer_WebGL(data, length);
+   }
+
+
+   @Override
+   public IFloatBuffer createFloatBuffer(final float f0,
+                                         final float f1,
+                                         final float f2,
+                                         final float f3,
+                                         final float f4,
+                                         final float f5,
+                                         final float f6,
+                                         final float f7,
+                                         final float f8,
+                                         final float f9,
+                                         final float f10,
+                                         final float f11,
+                                         final float f12,
+                                         final float f13,
+                                         final float f14,
+                                         final float f15) {
+      return new FloatBuffer_WebGL(f0, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15);
    }
 
 }

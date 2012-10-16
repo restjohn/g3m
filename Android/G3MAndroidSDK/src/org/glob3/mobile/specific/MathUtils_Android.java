@@ -7,13 +7,23 @@ import org.glob3.mobile.generated.IMathUtils;
 import android.util.FloatMath;
 
 
-public class MathUtils_Android
+public final class MathUtils_Android
          extends
             IMathUtils {
 
+   private static final double PI      = Math.PI;
+   private static final double HALF_PI = PI / 2;
+
+
    @Override
    public double pi() {
-      return Math.PI;
+      return PI;
+   }
+
+
+   @Override
+   public double halfPi() {
+      return HALF_PI;
    }
 
 

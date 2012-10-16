@@ -113,7 +113,7 @@ public class TileTextureBuilder extends RCObject
 	final double widthFactor = imageSector.getDeltaLongitude().div(wholeSector.getDeltaLongitude());
 	final double heightFactor = imageSector.getDeltaLatitude().div(wholeSector.getDeltaLatitude());
 
-	return new Rectangle(lowerFactor.x() * textureWidth, (1.0 - lowerFactor.y()) * textureHeight, widthFactor * textureWidth, heightFactor * textureHeight);
+	return new Rectangle(lowerFactor._x * textureWidth, (1.0 - lowerFactor._y) * textureHeight, widthFactor * textureWidth, heightFactor * textureHeight);
   }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
@@ -122,7 +122,7 @@ public class TileTextureBuilder extends RCObject
   {
 	final java.util.ArrayList<IImage> images = new java.util.ArrayList<IImage>();
 	final java.util.ArrayList<Rectangle> rectangles = new java.util.ArrayList<Rectangle>();
-	String petitionsID = _tile.getKey().tinyDescription();
+	String textureId = _tile.getKey().tinyDescription();
 
 	final int textureWidth = _parameters._tileTextureWidth;
 	final int textureHeight = _parameters._tileTextureHeight;
@@ -140,8 +140,8 @@ public class TileTextureBuilder extends RCObject
 
 		rectangles.add(getImageRectangleInTexture(tileSector, petition.getSector(), textureWidth, textureHeight));
 
-		petitionsID += petition.getURL().getPath();
-		petitionsID += "_";
+		textureId += petition.getURL().getPath();
+		textureId += "_";
 	  }
 	}
 
@@ -152,7 +152,7 @@ public class TileTextureBuilder extends RCObject
 
 	  IImage image = _textureBuilder.createTextureFromImages(_gl, _factory, images, rectangles, textureWidth, textureHeight);
 
-	  final IGLTextureId glTextureId = _texturesHandler.getGLTextureId(image, GLFormat.rgba(), petitionsID, isMipmap);
+	  final IGLTextureId glTextureId = _texturesHandler.getGLTextureId(image, GLFormat.rgba(), textureId, isMipmap);
 
 	  if (glTextureId != null)
 	  {

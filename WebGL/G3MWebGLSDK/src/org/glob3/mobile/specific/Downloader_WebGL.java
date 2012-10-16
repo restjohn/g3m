@@ -15,20 +15,21 @@ import org.glob3.mobile.generated.URL;
 import com.google.gwt.user.client.Timer;
 
 
-public class Downloader_WebGL
+public final class Downloader_WebGL
          implements
             IDownloader {
 
    final private int                                _maxConcurrentOperationCount;
-   private long                                     _requestIdCounter;
-   private long                                     _requestsCounter;
-   private long                                     _cancelsCounter;
    private final Map<URL, Downloader_WebGL_Handler> _downloadingHandlers;
    private final Map<URL, Downloader_WebGL_Handler> _queuedHandlers;
    private final Timer                              _timer;
    private final int                                _delayMillis;
 
    private final String                             _proxy;
+
+   private long                                     _requestIdCounter;
+   private long                                     _requestsCounter;
+   private long                                     _cancelsCounter;
 
 
    public Downloader_WebGL(final int maxConcurrentOperationCount,
@@ -189,10 +190,14 @@ public class Downloader_WebGL
    public String statistics() {
       final StringBuilder_WebGL sb = new StringBuilder_WebGL();
 
-      sb.add("Downloader_WebGL(downloading=").add(_downloadingHandlers.size());
-      sb.add(", queued=").add(_queuedHandlers.size());
-      sb.add(", totalRequests=").add(_requestsCounter);
-      sb.add(", totalCancels=").add(_cancelsCounter);
+      sb.addString("Downloader_WebGL(downloading=");
+      sb.addInt(_downloadingHandlers.size());
+      sb.addString(", queued=");
+      sb.addInt(_queuedHandlers.size());
+      sb.addString(", totalRequests=");
+      sb.addLong(_requestsCounter);
+      sb.addString(", totalCancels=");
+      sb.addLong(_cancelsCounter);
 
       return sb.getString();
    }
@@ -235,14 +240,12 @@ public class Downloader_WebGL
 
    @Override
    public void onResume(final InitializationContext ic) {
-      // TODO Auto-generated method stub
 
    }
 
 
    @Override
    public void onPause(final InitializationContext ic) {
-      // TODO Auto-generated method stub
 
    }
 

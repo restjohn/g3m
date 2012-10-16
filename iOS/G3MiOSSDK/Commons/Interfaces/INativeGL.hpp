@@ -22,6 +22,8 @@ class IGLTextureId;
 #include <vector>
 #include <string>
 
+class MutableMatrix44D;
+
 class INativeGL {
 public:
   
@@ -45,11 +47,20 @@ public:
   virtual void uniform1i(IGLUniformID* loc,
                          int v) const = 0;
   
+//  virtual void uniformMatrix4fv(IGLUniformID* location,
+//                                bool transpose,
+//                                const IFloatBuffer* buffer) const = 0;
+
   virtual void uniformMatrix4fv(IGLUniformID* location,
-                                int count,
                                 bool transpose,
-                                const float value[]) const = 0;
+                                const MutableMatrix44D* matrix) const = 0;
+
   
+//  virtual void uniformMatrix4fv(IGLUniformID* location,
+//                                int count,
+//                                bool transpose,
+//                                const float value[]) const = 0;
+
   virtual void clearColor(float red,
                           float green,
                           float blue,
@@ -90,8 +101,8 @@ public:
   virtual void bindTexture(int target,
                            const IGLTextureId* texture) const = 0;
   
-  virtual void deleteTextures(int n,
-                              const IGLTextureId* textures[]) const = 0;
+  /* delete texture and answer if the textureId can be recycled */
+  virtual bool deleteTexture(const IGLTextureId* texture) const = 0;
   
   virtual void enableVertexAttribArray(int location) const = 0;
   

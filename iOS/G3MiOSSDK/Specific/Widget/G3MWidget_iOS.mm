@@ -124,16 +124,18 @@
   int height = (int) [self frame].size.height;
   
   IStringBuilder* stringBuilder = new StringBuilder_iOS();
-  IMathUtils*     mathUtils = new MathUtils_iOS();
-  IFactory*       factory  = new Factory_iOS();
-  ILogger*        logger    = new Logger_iOS(ErrorLevel);
-  NativeGL2_iOS*  nGL = new NativeGL2_iOS();
+  IMathUtils*     mathUtils     = new MathUtils_iOS();
+  IFactory*       factory       = new Factory_iOS();
+  ILogger*        logger        = new Logger_iOS(ErrorLevel);
+  NativeGL2_iOS*  nGL           = new NativeGL2_iOS();
 
   GL* gl = new GL(nGL);
   
   IStorage* storage = new SQLiteStorage_iOS("g3m.cache");
+  const bool saveInBackground = true;
   IDownloader* downloader = new CachedDownloader(new Downloader_iOS(8),
-                                                 storage);
+                                                 storage,
+                                                 saveInBackground);
   
   CompositeRenderer* composite = new CompositeRenderer();
   
@@ -166,7 +168,7 @@
   
   
   TextureBuilder* textureBuilder = new CPUTextureBuilder();
-  TexturesHandler* texturesHandler = new TexturesHandler(gl, factory, false);
+  TexturesHandler* texturesHandler = new TexturesHandler(gl, false);
   
   const Planet* planet = Planet::createEarth();
   

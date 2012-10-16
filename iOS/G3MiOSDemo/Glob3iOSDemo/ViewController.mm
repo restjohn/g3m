@@ -82,29 +82,43 @@
   //                                     NULL);
   //  layerSet->addLayer(political);
   
-  WMSLayer* bing = new WMSLayer("ve",
-                                URL("http://worldwind27.arc.nasa.gov/wms/virtualearth?"),
-                                WMS_1_1_0,
-                                Sector::fullSphere(),
-                                "image/jpeg",
-                                "EPSG:4326",
-                                "",
-                                false,
-                                NULL);
-  layerSet->addLayer(bing);
+  bool useBing = true;
+  if (useBing) {
+    WMSLayer* bing = new WMSLayer("ve",
+                                  URL("http://worldwind27.arc.nasa.gov/wms/virtualearth?"),
+                                  WMS_1_1_0,
+                                  Sector::fullSphere(),
+                                  "image/jpeg",
+                                  "EPSG:4326",
+                                  "",
+                                  false,
+                                  NULL);
+    layerSet->addLayer(bing);
+  }
   
-  
-  if (false) {
-    WMSLayer *osm = new WMSLayer("osm",
-                                 URL("http://wms.latlon.org/"),
+  bool useOSM = false;
+  if (useOSM) {
+//    WMSLayer *osm = new WMSLayer("osm",
+//                                 URL("http://wms.latlon.org/"),
+//                                 WMS_1_1_0,
+//                                 Sector::fromDegrees(-85.05, -180.0, 85.5, 180.0),
+//                                 "image/jpeg",
+//                                 "EPSG:4326",
+//                                 "",
+//                                 false,
+//                                 NULL);
+//    layerSet->addLayer(osm);
+    WMSLayer *osm = new WMSLayer("osm_auto:all",
+                                 URL("http://129.206.228.72/cached/osm"),
                                  WMS_1_1_0,
-                                 Sector::fromDegrees(-85.05, -180.0, 85.5, 180.0),
+                                 Sector::fromDegrees(-85.05, -180.0, 85.05, 180.0),
                                  "image/jpeg",
                                  "EPSG:4326",
                                  "",
                                  false,
                                  NULL);
     layerSet->addLayer(osm);
+
   }
   
   const bool usePnoaLayer = false;
@@ -163,18 +177,19 @@
   
   if (true) {
     // marks renderer
-    MarksRenderer* marks = new MarksRenderer();
+    const bool readyWhenMarksReady = false;
+    MarksRenderer* marks = new MarksRenderer(readyWhenMarksReady);
     renderers.push_back(marks);
     
     Mark* m1 = new Mark("Fuerteventura",
-                        "g3m-marker.png",
+                        URL("http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"),
                         Geodetic3D(Angle::fromDegrees(28.05), Angle::fromDegrees(-14.36), 0));
     //m1->addTouchListener(listener);
     marks->addMark(m1);
     
     
     Mark* m2 = new Mark("Las Palmas",
-                        "g3m-marker.png",
+                        URL("http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"),
                         Geodetic3D(Angle::fromDegrees(28.05), Angle::fromDegrees(-15.36), 0));
     //m2->addTouchListener(listener);
     marks->addMark(m2);
@@ -186,7 +201,7 @@
         //NSLog(@"lat=%f, lon=%f", latitude.degrees(), longitude.degrees());
         
         marks->addMark(new Mark("Random",
-                                "g3m-marker.png",
+                                URL("http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"),
                                 Geodetic3D(latitude, longitude, 0)));
       }
     }

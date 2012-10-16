@@ -169,21 +169,37 @@ bool GL::useProgram(IGLProgramId* program) {
 }
 
 void GL::loadModelView() {
-#ifdef C_CODE
-  float* M = _modelView.getColumnMajorFloatArray();
-#else
-  float[] M = _modelView.getColumnMajorFloatArray();
-#endif
-  _gl->uniformMatrix4fv(Uniforms.Modelview, 1, false, M);
+//#ifdef C_CODE
+//  float* M = _modelView.getColumnMajorFloatArray();
+//#else
+//  float[] M = _modelView.getColumnMajorFloatArray();
+//#endif
+
+//  _gl->uniformMatrix4fv(Uniforms.Modelview, 1, false, M);
+//  _gl->uniformMatrix4fv(Uniforms.Modelview,
+//                        false,
+//                        _modelView.getColumnMajorFloatBuffer());
+
+  _gl->uniformMatrix4fv(Uniforms.Modelview,
+                        false,
+                        &_modelView);
 }
 
 void GL::setProjection(const MutableMatrix44D &projection) {
-#ifdef C_CODE
-  float* M = projection.getColumnMajorFloatArray();
-#else
-  float[] M = projection.getColumnMajorFloatArray();
-#endif
-  _gl->uniformMatrix4fv(Uniforms.Projection, 1, false, M);
+//#ifdef C_CODE
+//  float* M = projection.getColumnMajorFloatArray();
+//#else
+//  float[] M = projection.getColumnMajorFloatArray();
+//#endif
+//  _gl->uniformMatrix4fv(Uniforms.Projection, 1, false, M);
+
+//  _gl->uniformMatrix4fv(Uniforms.Projection,
+//                        false,
+//                        projection.getColumnMajorFloatBuffer());
+
+  _gl->uniformMatrix4fv(Uniforms.Projection,
+                        false,
+                        &projection);
 }
 
 void GL::loadMatrixf(const MutableMatrix44D &modelView) {
@@ -559,21 +575,12 @@ const IGLTextureId* GL::getGLTextureId() {
   return result;
 }
 
-void GL::deleteTexture(const IGLTextureId* textureId) {
-  if (textureId == NULL) {
-    return;
+void GL::deleteTexture(const IGLTextureId* texture) {
+  if (texture != NULL) {
+    if ( _gl->deleteTexture(texture) ) {
+      _texturesIdBag.push_back(texture);
+    }
+    
+    _texturesIdTakeCounter++;
   }
-#ifdef C_CODE
-  const IGLTextureId* textures[] = {
-    textureId
-  };
-#endif
-#ifdef JAVA_CODE
-  IGLTextureId textures[] = { textureId };
-#endif
-  _gl->deleteTextures(1, textures);
-  
-  _texturesIdBag.push_back(textureId);
-  
-  _texturesIdTakeCounter++;
 }

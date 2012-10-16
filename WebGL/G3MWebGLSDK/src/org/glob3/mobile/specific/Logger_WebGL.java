@@ -11,11 +11,11 @@ import org.glob3.mobile.generated.LogLevel;
 import com.google.gwt.regexp.shared.RegExp;
 
 
-public class Logger_WebGL
+public final class Logger_WebGL
          extends
             ILogger {
 
-   Logger _logger;
+   private final Logger _logger;
 
 
    public Logger_WebGL(final LogLevel level) {

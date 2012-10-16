@@ -38,7 +38,7 @@ public:
     int location = ((GLUniformID_iOS*)loc)->getID();
     glUniform2f(location, x, y);
   }
-  
+
   void uniform1f(IGLUniformID* loc, float x) const {
     int location = ((GLUniformID_iOS*)loc)->getID();
     glUniform1f(location, x);
@@ -49,10 +49,33 @@ public:
     glUniform1i(location, v);
   }
   
-  void uniformMatrix4fv(IGLUniformID* location, int count, bool transpose, const float value[]) const {
-    int loc = ((GLUniformID_iOS*)location)->getID();
-    glUniformMatrix4fv(loc, count, transpose, value);
+//  void uniformMatrix4fv(IGLUniformID* location,
+//                        bool transpose,
+//                        const IFloatBuffer* buffer) const {
+//    const int loc = ((GLUniformID_iOS*)location)->getID();
+//    GLfloat* pointer = ((FloatBuffer_iOS*) buffer)->getPointer();
+//    glUniformMatrix4fv(loc, 1, transpose, pointer);
+//  }
+
+  void uniformMatrix4fv(IGLUniformID* location,
+                        bool transpose,
+                        const MutableMatrix44D* matrix) const {
+    const int loc = ((GLUniformID_iOS*)location)->getID();
+//    GLfloat* pointer = ((FloatBuffer_iOS*) buffer)->getPointer();
+    
+    GLfloat* pointer = matrix->getColumnMajorFloatArray();
+
+    glUniformMatrix4fv(loc, 1, transpose, pointer);
   }
+
+  
+//  void uniformMatrix4fv(IGLUniformID* location,
+//                        int count,
+//                        bool transpose,
+//                        const float value[]) const {
+//    int loc = ((GLUniformID_iOS*)location)->getID();
+//    glUniformMatrix4fv(loc, count, transpose, value);
+//  }
   
   void clearColor(float red, float green, float blue, float alpha) const {
     glClearColor(red, green, blue, alpha);
@@ -117,12 +140,14 @@ public:
     }
   }
   
-  void deleteTextures(int n, const IGLTextureId* textures[]) const {
-    unsigned int ts[n];
-    for(int i = 0; i < n; i++){
-      ts[i] = ((GLTextureId_iOS*)textures[i])->getGLTextureId();
-    }
-    glDeleteTextures(n, ts);
+  bool deleteTexture(const IGLTextureId* texture) const {
+    const unsigned int textures[] = {
+      ((GLTextureId_iOS*) texture)->getGLTextureId()
+    };
+    
+    glDeleteTextures(1, textures);
+    
+    return true;
   }
   
   void enableVertexAttribArray(int location) const {
@@ -157,13 +182,13 @@ public:
     unsigned char* data = ((Image_iOS*) image)->createByteArrayRGBA8888();
     
     glTexImage2D(GL_TEXTURE_2D,
-                 0, 
+                 0,
                  format,
-                 image->getWidth(), 
-                 image->getHeight(), 
-                 0, 
+                 image->getWidth(),
+                 image->getHeight(),
+                 0,
                  format,
-                 GL_UNSIGNED_BYTE, 
+                 GL_UNSIGNED_BYTE,
                  data);
     
     delete [] data;

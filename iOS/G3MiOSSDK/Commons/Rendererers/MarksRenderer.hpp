@@ -15,13 +15,23 @@
 
 class MarksRenderer : public Renderer {
 private:
+  bool               _readyWhenMarksReady;
   std::vector<Mark*> _marks;
+  
+#ifdef C_CODE
+  const InitializationContext* _initializationContext;
+#endif
+#ifdef JAVA_CODE
+  private InitializationContext _initializationContext;
+#endif
   
 public:
   
-  virtual void initialize(const InitializationContext* ic);
-  
-  virtual void render(const RenderContext* rc);
+  MarksRenderer(bool readyWhenMarksReady) :
+  _readyWhenMarksReady(readyWhenMarksReady),
+  _initializationContext(NULL)
+  {
+  }
   
   virtual ~MarksRenderer() {
     int marksSize = _marks.size();
@@ -30,9 +40,11 @@ public:
     }
   };
   
-  void addMark(Mark* mark) {
-    _marks.push_back(mark);
-  }
+  virtual void initialize(const InitializationContext* ic);
+  
+  virtual void render(const RenderContext* rc);
+  
+  void addMark(Mark* mark);
   
   virtual bool onTouchEvent(const EventContext* ec,
                             const TouchEvent* touchEvent);
@@ -42,9 +54,7 @@ public:
     
   }
   
-  bool isReadyToRender(const RenderContext* rc) {
-    return true;
-  }
+  bool isReadyToRender(const RenderContext* rc);
   
   void start() {
     

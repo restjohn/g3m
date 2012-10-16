@@ -27,13 +27,17 @@ public class StaticImageLayer extends Layer
   private final String _layerID;
   private final IStorage _storage;
 
-  public StaticImageLayer(String layerID, IImage image, Sector sector, IStorage storage, LayerCondition condition)
+  private final boolean _saveInBackground;
+
+
+  public StaticImageLayer(String layerID, IImage image, Sector sector, IStorage storage, LayerCondition condition, boolean saveInBackground)
   {
 	  super(condition);
 	  _image = image;
 	  _sector = new Sector(sector);
 	  _layerID = layerID;
 	  _storage = storage;
+	  _saveInBackground = saveInBackground;
 
   }
 
@@ -56,15 +60,15 @@ public class StaticImageLayer extends Layer
   
 	//CREATING ID FOR PETITION
 	IStringBuilder isb = IStringBuilder.newStringBuilder();
-	isb.add(_layerID);
-	isb.add("_");
-	isb.add(tileSector.lower().latitude().degrees());
-	isb.add("_");
-	isb.add(tileSector.lower().longitude().degrees());
-	isb.add("_");
-	isb.add(tileSector.upper().latitude().degrees());
-	isb.add("_");
-	isb.add(tileSector.upper().longitude().degrees());
+	isb.addString(_layerID);
+	isb.addString("_");
+	isb.addDouble(tileSector.lower().latitude().degrees());
+	isb.addString("_");
+	isb.addDouble(tileSector.lower().longitude().degrees());
+	isb.addString("_");
+	isb.addDouble(tileSector.upper().latitude().degrees());
+	isb.addString("_");
+	isb.addDouble(tileSector.upper().longitude().degrees());
   
 	final URL id = new URL(isb.getString());
   
@@ -88,9 +92,9 @@ public class StaticImageLayer extends Layer
 	final double heightUV = tileSector.getDeltaLatitude().degrees() / _sector.getDeltaLatitude().degrees();
   
 	final Vector2D p = _sector.getUVCoordinates(tileSector.lower());
-	final Vector2D pos = new Vector2D(p.x(), p.y() - heightUV);
+	final Vector2D pos = new Vector2D(p._x, p._y - heightUV);
   
-	Rectangle r = new Rectangle(pos.x() * _image.getWidth(), pos.y() * _image.getHeight(), widthUV * _image.getWidth(), heightUV * _image.getHeight());
+	Rectangle r = new Rectangle(pos._x * _image.getWidth(), pos._y * _image.getHeight(), widthUV * _image.getWidth(), heightUV * _image.getHeight());
   
 	final IImage subImage = _image.subImage(r);
   
@@ -100,7 +104,7 @@ public class StaticImageLayer extends Layer
   
 	if (_storage != null)
 	{
-	  _storage.saveImage(id, subImage);
+	  _storage.saveImage(id, subImage, _saveInBackground);
 	}
   
 	return res;

@@ -76,8 +76,18 @@ public class GL
 
   private void loadModelView()
   {
-	float[] M = _modelView.getColumnMajorFloatArray();
-	_gl.uniformMatrix4fv(GlobalMembersGL.Uniforms.Modelview, 1, false, M);
+  ///#ifdef C_CODE
+  //  float* M = _modelView.getColumnMajorFloatArray();
+  ///#else
+  //  float[] M = _modelView.getColumnMajorFloatArray();
+  ///#endif
+  
+  //  _gl->uniformMatrix4fv(Uniforms.Modelview, 1, false, M);
+  //  _gl->uniformMatrix4fv(Uniforms.Modelview,
+  //                        false,
+  //                        _modelView.getColumnMajorFloatBuffer());
+  
+	_gl.uniformMatrix4fv(GlobalMembersGL.Uniforms.Modelview, false, _modelView);
   }
 
   private IGLTextureId getGLTextureId()
@@ -403,8 +413,18 @@ public class GL
 
   public final void setProjection(MutableMatrix44D projection)
   {
-	float[] M = projection.getColumnMajorFloatArray();
-	_gl.uniformMatrix4fv(GlobalMembersGL.Uniforms.Projection, 1, false, M);
+  ///#ifdef C_CODE
+  //  float* M = projection.getColumnMajorFloatArray();
+  ///#else
+  //  float[] M = projection.getColumnMajorFloatArray();
+  ///#endif
+  //  _gl->uniformMatrix4fv(Uniforms.Projection, 1, false, M);
+  
+  //  _gl->uniformMatrix4fv(Uniforms.Projection,
+  //                        false,
+  //                        projection.getColumnMajorFloatBuffer());
+  
+	_gl.uniformMatrix4fv(GlobalMembersGL.Uniforms.Projection, false, projection);
   }
 
   public final boolean useProgram(IGLProgramId program)
@@ -587,18 +607,17 @@ public class GL
 	_gl.uniform1i(GlobalMembersGL.Uniforms.BillBoard, 0);
   }
 
-  public final void deleteTexture(IGLTextureId textureId)
+  public final void deleteTexture(IGLTextureId texture)
   {
-	if (textureId == null)
+	if (texture != null)
 	{
-	  return;
+	  if (_gl.deleteTexture(texture))
+	  {
+		_texturesIdBag.addLast(texture);
+	  }
+  
+	  _texturesIdTakeCounter++;
 	}
-	IGLTextureId textures[] = { textureId };
-	_gl.deleteTextures(1, textures);
-  
-	_texturesIdBag.addLast(textureId);
-  
-	_texturesIdTakeCounter++;
   }
 
   public final void enableCullFace(int face)
@@ -648,7 +667,7 @@ public class GL
 
   public final void transformTexCoords(Vector2D scale, Vector2D translation)
   {
-	transformTexCoords((float) scale.x(), (float) scale.y(), (float) translation.x(), (float) translation.y());
+	transformTexCoords((float) scale._x, (float) scale._y, (float) translation._x, (float) translation._y);
   }
 
   public final void transformTexCoords(MutableVector2D scale, MutableVector2D translation)

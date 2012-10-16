@@ -7,12 +7,47 @@ import org.glob3.mobile.generated.IIntBuffer;
 import com.google.gwt.core.client.JavaScriptObject;
 
 
-public class IntBuffer_WebGL
+public final class IntBuffer_WebGL
          extends
             IIntBuffer {
 
    private final JavaScriptObject _buffer;
-   private int                    _timestamp = 0;
+   private int                    _timestamp   = 0;
+
+   private JavaScriptObject       _webGLBuffer = null;
+   private JavaScriptObject       _gl          = null;
+
+
+   public JavaScriptObject getWebGLBuffer(final JavaScriptObject gl) {
+      if (_webGLBuffer == null) {
+         _gl = gl;
+         _webGLBuffer = jsCreateWebGLBuffer();
+      }
+      return _webGLBuffer;
+   }
+
+
+   @Override
+   public void dispose() {
+      if (_webGLBuffer != null) {
+         jsDeleteWebGLBuffer();
+         _webGLBuffer = null;
+         _gl = null;
+      }
+      super.dispose();
+   }
+
+
+   private native JavaScriptObject jsCreateWebGLBuffer() /*-{
+		return this.@org.glob3.mobile.specific.IntBuffer_WebGL::_gl
+				.createBuffer();
+   }-*/;
+
+
+   private native JavaScriptObject jsDeleteWebGLBuffer() /*-{
+		return this.@org.glob3.mobile.specific.IntBuffer_WebGL::_gl
+				.deleteBuffer(this.@org.glob3.mobile.specific.IntBuffer_WebGL::_webGLBuffer);
+   }-*/;
 
 
    public IntBuffer_WebGL(final JavaScriptObject data) {
@@ -25,10 +60,10 @@ public class IntBuffer_WebGL
    }
 
 
-   IntBuffer_WebGL(final byte[] data) {
-      //      TODO needed??
-      throw new RuntimeException("IntBuffer_WebGL(final byte[] data) IS NOT IMPLEMENTED");
-   }
+   //   IntBuffer_WebGL(final byte[] data) {
+   //      //      TODO needed??
+   //      throw new RuntimeException("IntBuffer_WebGL(final byte[] data) IS NOT IMPLEMENTED");
+   //   }
 
 
    @Override
@@ -49,11 +84,35 @@ public class IntBuffer_WebGL
    }
 
 
+   //   @Override
+   //   public void put(final int i,
+   //                   final int value) {
+   //      jsPut(i, value);
+   //   }
+   //   private native void jsPut(int i,
+   //                             int value) /*-{
+   //
+   //      if (value < 0 || value > 65535) {
+   //         alert("EXCEDING SHORT RANGE IN UINT16 JAVASCRIPT BUFFER");
+   //      }
+   //
+   //      var thisInstance = this;
+   //      if (thisInstance.@org.glob3.mobile.specific.IntBuffer_WebGL::_buffer[i] != value) {
+   //         thisInstance.@org.glob3.mobile.specific.IntBuffer_WebGL::_buffer[i] = value;
+   //         thisInstance.@org.glob3.mobile.specific.IntBuffer_WebGL::incTimestamp()();
+   //      }
+   //   }-*/;
+
    @Override
-   public void put(final int i,
-                   final int value) {
-      jsPut(i, value);
-   }
+   public native void rawPut(final int i,
+                             final int value) /*-{
+
+		if (value < 0 || value > 65535) {
+			alert("EXCEDING SHORT RANGE IN UINT16 JAVASCRIPT BUFFER");
+		}
+
+		this.@org.glob3.mobile.specific.IntBuffer_WebGL::_buffer[i] = value;
+   }-*/;
 
 
    public JavaScriptObject getBuffer() {
@@ -86,19 +145,5 @@ public class IntBuffer_WebGL
 		return this.@org.glob3.mobile.specific.IntBuffer_WebGL::_buffer[i];
    }-*/;
 
-
-   private native void jsPut(int i,
-                             int value) /*-{
-
-		if (value < 0 || value > 65535) {
-			alert("EXCEDING SHORT RANGE IN UINT16 JAVASCRIPT BUFFER");
-		}
-
-		var thisInstance = this;
-		if (thisInstance.@org.glob3.mobile.specific.IntBuffer_WebGL::_buffer[i] != value) {
-			thisInstance.@org.glob3.mobile.specific.IntBuffer_WebGL::_buffer[i] = value;
-			thisInstance.@org.glob3.mobile.specific.IntBuffer_WebGL::incTimestamp()();
-		}
-   }-*/;
 
 }

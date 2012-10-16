@@ -27,14 +27,24 @@ public class CachedDownloader implements IDownloader
   private int _cacheHitsCounter;
   private int _savesCounter;
 
-  public CachedDownloader(IDownloader downloader, IStorage cacheStorage)
+  private final boolean _saveInBackground;
+
+  public CachedDownloader(IDownloader downloader, IStorage cacheStorage, boolean saveInBackground)
   {
 	  _downloader = downloader;
 	  _cacheStorage = cacheStorage;
 	  _requestsCounter = 0;
 	  _cacheHitsCounter = 0;
 	  _savesCounter = 0;
+	  _saveInBackground = saveInBackground;
 
+  }
+
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: boolean saveInBackground() const
+  public final boolean saveInBackground()
+  {
+	return _saveInBackground;
   }
 
   public final void start()
@@ -115,15 +125,15 @@ public class CachedDownloader implements IDownloader
   public final String statistics()
   {
 	IStringBuilder isb = IStringBuilder.newStringBuilder();
-	isb.add("CachedDownloader(cache hits=");
-	isb.add(_cacheHitsCounter);
-	isb.add("/");
-	isb.add(_requestsCounter);
-	isb.add(", saves=");
-	isb.add(_savesCounter);
-	isb.add(", downloader=");
-	isb.add(_downloader.statistics());
-	String s = isb.getString();
+	isb.addString("CachedDownloader(cache hits=");
+	isb.addInt(_cacheHitsCounter);
+	isb.addString("/");
+	isb.addInt(_requestsCounter);
+	isb.addString(", saves=");
+	isb.addInt(_savesCounter);
+	isb.addString(", downloader=");
+	isb.addString(_downloader.statistics());
+	final String s = isb.getString();
 	if (isb != null)
 		isb.dispose();
 	return s;

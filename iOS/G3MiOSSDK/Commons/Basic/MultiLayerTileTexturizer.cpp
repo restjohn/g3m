@@ -255,8 +255,8 @@ public:
     const double widthFactor  = imageSector.getDeltaLongitude().div(wholeSector.getDeltaLongitude());
     const double heightFactor = imageSector.getDeltaLatitude().div(wholeSector.getDeltaLatitude());
     
-    return new Rectangle(lowerFactor.x()         * textureWidth,
-                         (1.0 - lowerFactor.y()) * textureHeight,
+    return new Rectangle(lowerFactor._x         * textureWidth,
+                         (1.0 - lowerFactor._y) * textureHeight,
                          widthFactor  * textureWidth,
                          heightFactor * textureHeight);
   }
@@ -264,7 +264,7 @@ public:
   void composeAndUploadTexture() const {
     std::vector<const IImage*>    images;
     std::vector<const Rectangle*> rectangles;
-    std::string petitionsID = _tile->getKey().tinyDescription();
+    std::string textureId = _tile->getKey().tinyDescription();
     
     const int textureWidth  = _parameters->_tileTextureWidth;
     const int textureHeight = _parameters->_tileTextureHeight;
@@ -283,8 +283,8 @@ public:
                                                         textureWidth,
                                                         textureHeight));
         
-        petitionsID += petition->getURL().getPath();
-        petitionsID += "_";
+        textureId += petition->getURL().getPath();
+        textureId += "_";
       }
     }
     
@@ -299,8 +299,10 @@ public:
                                                                      textureWidth,
                                                                      textureHeight);
       
-      const IGLTextureId* glTextureId = _texturesHandler->getGLTextureId(image, GLFormat::rgba(),
-                                                                 petitionsID, isMipmap);
+      const IGLTextureId* glTextureId = _texturesHandler->getGLTextureId(image,
+                                                                         GLFormat::rgba(),
+                                                                         textureId,
+                                                                         isMipmap);
       
       if (glTextureId != NULL) {
         if (!_mesh->setGLTextureIdForLevel(0, glTextureId)) {
