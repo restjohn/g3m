@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Image;
  * maintain the correct aspect ratio and fit within the maximum dimensions.
  * 
  */
+
 public class GImage
          extends
             Image {
@@ -194,11 +195,11 @@ public class GImage
 
    /**
     * <p>
-    * Handle FitImageLoadEvents. These events are fired whenever the image finishes loading completely or fails to load. The event
+    * Handle ImageLoadEvents. These events are fired whenever the image finishes loading completely or fails to load. The event
     * occurs after the image has been resized to fit the original image aspect ratio.
     * 
     * <p>
-    * NOTE: Add this handler before setting the URL property of the FitImage. If set after, there is no guarantee that the handler
+    * NOTE: Add this handler before setting the URL property of the Image. If set after, there is no guarantee that the handler
     * will be fired for the event.
     */
    public HandlerRegistration addImageLoadHandler(final IImageLoadHandler handler) {

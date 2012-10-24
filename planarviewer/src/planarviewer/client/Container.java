@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.DragEvent;
 import com.google.gwt.event.dom.client.DragHandler;
 import com.google.gwt.event.dom.client.DragStartEvent;
 import com.google.gwt.event.dom.client.DragStartHandler;
+import com.google.gwt.event.dom.client.HasAllTouchHandlers;
 import com.google.gwt.event.dom.client.HasClickHandlers;
 import com.google.gwt.event.dom.client.HasDragEndHandlers;
 import com.google.gwt.event.dom.client.HasDragHandlers;
@@ -26,6 +27,14 @@ import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseWheelEvent;
 import com.google.gwt.event.dom.client.MouseWheelHandler;
+import com.google.gwt.event.dom.client.TouchCancelEvent;
+import com.google.gwt.event.dom.client.TouchCancelHandler;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchEndHandler;
+import com.google.gwt.event.dom.client.TouchMoveEvent;
+import com.google.gwt.event.dom.client.TouchMoveHandler;
+import com.google.gwt.event.dom.client.TouchStartEvent;
+import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Composite;
@@ -36,6 +45,7 @@ public class Container
          extends
             Composite
          implements
+            HasAllTouchHandlers,
             HasClickHandlers,
             HasDragHandlers,
             HasMouseWheelHandlers,
@@ -116,6 +126,30 @@ public class Container
    }
 
 
+   @Override
+   public HandlerRegistration addTouchStartHandler(final TouchStartHandler handler) {
+      return addDomHandler(handler, TouchStartEvent.getType());
+   }
+
+
+   @Override
+   public HandlerRegistration addTouchMoveHandler(final TouchMoveHandler handler) {
+      return addDomHandler(handler, TouchMoveEvent.getType());
+   }
+
+
+   @Override
+   public HandlerRegistration addTouchEndHandler(final TouchEndHandler handler) {
+      return addDomHandler(handler, TouchEndEvent.getType());
+   }
+
+
+   @Override
+   public HandlerRegistration addTouchCancelHandler(final TouchCancelHandler handler) {
+      return addDomHandler(handler, TouchCancelEvent.getType());
+   }
+
+
    //   @Override
    //   public void onClick(final ClickEvent event) {
    //      System.out.println("MOUSE CLICK EVENT");
@@ -136,7 +170,7 @@ public class Container
    //
    //   //   @Override
    //   //   public void onDrag(final DragEvent event) {
-   //   //      // TODO Auto-generated method stub
+   //   //      //  Auto-generated method stub
    //   //   }
    //
    //

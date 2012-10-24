@@ -3,7 +3,6 @@
 package planarviewer.client;
 
 
-
 public class GRectangle {
 
    /**
@@ -104,7 +103,7 @@ public class GRectangle {
       final int width = (int) (_width * scale);
       final int height = (int) (_height * scale);
       final int x = (int) (getCenterX() - (width / 2.0));
-      final int y = (int) (getCenterY() + (height / 2.0));
+      final int y = (int) (getCenterY() - (height / 2.0));
       return new GRectangle(x, y, width, height);
    }
 
@@ -115,7 +114,8 @@ public class GRectangle {
 
 
    public int getLowerY() {
-      return (int) (_y - getHeight());
+      //return (int) (_y - getHeight());
+      return _y;
    }
 
 
@@ -125,7 +125,8 @@ public class GRectangle {
 
 
    public int getUpperY() {
-      return _y;
+      //return _y;
+      return (int) (_y + getHeight());
    }
 
 

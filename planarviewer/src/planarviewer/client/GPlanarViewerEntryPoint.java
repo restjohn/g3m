@@ -3,24 +3,26 @@
 package planarviewer.client;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.RootPanel;
 
 
 public class GPlanarViewerEntryPoint
-         extends
-            FlexTable
          implements
             EntryPoint {
 
    @Override
    public void onModuleLoad() {
 
+      final String imgUrl = Location.getParameter("url");
+      //System.out.println("url=" + imgUrl);
+      //ExporterUtil.exportAll();
+
       System.out.println("> Arrancando panoramica..");
 
-      final String imgUrl = "./IMG/caminomontana";
+      //final String imgUrl = "./IMG/caminomontana";
 
-      final GPlanarPanoramicViewer viewer = new GPlanarPanoramicViewer(imgUrl, "caminomontana", true);
+      final GPlanarPanoramicViewer viewer = new GPlanarPanoramicViewer(imgUrl, "caminomontana", false);
       RootPanel.get().add(viewer);
 
    }

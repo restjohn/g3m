@@ -2,9 +2,6 @@
 
 package planarviewer.client;
 
-//import com.google.gson.annotations.SerializedName;
-//import com.google.gwt.json.client.JSONObject;
-
 
 class GPlanarPanoramicZoomLevel {
 
@@ -12,19 +9,14 @@ class GPlanarPanoramicZoomLevel {
    public static final int TILE_HEIGHT = 256;
 
 
-   //@Field("level")    //TODO: look for the way for doing this in gwt.json
    private int             _level;
 
-   //@SerializedName("width")
    private int             _width;
 
-   //@SerializedName("height")
    private int             _height;
 
-   //@SerializedName("widthInTiles")
    private int             _widthInTiles;
 
-   //@SerializedName("heightInTiles")
    private int             _heightInTiles;
 
 
