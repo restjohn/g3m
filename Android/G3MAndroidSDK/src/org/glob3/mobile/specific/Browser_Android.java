@@ -32,12 +32,12 @@ public class Browser_Android {
       _webView.getSettings().setAppCacheEnabled(true);
       //WebSettings.
       //_webView.setAlwaysDrawnWithCacheEnabled(true);
-      _webView.setClickable(false);
+      //_webView.setClickable(false);
       //_webView.getSettings().setSupportZoom(true);
       //_webView.getSettings().setBuiltInZoomControls(true);
-      _webView.getSettings().setLightTouchEnabled(true);
-
+      //_webView.getSettings().setLightTouchEnabled(true);
       //_webView.getSettings().setUseWideViewPort(true);
+
       //      _webView.setWebChromeClient(new WebChromeClient() {
       //         @Override
       //         public boolean onJsAlert(final WebView view,
