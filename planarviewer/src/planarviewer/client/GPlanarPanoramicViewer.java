@@ -6,14 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsArray;
+import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DragEndEvent;
-import com.google.gwt.event.dom.client.DragEndHandler;
-import com.google.gwt.event.dom.client.DragEvent;
-import com.google.gwt.event.dom.client.DragHandler;
-import com.google.gwt.event.dom.client.DragStartEvent;
-import com.google.gwt.event.dom.client.DragStartHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -22,6 +18,8 @@ import com.google.gwt.event.dom.client.MouseUpEvent;
 import com.google.gwt.event.dom.client.MouseUpHandler;
 import com.google.gwt.event.dom.client.MouseWheelEvent;
 import com.google.gwt.event.dom.client.MouseWheelHandler;
+import com.google.gwt.event.dom.client.TouchEndEvent;
+import com.google.gwt.event.dom.client.TouchEndHandler;
 import com.google.gwt.event.dom.client.TouchMoveEvent;
 import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
@@ -38,6 +36,7 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Image;
@@ -300,68 +299,13 @@ public class GPlanarPanoramicViewer
                //_image = new GImage(event.takeImage());
                _image = event.getImage();
                if (_imgSize != null) {
-                  //_image.setVisibleRect(0, 0, _imgSize.getWidth(), _imgSize.getHeight());
-                  //_image.setSize(_imgSize);
-                  //_image.setFixedSize(_imgSize.getWidth() * 2, _imgSize.getHeight() * 2);
                   final AbsolutePanel cropPanel = new AbsolutePanel();
                   _image.setSize(_imgSize);
                   cropPanel.add(_image, _left, _top);
-                  //cropPanel.setPixelSize(_imgSize.getWidth(), _imgSize.getHeight());
                   cropPanel.setPixelSize(GPlanarPanoramicZoomLevel.TILE_WIDTH, GPlanarPanoramicZoomLevel.TILE_HEIGHT);
                   _container.setWidget(cropPanel, _xPos, _yPos);
                }
                else {
-                  //                  //                  _image.unsinkEvents(Event.DRAGDROP);
-                  //                  //                  _image.unsinkEvents(Event.CLICK);
-                  //                  //                  _image.unsinkEvents(Event.MOUSEEVENTS);
-                  //                  //                  _image.unsinkEvents(Event.MOUSEDRAG);
-                  //                  //                  _image.unsinkEvents(Event.SELECT);
-                  //                  //                  _image.sinkEvents(Event.MOUSEDOWN);
-                  //                  //                  _image.sinkEvents(Event.DRAGDROP);
-                  //                  _image.addMouseDownHandler(new MouseDownHandler() {
-                  //
-                  //                     @Override
-                  //                     public void onMouseDown(final MouseDownEvent evt) {
-                  //                        System.out.println("POS SI SALTA EL MOUSEDOWN");
-                  //                        evt.preventDefault();
-                  //                     }
-                  //                  });
-                  //
-                  //                  //                  _image.addAttachHandler(new AttachEvent.Handler() {
-                  //                  //
-                  //                  //                     @Override
-                  //                  //                     public void onAttachOrDetach(final AttachEvent evt) {
-                  //                  //                        System.out.println("POS SI SALTA EL ATTACH");
-                  //                  //
-                  //                  //                     }
-                  //                  //                  });
-                  //                  //                  _image.addTouchStartHandler(new TouchStartHandler() {
-                  //                  //
-                  //                  //                     @Override
-                  //                  //                     public void onTouchStart(final TouchStartEvent evt) {
-                  //                  //                        System.out.println("POS SI SALTA EL TOUCH START");
-                  //                  //                        evt.preventDefault();
-                  //                  //                     }
-                  //                  //                  });
-                  //                  _image.addDragStartHandler(new DragStartHandler() {
-                  //
-                  //                     @Override
-                  //                     public void onDragStart(final DragStartEvent evt) {
-                  //                        System.out.println("POS SI SALTA EL DRAG START");
-                  //                        evt.preventDefault();
-                  //                        evt.stopPropagation();
-                  //                     }
-                  //                  });
-                  //                  _image.addDropHandler(new DropHandler() {
-                  //
-                  //                     @Override
-                  //                     public void onDrop(final DropEvent evt) {
-                  //                        System.out.println("POS SI SALTA EL DROP START");
-                  //                        evt.preventDefault();
-                  //                        evt.stopPropagation();
-                  //                     }
-                  //                  });
-
                   _container.setWidget(_image, _xPos, _yPos);
                }
                if (_debug) {
@@ -380,18 +324,24 @@ public class GPlanarPanoramicViewer
    private final String                          _name;
    private final boolean                         _debug;
 
-   private final List<GPlanarPanoramicZoomLevel> _zoomLevels        = new ArrayList<GPlanarPanoramicZoomLevel>();
+   private final List<GPlanarPanoramicZoomLevel> _zoomLevels          = new ArrayList<GPlanarPanoramicZoomLevel>();
    private int                                   _minLevel;
    private int                                   _maxLevel;
-   private final List<Tile>                      _tiles             = new ArrayList<Tile>();
+   private final List<Tile>                      _tiles               = new ArrayList<Tile>();
 
    private int                                   _currentLevel;
-   private int                                   _offsetX           = 0;
-   private int                                   _offsetY           = 0;
+   private int                                   _offsetX             = 0;
+   private int                                   _offsetY             = 0;
 
-   private int                                   _dragLastXPosition = 0;
-   private int                                   _dragLastYPosition = 0;
-   private boolean                               _isDragging        = false;
+   private int                                   _dragLastXPosition   = 0;
+   private int                                   _dragLastYPosition   = 0;
+   private boolean                               _isDragging          = false;
+
+   private int                                   _touch0LastXPosition = 0;
+   private int                                   _touch0LastYPosition = 0;
+   private double                                _touchesDistance     = 0;
+   private double                                _referenceScale      = 0;
+   private boolean                               _isScaling           = false;
 
    private PushButton                            _buttonZoomIn;
    private PushButton                            _buttonZoomOut;
@@ -411,15 +361,14 @@ public class GPlanarPanoramicViewer
       _url = url;
       _name = name;
       _debug = debug;
+      //_topPanel = new TopPanel();
 
       super.setTitle(name);
       super.setVisible(true);
       super.setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
       Window.enableScrolling(false);
 
-
       readZoomLevelsAndGo();
-
 
       //forceDownloadLevelOne();
 
@@ -443,34 +392,31 @@ public class GPlanarPanoramicViewer
 
    private void fillContainer() {
 
-      super.addMouseWheelHandler(_mouseWheelHandler);
+      addMouseWheelHandler(_mouseWheelHandler);
 
-      //super.addDragStartHandler(_dragStartHandler);
-      //super.addDragHandler(_dragHandler);
-      //super.addDragEndHandler(_dragEndHandler);
+      addMouseDownHandler(_mouseDownHandler);
+      addMouseMoveHandler(_mouseMoveHandler);
+      addMouseUpHandler(_mouseUpHandler);
+      sinkEvents(Event.MOUSEEVENTS);
 
-      super.addTouchStartHandler(_touchStartHandler);
-      super.addTouchMoveHandler(_touchMoveHandler);
-      //super.sinkEvents(Event.TOUCHEVENTS);
-
-      super.addMouseDownHandler(_mouseDownHandler);
-      super.addMouseMoveHandler(_mouseMoveHandler);
-      super.addMouseUpHandler(_mouseUpHandler);
+      addTouchStartHandler(_touchStartHandler);
+      addTouchMoveHandler(_touchMoveHandler);
+      addTouchEndHandler(_touchEndHandler);
+      sinkEvents(Event.TOUCHEVENTS);
 
       Window.addResizeHandler(new ResizeHandler() {
 
          @Override
          public void onResize(final ResizeEvent event) {
             setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
-            //updateZoomLevelFromContainerSize(_currentLevel);
-            recreateTiles();
+            updateZoomLevelFromContainerSize(_currentLevel);
+            //recreateTiles();
             recreateZoomWidtgets(BUTTONEXTEND, BUTTONMARGIN);
          }
       });
 
       createHUD();
    }
-
 
    final MouseWheelHandler _mouseWheelHandler = new MouseWheelHandler() {
 
@@ -481,80 +427,34 @@ public class GPlanarPanoramicViewer
                                                        System.out.println("MOUSE-WHEEL EVENT");
                                                     }
                                                     if (event.getDeltaY() < 0) {
-                                                       //setZoomLevel(_currentLevel + 1, event.getClientX(), event.getClientY());
                                                        setZoomLevel(_currentLevel + 1, event.getX(), event.getY());
                                                     }
                                                     else {
-                                                       //setZoomLevel(_currentLevel - 1, event.getClientX(), event.getClientY());
                                                        setZoomLevel(_currentLevel - 1, event.getX(), event.getY());
                                                     }
-                                                    event.stopPropagation();
+
                                                  }
                                               };
 
-   final DragStartHandler  _dragStartHandler  = new DragStartHandler() {
+
+   final MouseDownHandler  _mouseDownHandler  = new MouseDownHandler() {
 
                                                  @Override
-                                                 public void onDragStart(final DragStartEvent event) {
-                                                    //event.preventDefault();
+                                                 public void onMouseDown(final MouseDownEvent event) {
+                                                    event.preventDefault();
                                                     _dragLastXPosition = event.getNativeEvent().getScreenX();
                                                     _dragLastYPosition = event.getNativeEvent().getScreenY();
+
                                                     if (_debug) {
-                                                       System.out.println("DRAG-START EVENT");
-                                                       System.out.println("EVENT: " + event.toDebugString());
+                                                       System.out.println("MOUSE-DOWN EVENT");
                                                        System.out.println("pos: (" + _dragLastXPosition + ","
                                                                           + _dragLastYPosition + ")");
+                                                       Window.alert("MOUSE-DOWN EVENT: X=" + _dragLastXPosition + ", Y="
+                                                                    + _dragLastYPosition);
                                                     }
+                                                    _isDragging = true;
                                                  }
                                               };
-
-
-   final DragEndHandler    _dragEndHandler    = new DragEndHandler() {
-
-                                                 @Override
-                                                 public void onDragEnd(final DragEndEvent event) {
-                                                    //event.preventDefault();
-                                                    final int deltaX = event.getNativeEvent().getScreenX() - _dragLastXPosition;
-                                                    final int deltaY = event.getNativeEvent().getScreenY() - _dragLastYPosition;
-
-                                                    if (_debug) {
-                                                       System.out.println("DRAG-END EVENT");
-                                                       System.out.println("delta: (" + deltaX + "," + deltaY + ")");
-                                                    }
-                                                    setOffset(_offsetX + deltaX, _offsetY + deltaY);
-                                                    //_isDragging = false;
-                                                 }
-                                              };
-
-   final DragHandler       _dragHandler       = new DragHandler() {
-
-                                                 @Override
-                                                 public void onDrag(final DragEvent event) {
-                                                    event.preventDefault();
-                                                    final int deltaX = event.getNativeEvent().getScreenX() - _dragLastXPosition;
-                                                    final int deltaY = event.getNativeEvent().getScreenY() - _dragLastYPosition;
-                                                    final int deltaCX = event.getNativeEvent().getClientX() - _dragLastXPosition;
-                                                    final int deltaCY = event.getNativeEvent().getClientY() - _dragLastYPosition;
-
-                                                    if (_debug) {
-                                                       System.out.println("ON-DRAG EVENT");
-                                                       System.out.println("pos: (" + event.getNativeEvent().getScreenX() + ","
-                                                                          + event.getNativeEvent().getScreenY() + ")");
-                                                       System.out.println("deltaScreen: (" + deltaX + "," + deltaY + ")");
-                                                       System.out.println("deltaClient: (" + deltaCX + "," + deltaCY + ")");
-                                                    }
-                                                    setOffset(_offsetX + deltaX, _offsetY + deltaY);
-                                                 }
-                                              };
-
-
-   //   final DragSourceMotionListener _dragSourceListener = new DragSourceMotionListener() {
-   //
-   //                                                         @Override
-   //                                                         public void dragMouseMoved(final DragSourceDragEvent dsde) {
-   //                                                            System.out.println("DRAG-MOVE EVENT");
-   //                                                         }
-   //                                                      };
 
    final MouseMoveHandler  _mouseMoveHandler  = new MouseMoveHandler() {
 
@@ -568,9 +468,12 @@ public class GPlanarPanoramicViewer
                                                                           - _dragLastYPosition;
                                                        _dragLastXPosition = event.getNativeEvent().getScreenX();
                                                        _dragLastYPosition = event.getNativeEvent().getScreenY();
+
                                                        if (_debug) {
                                                           System.out.println("ON-MOUSE-MOVE EVENT");
                                                           System.out.println("delta: (" + deltaX + "," + deltaY + ")");
+                                                          Window.alert("MOUSE-MOVE EVENT: deltaX=" + deltaX + ", deltaY="
+                                                                       + deltaY);
                                                        }
                                                        setOffset(_offsetX + deltaX, _offsetY + deltaY);
                                                     }
@@ -578,46 +481,50 @@ public class GPlanarPanoramicViewer
                                               };
 
 
-   final MouseDownHandler  _mouseDownHandler  = new MouseDownHandler() {
-
-                                                 @Override
-                                                 public void onMouseDown(final MouseDownEvent event) {
-                                                    event.preventDefault();
-                                                    _dragLastXPosition = event.getNativeEvent().getScreenX();
-                                                    _dragLastYPosition = event.getNativeEvent().getScreenY();
-                                                    if (_debug) {
-                                                       System.out.println("MOUSE-DOWN EVENT");
-                                                       System.out.println("pos: (" + _dragLastXPosition + ","
-                                                                          + _dragLastYPosition + ")");
-                                                    }
-                                                    _isDragging = true;
-                                                 }
-                                              };
-
    final MouseUpHandler    _mouseUpHandler    = new MouseUpHandler() {
 
                                                  @Override
                                                  public void onMouseUp(final MouseUpEvent event) {
                                                     event.preventDefault();
+
                                                     if (_debug) {
                                                        System.out.println("MOUSE-UP EVENT");
+                                                       Window.alert("MOUSE-UP EVENT");
                                                     }
                                                     _isDragging = false;
                                                  }
                                               };
-
 
    final TouchStartHandler _touchStartHandler = new TouchStartHandler() {
 
                                                  @Override
                                                  public void onTouchStart(final TouchStartEvent event) {
                                                     event.preventDefault();
-                                                    _dragLastXPosition = event.getNativeEvent().getScreenX();
-                                                    _dragLastXPosition = event.getNativeEvent().getScreenY();
-                                                    if (_debug) {
-                                                       System.out.println("TOUCH-START EVENT");
-                                                       System.out.println("ScreenPos: (" + _dragLastXPosition + ","
-                                                                          + _dragLastXPosition + ")");
+
+                                                    final JsArray<Touch> touches = event.getTargetTouches();
+                                                    if (touches.length() > 1) {
+                                                       _isScaling = true;
+                                                    }
+                                                    if (_isScaling) {
+                                                       final Touch t0 = touches.get(0);
+                                                       final Touch t1 = touches.get(1);
+                                                       final int deltaX = t1.getScreenX() - t0.getScreenX();
+                                                       final int deltaY = t1.getScreenY() - t0.getScreenY();
+                                                       _touchesDistance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+                                                       _referenceScale = Math.sqrt(Math.pow(getContainerSize().getHeight(), 2)
+                                                                                   + Math.pow(getContainerSize().getWidth(), 2));
+                                                       if (_debug) {
+                                                          Window.alert("TOUCHES distance: " + _touchesDistance);
+                                                       }
+                                                    }
+                                                    else {
+                                                       final Touch t = touches.get(0);
+                                                       _touch0LastXPosition = t.getScreenX();
+                                                       _touch0LastYPosition = t.getScreenY();
+                                                       if (_debug) {
+                                                          Window.alert("TOUCH-START EVENT: x=" + _touch0LastXPosition + ", y="
+                                                                       + _touch0LastYPosition);
+                                                       }
                                                     }
                                                  }
                                               };
@@ -627,15 +534,72 @@ public class GPlanarPanoramicViewer
                                                  @Override
                                                  public void onTouchMove(final TouchMoveEvent event) {
                                                     event.preventDefault();
-                                                    final int deltaX = event.getNativeEvent().getScreenX() - _dragLastXPosition;
-                                                    final int deltaY = event.getNativeEvent().getScreenY() - _dragLastYPosition;
-                                                    _dragLastXPosition = event.getNativeEvent().getScreenX();
-                                                    _dragLastYPosition = event.getNativeEvent().getScreenY();
-                                                    if (_debug) {
-                                                       System.out.println("TOUCH-MOVE EVENT");
-                                                       System.out.println("delta: (" + deltaX + "," + deltaY + ")");
+
+                                                    final JsArray<Touch> touches = event.getTargetTouches();
+                                                    if (_isScaling) {
+                                                       final Touch t0 = touches.get(0);
+                                                       final Touch t1 = touches.get(1);
+                                                       final int deltaX = t1.getScreenX() - t0.getScreenX();
+                                                       final int deltaY = t1.getScreenY() - t0.getScreenY();
+                                                       final double currentDistance = Math.sqrt(Math.pow(deltaX, 2)
+                                                                                                + Math.pow(deltaY, 2));
+                                                       final double distanceDelta = currentDistance - _touchesDistance;
+                                                       if (_debug) {
+                                                          Window.alert("delta distance: " + distanceDelta);
+                                                       }
+                                                       if (distanceDelta > (_referenceScale / 10)) {
+                                                          _touchesDistance = currentDistance;
+                                                          setZoomLevel(_currentLevel + 1);
+                                                       }
+                                                       else if (distanceDelta < -(_referenceScale / 10)) {
+                                                          _touchesDistance = currentDistance;
+                                                          setZoomLevel(_currentLevel - 1);
+                                                       }
+
                                                     }
-                                                    setOffset(_offsetX + deltaX, _offsetY + deltaY);
+                                                    else {
+                                                       final Touch t = touches.get(0);
+                                                       int deltaX = t.getScreenX() - _touch0LastXPosition;
+                                                       int deltaY = t.getScreenY() - _touch0LastYPosition;
+
+                                                       if (_debug) {
+                                                          Window.alert("TOUCH-MOVE EVENT: deltaX=" + deltaX + ", deltaY="
+                                                                       + deltaY);
+                                                       }
+
+                                                       // to filter spurious offsets
+                                                       if (Math.abs(deltaX) < 6) {
+                                                          deltaX = 0;
+                                                       }
+                                                       else {
+                                                          _touch0LastXPosition = t.getScreenX();
+                                                       }
+
+                                                       if (Math.abs(deltaY) < 6) {
+                                                          deltaY = 0;
+                                                       }
+                                                       else {
+                                                          _touch0LastYPosition = t.getScreenY();
+                                                       }
+
+                                                       if ((deltaX != 0) || (deltaY != 0)) { // to filter controls touchs
+                                                          setOffset(_offsetX + deltaX, _offsetY + deltaY);
+                                                       }
+                                                    }
+                                                 }
+                                              };
+
+   final TouchEndHandler   _touchEndHandler   = new TouchEndHandler() {
+
+                                                 @Override
+                                                 public void onTouchEnd(final TouchEndEvent event) {
+                                                    event.preventDefault();
+                                                    if (_isScaling && (event.getTargetTouches().length() == 0)) {
+                                                       _isScaling = false;
+                                                    }
+                                                    if (_debug) {
+                                                       Window.alert("TOUCH-END EVENT: " + event.getTargetTouches().length());
+                                                    }
                                                  }
                                               };
 
@@ -688,7 +652,6 @@ public class GPlanarPanoramicViewer
             try {
                final int responseCode = response.getStatusCode() / 100;
                if (_url.startsWith("file:/") || (responseCode == 2)) {
-                  //final JavaScriptObject valores = parseJson(response.getText());
                   final JSONValue values = JSONParser.parseLenient(response.getText());
                   if (values != null) {
                      final JSONArray valuesList = values.isArray();
@@ -747,66 +710,6 @@ public class GPlanarPanoramicViewer
          GWT.log("RequestException: " + e.toString());
       }
    }
-
-
-   //   private void readZoomLevelsAndGo2() {
-   //
-   //      final JsonpRequestBuilder jsonp = new JsonpRequestBuilder();
-   //
-   //
-   //      System.out.println("URL=" + _url.toString());
-   //      jsonp.setPredeterminedId("jq");
-   //      jsonp.requestString(_url + "/info.txt", new AsyncCallback<String>() {
-   //         @Override
-   //         public void onFailure(final Throwable caught) {
-   //            Window.alert("Failure: ->" + caught.getMessage());
-   //         }
-   //
-   //
-   //         @Override
-   //         public void onSuccess(final String result) {
-   //
-   //            System.out.println(result.toString());
-   //
-   //            //final JavaScriptObject valores = parseJson(response.getText());
-   //            final JSONValue values = JSONParser.parseLenient(result.toString());
-   //            if (values != null) {
-   //               final JSONArray valuesList = values.isArray();
-   //               for (int i = 0; i < valuesList.size(); i++) {
-   //                  final JSONObject data = valuesList.get(i).isObject();
-   //                  final GPlanarPanoramicZoomLevel level = new GPlanarPanoramicZoomLevel(
-   //                           (int) data.get("level").isNumber().doubleValue(), (int) data.get("width").isNumber().doubleValue(),
-   //                           (int) data.get("height").isNumber().doubleValue(),
-   //                           (int) data.get("widthInTiles").isNumber().doubleValue(),
-   //                           (int) data.get("heightInTiles").isNumber().doubleValue());
-   //                  _zoomLevels.add(level);
-   //                  if (_debug) {
-   //                     System.out.println("valores: " + level.toString());
-   //                  }
-   //               }
-   //
-   //               // Complete initialization on zoom-level data received 
-   //               int minLevel = Integer.MAX_VALUE;
-   //               int maxLevel = Integer.MIN_VALUE;
-   //
-   //               for (final GPlanarPanoramicZoomLevel zoomLevel : _zoomLevels) {
-   //                  final int currentLevel = zoomLevel.getLevel();
-   //                  minLevel = Math.min(minLevel, currentLevel);
-   //                  maxLevel = Math.max(maxLevel, currentLevel);
-   //               }
-   //
-   //               _minLevel = minLevel;
-   //               _maxLevel = maxLevel;
-   //               _currentLevel = minLevel;
-   //
-   //               fillContainer();
-   //               updateZoomLevelFromContainerSize(0);
-   //            }
-   //
-   //         }
-   //      });
-   //
-   //   }
 
 
    //   /*
@@ -1273,6 +1176,5 @@ public class GPlanarPanoramicViewer
    public int getMaxLevel() {
       return _maxLevel;
    }
-
 
 }

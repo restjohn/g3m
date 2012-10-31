@@ -2,19 +2,7 @@
 
 package planarviewer.client;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DragEndEvent;
-import com.google.gwt.event.dom.client.DragEndHandler;
-import com.google.gwt.event.dom.client.DragEvent;
-import com.google.gwt.event.dom.client.DragHandler;
-import com.google.gwt.event.dom.client.DragStartEvent;
-import com.google.gwt.event.dom.client.DragStartHandler;
 import com.google.gwt.event.dom.client.HasAllTouchHandlers;
-import com.google.gwt.event.dom.client.HasClickHandlers;
-import com.google.gwt.event.dom.client.HasDragEndHandlers;
-import com.google.gwt.event.dom.client.HasDragHandlers;
-import com.google.gwt.event.dom.client.HasDragStartHandlers;
 import com.google.gwt.event.dom.client.HasMouseDownHandlers;
 import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
 import com.google.gwt.event.dom.client.HasMouseUpHandlers;
@@ -36,8 +24,10 @@ import com.google.gwt.event.dom.client.TouchMoveHandler;
 import com.google.gwt.event.dom.client.TouchStartEvent;
 import com.google.gwt.event.dom.client.TouchStartHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -46,182 +36,101 @@ public class Container
             Composite
          implements
             HasAllTouchHandlers,
-            HasClickHandlers,
-            HasDragHandlers,
             HasMouseWheelHandlers,
-            HasDragStartHandlers,
-            HasDragEndHandlers,
             HasMouseDownHandlers,
             HasMouseUpHandlers,
-            HasMouseMoveHandlers
-//ClickHandler,
-//DragStartHandler,
-//DragEndHandler,
-//MouseWheelHandler 
-{
+            HasMouseMoveHandlers {
 
-   private final AbsolutePanel panel = new AbsolutePanel();
-
-
-   //   private final int           _dragStart = 0;
-   //   private final int           _dragEnd   = 0;
+   private final AbsolutePanel _panel    = new AbsolutePanel();
+   private final SimplePanel   _topPanel = new SimplePanel();
 
 
    public Container() {
       super();
-      initWidget(panel);
-      //addClickHandler(this);
-      //      addDragHandler(this);
-      //addDragStartHandler(this);
-      //addDragEndHandler(this);
-      //addMouseWheelHandler(this);
-   }
-
-
-   @Override
-   public HandlerRegistration addClickHandler(final ClickHandler handler) {
-      return addDomHandler(handler, ClickEvent.getType());
-   }
-
-
-   @Override
-   public HandlerRegistration addDragHandler(final DragHandler handler) {
-      return addDomHandler(handler, DragEvent.getType());
-   }
-
-
-   @Override
-   public HandlerRegistration addDragStartHandler(final DragStartHandler handler) {
-      return addDomHandler(handler, DragStartEvent.getType());
-   }
-
-
-   @Override
-   public HandlerRegistration addDragEndHandler(final DragEndHandler handler) {
-      return addDomHandler(handler, DragEndEvent.getType());
+      initWidget(_panel);
+      DOM.setIntStyleAttribute(_topPanel.getElement(), "zIndex", 50);
+      //_topPanel.setVisible(true);
+      setWidget(_topPanel, 0, 0);
    }
 
 
    @Override
    public HandlerRegistration addMouseWheelHandler(final MouseWheelHandler handler) {
-      return addDomHandler(handler, MouseWheelEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseWheelEvent.getType());
+      return hr;
    }
 
 
    @Override
    public HandlerRegistration addMouseMoveHandler(final MouseMoveHandler handler) {
-      return addDomHandler(handler, MouseMoveEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseMoveEvent.getType());
+      return hr;
    }
 
 
    @Override
    public HandlerRegistration addMouseDownHandler(final MouseDownHandler handler) {
-      return addDomHandler(handler, MouseDownEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseDownEvent.getType());
+      return hr;
    }
 
 
    @Override
    public HandlerRegistration addMouseUpHandler(final MouseUpHandler handler) {
-      return addDomHandler(handler, MouseUpEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseUpEvent.getType());
+      return hr;
    }
 
 
    @Override
    public HandlerRegistration addTouchStartHandler(final TouchStartHandler handler) {
-      return addDomHandler(handler, TouchStartEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchStartEvent.getType());
+      return hr;
    }
 
 
    @Override
    public HandlerRegistration addTouchMoveHandler(final TouchMoveHandler handler) {
-      return addDomHandler(handler, TouchMoveEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchMoveEvent.getType());
+      return hr;
    }
 
 
    @Override
    public HandlerRegistration addTouchEndHandler(final TouchEndHandler handler) {
-      return addDomHandler(handler, TouchEndEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchEndEvent.getType());
+      return hr;
    }
 
 
    @Override
    public HandlerRegistration addTouchCancelHandler(final TouchCancelHandler handler) {
-      return addDomHandler(handler, TouchCancelEvent.getType());
+      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchCancelEvent.getType());
+      return hr;
    }
-
-
-   //   @Override
-   //   public void onClick(final ClickEvent event) {
-   //      System.out.println("MOUSE CLICK EVENT");
-   //      System.out.println("CclientX: " + event.getClientX() + ", CclientY: " + event.getClientY());
-   //      System.out.println("CscreenX: " + event.getScreenX() + ", CscreenY: " + event.getScreenY());
-   //   }
-   //
-   //
-   //   @Override
-   //   public void onMouseWheel(final MouseWheelEvent event) {
-   //      System.out.println("MOUSE WHEEL EVENT");
-   //      System.out.println("WclientX: " + event.getClientX() + ", WclientY: " + event.getClientY());
-   //      System.out.println("WscreenX: " + event.getScreenX() + ", WscreenY: " + event.getScreenY());
-   //      System.out.println("WdeltaY: " + event.getDeltaY());
-   //      event.stopPropagation();
-   //   }
-   //
-   //
-   //   //   @Override
-   //   //   public void onDrag(final DragEvent event) {
-   //   //      //  Auto-generated method stub
-   //   //   }
-   //
-   //
-   //   @Override
-   //   public void onDragStart(final DragStartEvent event) {
-   //      final int SclientX = event.getNativeEvent().getClientX();
-   //      final int SclientY = event.getNativeEvent().getClientY();
-   //      final int SscreenX = event.getNativeEvent().getScreenX();
-   //      final int SscreenY = event.getNativeEvent().getScreenY();
-   //      _dragStart = SscreenX;
-   //      System.out.println("MOUSE DRAG-START EVENT");
-   //      System.out.println("SclientX: " + SclientX + ", SclientY: " + SclientY);
-   //      System.out.println("SscreenX: " + SscreenX + ", SscreenY: " + SscreenY);
-   //   }
-   //
-   //
-   //   @Override
-   //   public void onDragEnd(final DragEndEvent event) {
-   //      final int EclientX = event.getNativeEvent().getClientX();
-   //      final int EclientY = event.getNativeEvent().getClientY();
-   //      final int EscreenX = event.getNativeEvent().getScreenX();
-   //      final int EscreenY = event.getNativeEvent().getScreenY();
-   //      _dragEnd = EscreenX;
-   //      System.out.println("MOUSE DRAG-END EVENT");
-   //      System.out.println("EclientX: " + EclientX + ", EclientY: " + EclientY);
-   //      System.out.println("EscreenX: " + EscreenX + ", EscreenY: " + EscreenY);
-   //      System.out.println("Distance: " + (_dragEnd - _dragStart));
-   //      //System.out.println("WscreenX: " + event.getScreenX() + ", WscreenY: " + event.getScreenY());
-   //   }
 
 
    public void setWidget(final Widget widget,
                          final int left,
                          final int top) {
-      panel.add(widget, left, top);
+      _panel.add(widget, left, top);
    }
 
 
    public void remove(final Widget widget) {
-      panel.remove(widget);
+      _panel.remove(widget);
    }
 
 
    public void setSize(final int width,
                        final int height) {
       super.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
+      _topPanel.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
    }
 
 
    public void clear() {
-      panel.clear();
+      _panel.clear();
    }
 
 

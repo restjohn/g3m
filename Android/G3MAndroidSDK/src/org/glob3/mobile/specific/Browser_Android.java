@@ -5,6 +5,9 @@ package org.glob3.mobile.specific;
 import org.glob3.mobile.generated.URL;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 
@@ -20,7 +23,6 @@ public class Browser_Android {
       _webView = webView;
       //      _webView = new WebView(_activity.getApplicationContext());
       //      _activity.setContentView(_webView);
-
    }
 
 
@@ -32,23 +34,31 @@ public class Browser_Android {
       _webView.getSettings().setAppCacheEnabled(true);
       //WebSettings.
       //_webView.setAlwaysDrawnWithCacheEnabled(true);
-      //_webView.setClickable(false);
+      _webView.setClickable(true);
+      //      _webView.getSettings().setDomStorageEnabled(true);
+      //      _webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+
+      //_webView.setLongClickable(false);
       //_webView.getSettings().setSupportZoom(true);
       //_webView.getSettings().setBuiltInZoomControls(true);
-      //_webView.getSettings().setLightTouchEnabled(true);
+      _webView.getSettings().setLightTouchEnabled(true);
       //_webView.getSettings().setUseWideViewPort(true);
 
-      //      _webView.setWebChromeClient(new WebChromeClient() {
-      //         @Override
-      //         public boolean onJsAlert(final WebView view,
-      //                                  final String url,
-      //                                  final String message,
-      //                                  final JsResult result) {
-      //            return super.onJsAlert(view, url, message, result);
-      //         }
-      //      });
 
+      //      _webView.setWebViewClient(new WebViewClient());
+      _webView.setWebChromeClient(new WebChromeClient() {
+         @Override
+         public boolean onJsAlert(final WebView view,
+                                  final String url,
+                                  final String message,
+                                  final JsResult result) {
+            return super.onJsAlert(view, url, message, result);
+         }
+      });
+
+      Log.v("Opening url: ", targetUrl.getPath());
       _webView.loadUrl(targetUrl.getPath());
+
    }
 
    //   public Browser_Android(final Activity activity) {
