@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">G3MAndroidPlanarViewerDemo</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_planar_v">PlanarVActivity</string>
+
+</resources>
