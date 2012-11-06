@@ -59,7 +59,7 @@ public class GPlanarPanoramicViewer
 
    private class Tile {
 
-      final GContainer                         _container;
+      final GContainer                        _container;
       private final GPlanarPanoramicZoomLevel _zoomLevel;
       private final int                       _x;
       private final int                       _y;
@@ -129,8 +129,9 @@ public class GPlanarPanoramicViewer
 
       private void tryToLoadImage() {
          //GImageLoader.load(getTileUrl(), new OnLoadImageHandler(_x, _y));
-         _removeWhileLoading = false;
+         //_removeWhileLoading = false;
          if (GImageLoader.isDownloadingImage(_tileUrl)) {
+            _removeWhileLoading = false;
             return;
          }
          //final GRectangle bounds = calculateBounds();
@@ -142,8 +143,9 @@ public class GPlanarPanoramicViewer
 
       //TODO
       private void tryToLoadImage(final OnLoadImageHandler handler) {
-         _removeWhileLoading = false;
+         //_removeWhileLoading = false;
          if (GImageLoader.isDownloadingImage(_tileUrl)) {
+            _removeWhileLoading = false;
             return;
          }
          GImageLoader.load(_tileUrl, handler);
@@ -511,8 +513,9 @@ public class GPlanarPanoramicViewer
                                                        final int deltaX = t1.getScreenX() - t0.getScreenX();
                                                        final int deltaY = t1.getScreenY() - t0.getScreenY();
                                                        _touchesDistance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-                                                       _referenceScale = Math.sqrt(Math.pow(getContainerSize().getHeight(), 2)
-                                                                                   + Math.pow(getContainerSize().getWidth(), 2));
+                                                       //                                                       _referenceScale = Math.max(getContainerSize().getHeight(),
+                                                       //                                                                getContainerSize().getWidth());
+                                                       _referenceScale = getContainerSize().getHeight();
                                                        if (_debug) {
                                                           Window.alert("TOUCHES distance: " + _touchesDistance);
                                                        }
@@ -597,6 +600,7 @@ public class GPlanarPanoramicViewer
                                                     if (_isScaling && (event.getTargetTouches().length() == 0)) {
                                                        _isScaling = false;
                                                     }
+
                                                     if (_debug) {
                                                        Window.alert("TOUCH-END EVENT: " + event.getTargetTouches().length());
                                                     }

@@ -47,3 +47,8 @@ Android/G3MAndroidPlanarViewerDemo/gen/
 # Android/G3MAndroidDemo/bin/res/*/*
 # Android/G3MAndroidSDK/bin/*
 # Android/G3MAndroidSDK/bin/*/*/*
+
+planarviewer/gwt-unitCache/
+planarviewer/war/WEB-INF/
+planarviewer/war/planarviewer.planarviewer/
+

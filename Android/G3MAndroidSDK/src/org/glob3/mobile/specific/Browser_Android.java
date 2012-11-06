@@ -32,7 +32,6 @@ public class Browser_Android {
       _webView.getSettings().setAllowFileAccess(true);
       _webView.getSettings().setJavaScriptEnabled(true);
       _webView.getSettings().setAppCacheEnabled(true);
-      //WebSettings.
       //_webView.setAlwaysDrawnWithCacheEnabled(true);
       _webView.setClickable(true);
       //      _webView.getSettings().setDomStorageEnabled(true);
@@ -43,7 +42,6 @@ public class Browser_Android {
       //_webView.getSettings().setBuiltInZoomControls(true);
       _webView.getSettings().setLightTouchEnabled(true);
       //_webView.getSettings().setUseWideViewPort(true);
-
 
       //      _webView.setWebViewClient(new WebViewClient());
       _webView.setWebChromeClient(new WebChromeClient() {
