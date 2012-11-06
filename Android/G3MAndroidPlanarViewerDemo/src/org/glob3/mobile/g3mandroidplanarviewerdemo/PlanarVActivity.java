@@ -39,7 +39,7 @@ public class PlanarVActivity
       URL url = null;
       try {
          url = new URL("file:///android_asset/www/planarpanoramic.html?url="
-                       + URLEncoder.encode("http://192.168.1.23/caminomontana", "UTF-8"));
+                       + URLEncoder.encode("http://192.168.1.23/caminomontana", "UTF-8"), false);
       }
       catch (final UnsupportedEncodingException e) {
          Log.e("UnsupportedEncodingException: ", e.getMessage());
