@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
-public class Container
+public class GContainer
          extends
             Composite
          implements
@@ -45,68 +45,59 @@ public class Container
    private final SimplePanel   _topPanel = new SimplePanel();
 
 
-   public Container() {
+   public GContainer() {
       super();
       initWidget(_panel);
       DOM.setIntStyleAttribute(_topPanel.getElement(), "zIndex", 50);
-      //_topPanel.setVisible(true);
       setWidget(_topPanel, 0, 0);
    }
 
 
    @Override
    public HandlerRegistration addMouseWheelHandler(final MouseWheelHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseWheelEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, MouseWheelEvent.getType());
    }
 
 
    @Override
    public HandlerRegistration addMouseMoveHandler(final MouseMoveHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseMoveEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, MouseMoveEvent.getType());
    }
 
 
    @Override
    public HandlerRegistration addMouseDownHandler(final MouseDownHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseDownEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, MouseDownEvent.getType());
    }
 
 
    @Override
    public HandlerRegistration addMouseUpHandler(final MouseUpHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, MouseUpEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, MouseUpEvent.getType());
    }
 
 
    @Override
    public HandlerRegistration addTouchStartHandler(final TouchStartHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchStartEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, TouchStartEvent.getType());
    }
 
 
    @Override
    public HandlerRegistration addTouchMoveHandler(final TouchMoveHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchMoveEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, TouchMoveEvent.getType());
    }
 
 
    @Override
    public HandlerRegistration addTouchEndHandler(final TouchEndHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchEndEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, TouchEndEvent.getType());
    }
 
 
    @Override
    public HandlerRegistration addTouchCancelHandler(final TouchCancelHandler handler) {
-      final HandlerRegistration hr = _topPanel.addDomHandler(handler, TouchCancelEvent.getType());
-      return hr;
+      return _topPanel.addDomHandler(handler, TouchCancelEvent.getType());
    }
 
 

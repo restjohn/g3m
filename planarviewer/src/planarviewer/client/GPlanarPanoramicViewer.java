@@ -45,7 +45,7 @@ import com.google.gwt.user.client.ui.PushButton;
 
 public class GPlanarPanoramicViewer
          extends
-            Container {
+            GContainer {
 
    //private static final ILogger LOGGER               = ILogger.instance();
    //private static Logger        logger               = Logger.getLogger("NameOfYourLogger");
@@ -59,7 +59,7 @@ public class GPlanarPanoramicViewer
 
    private class Tile {
 
-      final Container                         _container;
+      final GContainer                         _container;
       private final GPlanarPanoramicZoomLevel _zoomLevel;
       private final int                       _x;
       private final int                       _y;
@@ -70,7 +70,7 @@ public class GPlanarPanoramicViewer
       private final GRectangle                _pixelsBounds;
 
 
-      private Tile(final Container container,
+      private Tile(final GContainer container,
                    final GPlanarPanoramicZoomLevel zoomLevel,
                    final int x,
                    final int y) {
