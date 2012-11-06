@@ -15,7 +15,7 @@
 #include "ITimer.hpp"
 #include "TilesRenderParameters.hpp"
 #include "TouchEvent.hpp"
-
+#include "LayerSet.hpp"
 
 TileRenderer::~TileRenderer() {
   clearTopLevelTiles();
@@ -76,11 +76,10 @@ void TileRenderer::initialize(const InitializationContext* ic) {
   clearTopLevelTiles();
   createTopLevelTiles(ic);
   
-  if (_lastSplitTimer != NULL) {
-    delete _lastSplitTimer;
-  }
+  delete _lastSplitTimer;
   _lastSplitTimer      = ic->getFactory()->createTimer();
   
+  _layerSet->initialize(ic);
   _texturizer->initialize(ic, _parameters);
 }
 
@@ -90,7 +89,7 @@ bool TileRenderer::isReadyToRender(const RenderContext *rc) {
       const int topLevelTilesSize = _topLevelTiles.size();
       for (int i = 0; i < topLevelTilesSize; i++) {
         Tile* tile = _topLevelTiles[i];
-        _texturizer->justCreatedTopTile(rc, tile);
+        _texturizer->justCreatedTopTile(rc, tile, _layerSet);
       }
     }
     _topTilesJustCreated = false;
@@ -104,7 +103,7 @@ bool TileRenderer::isReadyToRender(const RenderContext *rc) {
     }
     
     if (_texturizer != NULL) {
-      if (!_texturizer->isReady(rc)) {
+      if (!_texturizer->isReady(rc, _layerSet)) {
         return false;
       }
     }
@@ -114,12 +113,14 @@ bool TileRenderer::isReadyToRender(const RenderContext *rc) {
 }
 
 void TileRenderer::render(const RenderContext* rc) {
-  TilesStatistics statistics;
-  //Saving camera for Long Press Event
+  // Saving camera for use in onTouchEvent
   _lastCamera = rc->getCurrentCamera();
+
+  TilesStatistics statistics;
   
   TileRenderContext trc(_tessellator,
                         _texturizer,
+                        _layerSet,
                         _parameters,
                         &statistics,
                         _lastSplitTimer,
@@ -183,7 +184,7 @@ bool TileRenderer::onTouchEvent(const EventContext* ec,
   if (touchEvent->getType() == LongPress) {
     
     if (_lastCamera != NULL) {
-      const Vector2D pixel = touchEvent->getTouch(0)->getPos();
+      const Vector2I pixel = touchEvent->getTouch(0)->getPos();
       const Vector3D ray = _lastCamera->pixel2Ray(pixel);
       const Vector3D origin = _lastCamera->getCartesianPosition();
       
@@ -199,7 +200,7 @@ bool TileRenderer::onTouchEvent(const EventContext* ec,
       for (int i = 0; i < _topLevelTiles.size(); i++) {
         const Tile* tile = _topLevelTiles[i]->getDeepestTileContaining(position);
         if (tile != NULL) {
-          _texturizer->onTerrainTouchEvent(ec, position, tile);
+          _texturizer->onTerrainTouchEvent(ec, position, tile, _layerSet);
           handled = true;
         }
       }
@@ -210,3 +211,10 @@ bool TileRenderer::onTouchEvent(const EventContext* ec,
   return handled;
 }
 
+
+void TileRenderer::pruneTopLevelTiles() {
+  for (int i = 0; i < _topLevelTiles.size(); i++) {
+    Tile* tile = _topLevelTiles[i];
+    tile->prune(_texturizer);
+  }
+}

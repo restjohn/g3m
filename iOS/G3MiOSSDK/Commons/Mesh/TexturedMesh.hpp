@@ -20,18 +20,20 @@ private:
   const TextureMapping* _textureMapping;
   const bool            _ownedMesh;
   const bool            _ownedTexMapping;
-  
+  const bool            _transparent;
   
 public:
   
   TexturedMesh(const Mesh* mesh,
                bool ownedMesh,
                TextureMapping* const textureMapping,
-               bool ownedTexMapping) :
+               bool ownedTexMapping,
+               bool transparent) :
   _mesh(mesh),
   _ownedMesh(ownedMesh),
   _textureMapping(textureMapping),
-  _ownedTexMapping(ownedTexMapping)
+  _ownedTexMapping(ownedTexMapping),
+  _transparent(transparent)
   {
     
   }
@@ -40,7 +42,7 @@ public:
 #ifdef C_CODE
     if (_ownedMesh) {
       delete _mesh;
-    }
+    } 
     if (_ownedTexMapping){
       delete _textureMapping;
     }

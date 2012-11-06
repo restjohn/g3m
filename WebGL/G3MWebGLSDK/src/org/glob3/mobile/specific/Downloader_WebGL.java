@@ -12,6 +12,7 @@ import org.glob3.mobile.generated.IImageDownloadListener;
 import org.glob3.mobile.generated.InitializationContext;
 import org.glob3.mobile.generated.URL;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Timer;
 
 
@@ -86,7 +87,7 @@ public final class Downloader_WebGL
 
       final long requestId;
       Downloader_WebGL_Handler handler = null;
-      final URL proxyUrl = new URL(_proxy + url.getPath());
+      final URL proxyUrl = new URL(_proxy + url.getPath(), false);
 
       _requestsCounter++;
       requestId = _requestIdCounter++;
@@ -104,7 +105,9 @@ public final class Downloader_WebGL
          }
          else {
             // new handler, queue it
-            handler = new Downloader_WebGL_Handler(proxyUrl, listener, priority, requestId);
+            //            handler = new Downloader_WebGL_HandlerImpl(proxyUrl, listener, priority, requestId);
+            handler = GWT.create(Downloader_WebGL_Handler.class);
+            handler.init(proxyUrl, listener, priority, requestId);
             _queuedHandlers.put(proxyUrl, handler);
          }
       }
@@ -120,7 +123,7 @@ public final class Downloader_WebGL
                             final boolean deleteListener) {
       final long requestId;
       Downloader_WebGL_Handler handler = null;
-      final URL proxyUrl = new URL(_proxy + url.getPath());
+      final URL proxyUrl = new URL(_proxy + url.getPath(), false);
 
       _requestsCounter++;
       requestId = _requestIdCounter++;
@@ -138,7 +141,9 @@ public final class Downloader_WebGL
          }
          else {
             // new handler, queue it
-            handler = new Downloader_WebGL_Handler(proxyUrl, listener, priority, requestId);
+            //            handler = new Downloader_WebGL_HandlerImpl(proxyUrl, listener, priority, requestId);
+            handler = GWT.create(Downloader_WebGL_Handler.class);
+            handler.init(proxyUrl, listener, priority, requestId);
             _queuedHandlers.put(proxyUrl, handler);
          }
       }

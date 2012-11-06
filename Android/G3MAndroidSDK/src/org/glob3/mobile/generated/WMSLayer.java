@@ -109,13 +109,13 @@ public class WMSLayer extends Layer
 		isb.addInt(height);
   
 		isb.addString("&BBOX=");
-		isb.addDouble(sector.lower().latitude().degrees());
+		isb.addDouble(sector.lower().latitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.lower().longitude().degrees());
+		isb.addDouble(sector.lower().longitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().latitude().degrees());
+		isb.addDouble(sector.upper().latitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().longitude().degrees());
+		isb.addDouble(sector.upper().longitude()._degrees);
   
 		req += isb.getString();
 		if (isb != null)
@@ -139,13 +139,13 @@ public class WMSLayer extends Layer
 		isb.addInt(height);
   
 		isb.addString("&BBOX=");
-		isb.addDouble(sector.lower().longitude().degrees());
+		isb.addDouble(sector.lower().longitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.lower().latitude().degrees());
+		isb.addDouble(sector.lower().latitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().longitude().degrees());
+		isb.addDouble(sector.upper().longitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().latitude().degrees());
+		isb.addDouble(sector.upper().latitude()._degrees);
   
 		req += isb.getString();
 		if (isb != null)
@@ -187,18 +187,15 @@ public class WMSLayer extends Layer
 	  req += "&TRANSPARENT=FALSE";
 	}
   
-	Petition petition = new Petition(sector, new URL(req));
+	Petition petition = new Petition(sector, new URL(req, false));
 	petitions.add(petition);
   
 	  return petitions;
   }
 
-//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
-//ORIGINAL LINE: boolean isTransparent() const
-  public final boolean isTransparent()
-  {
-	return _isTransparent;
-  }
+//  bool isTransparent() const{
+//    return _isTransparent;
+//  }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: URL getFeatureInfoURL(const Geodetic2D& g, const IFactory* factory, const Sector& tileSector, int width, int height) const
@@ -256,13 +253,13 @@ public class WMSLayer extends Layer
 		isb.addInt(height);
   
 		isb.addString("&BBOX=");
-		isb.addDouble(sector.lower().latitude().degrees());
+		isb.addDouble(sector.lower().latitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.lower().longitude().degrees());
+		isb.addDouble(sector.lower().longitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().latitude().degrees());
+		isb.addDouble(sector.upper().latitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().longitude().degrees());
+		isb.addDouble(sector.upper().longitude()._degrees);
   
 		req += isb.getString();
   
@@ -287,13 +284,13 @@ public class WMSLayer extends Layer
 		isb.addInt(height);
   
 		isb.addString("&BBOX=");
-		isb.addDouble(sector.lower().longitude().degrees());
+		isb.addDouble(sector.lower().longitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.lower().latitude().degrees());
+		isb.addDouble(sector.lower().latitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().longitude().degrees());
+		isb.addDouble(sector.upper().longitude()._degrees);
 		isb.addString(",");
-		isb.addDouble(sector.upper().latitude().degrees());
+		isb.addDouble(sector.upper().latitude()._degrees);
   
 		req += isb.getString();
   
@@ -323,7 +320,7 @@ public class WMSLayer extends Layer
 	if (isb != null)
 		isb.dispose();
   
-	  return new URL(req);
+	  return new URL(req, false);
   }
 
 

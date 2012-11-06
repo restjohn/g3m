@@ -7,13 +7,20 @@ import java.util.Random;
 
 import org.glob3.mobile.generated.Angle;
 import org.glob3.mobile.generated.GLErrorRenderer;
+import org.glob3.mobile.generated.GTask;
 import org.glob3.mobile.generated.Geodetic3D;
 import org.glob3.mobile.generated.ICameraConstrainer;
+import org.glob3.mobile.generated.IFactory;
+import org.glob3.mobile.generated.IImage;
 import org.glob3.mobile.generated.LayerSet;
 import org.glob3.mobile.generated.Mark;
+import org.glob3.mobile.generated.MarkTouchListener;
 import org.glob3.mobile.generated.MarksRenderer;
+import org.glob3.mobile.generated.PeriodicalTask;
+import org.glob3.mobile.generated.QuadShape;
 import org.glob3.mobile.generated.Renderer;
 import org.glob3.mobile.generated.Sector;
+import org.glob3.mobile.generated.ShapesRenderer;
 import org.glob3.mobile.generated.SimpleCameraConstrainer;
 import org.glob3.mobile.generated.URL;
 import org.glob3.mobile.generated.UserData;
@@ -21,6 +28,8 @@ import org.glob3.mobile.generated.WMSLayer;
 import org.glob3.mobile.generated.WMSServerVersion;
 import org.glob3.mobile.specific.G3MBaseActivity;
 import org.glob3.mobile.specific.G3MWidget_Android;
+
+import android.app.AlertDialog;
 
 
 public class G3MAndroidDemoActivity
@@ -33,15 +42,15 @@ public class G3MAndroidDemoActivity
 
       final boolean useBing = false;
       if (useBing) {
-         final WMSLayer bing = new WMSLayer("ve", new URL("http://worldwind27.arc.nasa.gov/wms/virtualearth?"),
+         final WMSLayer bing = new WMSLayer("ve", new URL("http://worldwind27.arc.nasa.gov/wms/virtualearth?", false),
                   WMSServerVersion.WMS_1_1_0, Sector.fullSphere(), "image/png", "EPSG:4326", "", false, null);
          layerSet.addLayer(bing);
       }
 
       final boolean usePnoa = false;
       if (usePnoa) {
-         final WMSLayer pnoa = new WMSLayer("PNOA", new URL("http://www.idee.es/wms/PNOA/PNOA"), WMSServerVersion.WMS_1_1_0,
-                  Sector.fromDegrees(21, -18, 45, 6), "image/png", "EPSG:4326", "", true, null);
+         final WMSLayer pnoa = new WMSLayer("PNOA", new URL("http://www.idee.es/wms/PNOA/PNOA", false),
+                  WMSServerVersion.WMS_1_1_0, Sector.fromDegrees(21, -18, 45, 6), "image/png", "EPSG:4326", "", true, null);
          layerSet.addLayer(pnoa);
       }
 
@@ -61,7 +70,7 @@ public class G3MAndroidDemoActivity
 
          final WMSLayer osm = new WMSLayer( //
                   "osm_auto:all", //
-                  new URL("http://129.206.228.72/cached/osm"), //
+                  new URL("http://129.206.228.72/cached/osm", false), //
                   WMSServerVersion.WMS_1_1_0, //
                   Sector.fromDegrees(-85.05, -180.0, 85.05, 180.0), //
                   "image/jpeg", //
@@ -97,6 +106,20 @@ public class G3MAndroidDemoActivity
       //                               Angle::nan());
       //  layerSet->addLayer(osm);
 
+      final boolean testURLescape = false;
+      if (testURLescape) {
+         final WMSLayer ayto = new WMSLayer(URL.escape("Ejes de via"), //
+                  new URL("http://sig.caceres.es/wms_callejero.mapdef?", false), //
+                  WMSServerVersion.WMS_1_1_0,//  
+                  Sector.fullSphere(), //
+                  "image/png", //
+                  "EPSG:4326", //
+                  "", //
+                  true, //
+                  null);
+         layerSet.addLayer(ayto);
+      }
+
       final ArrayList<Renderer> renderers = new ArrayList<Renderer>();
 
       //  if (false) {
@@ -114,24 +137,41 @@ public class G3MAndroidDemoActivity
 
       final boolean useMarkers = true;
       if (useMarkers) {
-         // marks renderer
          final boolean readyWhenMarksReady = false;
-         final MarksRenderer marks = new MarksRenderer(readyWhenMarksReady);
-         renderers.add(marks);
+         final MarksRenderer marksRenderer = new MarksRenderer(readyWhenMarksReady);
+
+         marksRenderer.setMarkTouchListener(new MarkTouchListener() {
+            @Override
+            public boolean touchedMark(final Mark mark) {
+               G3MAndroidDemoActivity.this.runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+                     final AlertDialog.Builder builder = new AlertDialog.Builder(G3MAndroidDemoActivity.this);
+                     builder.setMessage("Touched on mark \"" + mark.getName() + "\"");
+                     builder.setTitle("G3M Demo");
+
+                     final AlertDialog dialog = builder.create();
+                     dialog.show();
+                  }
+               });
+
+               return true;
+            }
+         }, true);
+
+         renderers.add(marksRenderer);
 
          final Mark m1 = new Mark(//
                   "Fuerteventura", //
-                  new URL("http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"), //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
                   new Geodetic3D(Angle.fromDegrees(28.05), Angle.fromDegrees(-14.36), 0));
-         //m1->addTouchListener(listener);
-         marks.addMark(m1);
+         marksRenderer.addMark(m1);
 
          final Mark m2 = new Mark( //
                   "Las Palmas", //
-                  new URL("http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"), //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
                   new Geodetic3D(Angle.fromDegrees(28.05), Angle.fromDegrees(-15.36), 0));
-         //m2->addTouchListener(listener);
-         marks.addMark(m2);
+         marksRenderer.addMark(m2);
 
          final boolean randomMarkers = false;
          if (randomMarkers) {
@@ -139,14 +179,38 @@ public class G3MAndroidDemoActivity
             for (int i = 0; i < 500; i++) {
                final Angle latitude = Angle.fromDegrees((random.nextInt() % 180) - 90);
                final Angle longitude = Angle.fromDegrees((random.nextInt() % 360) - 180);
-               //NSLog(@"lat=%f, lon=%f", latitude.degrees(), longitude.degrees());
 
-               marks.addMark(new Mark("Random", new URL(
-                        "http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"), new Geodetic3D(latitude,
-                        longitude, 0)));
+               marksRenderer.addMark(new Mark( //
+                        "Random #" + i, //
+                        new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
+                        new Geodetic3D(latitude, longitude, 0)));
+
             }
          }
 
+      }
+
+
+      final boolean useQuadShapes = true;
+      if (useQuadShapes) {
+         final ShapesRenderer shapesRenderer = new ShapesRenderer();
+         final String textureFileName = "g3m-marker.png";
+         final IImage textureImage = IFactory.instance().createImageFromFileName(textureFileName);
+
+         final QuadShape quad = new QuadShape( //
+                  new Geodetic3D(Angle.fromDegrees(37.78333333), //
+                           Angle.fromDegrees(-122.41666666666667), //
+                           10000), //
+                  textureImage, //
+                  true, //
+                  textureFileName, //
+                  500000, //
+                  500000);
+         quad.setHeading(Angle.fromDegrees(0));
+         quad.setPitch(Angle.fromDegrees(0));
+         shapesRenderer.addShape(quad);
+
+         renderers.add(shapesRenderer);
       }
 
       //  if (false) {
@@ -170,8 +234,11 @@ public class G3MAndroidDemoActivity
 
       final UserData userData = null;
 
-      widget.initWidget(cameraConstraints, layerSet, renderers, userData);
+      final GTask initializationTask = null;
+      final ArrayList<PeriodicalTask> periodicalTasks = new ArrayList<PeriodicalTask>();
+      final boolean incrementalTileQuality = false;
+      widget.initWidget(cameraConstraints, layerSet, renderers, userData, initializationTask, periodicalTasks,
+               incrementalTileQuality);
 
    }
-
 }

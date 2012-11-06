@@ -24,14 +24,14 @@ package org.glob3.mobile.generated;
 
 public class Angle
 {
-  private final double _degrees;
-  private final double _radians;
-
   private Angle(double degrees) //GMath.pi()
   {
 	  _degrees = degrees;
 	  _radians = degrees / 180.0 * 3.14159265358979323846264338327950288;
   }
+
+  public final double _degrees;
+  public final double _radians;
 
   public static Angle lerp(Angle start, Angle end, float percent)
   {
@@ -43,25 +43,34 @@ public class Angle
 	return new Angle(degrees);
   }
 
+  public static Angle fromDegreesMinutes(double degrees, double minutes)
+  {
+	return new Angle(degrees + (minutes / 60.0));
+  }
+
+  public static Angle fromDegreesMinutesSeconds(double degrees, double minutes, double seconds)
+  {
+	return new Angle(degrees + (minutes / 60.0) + (seconds / 3600.0));
+  }
+
   public static Angle fromRadians(double radians)
   {
 	return Angle.fromDegrees(radians / IMathUtils.instance().pi() * 180.0);
   }
 
-  public static Angle getMin(Angle a1, Angle a2)
+  public static Angle min(Angle a1, Angle a2)
   {
-	if (a1._degrees < a2._degrees)
-		return a1;
-	else
-		return a2;
+	//    if (a1._degrees < a2._degrees) return a1;
+	//    else return a2;
+
+	return (a1._degrees < a2._degrees) ? a1 : a2;
   }
 
-  public static Angle getMax(Angle a1, Angle a2)
+  public static Angle max(Angle a1, Angle a2)
   {
-	if (a1._degrees > a2._degrees)
-		return a1;
-	else
-		return a2;
+//    if (a1._degrees > a2._degrees) return a1;
+//    else return a2;
+	return (a1._degrees > a2._degrees) ? a1 : a2;
   }
 
   public static Angle zero()
@@ -76,9 +85,13 @@ public class Angle
 
   public static Angle midAngle(Angle angle1, Angle angle2)
   {
-	return Angle.fromDegrees((angle1.degrees() + angle2.degrees()) / 2);
+	return Angle.fromDegrees((angle1._degrees + angle2._degrees) / 2);
   }
 
+  public static Angle interpolation(Angle angle1, Angle angle2, double v)
+  {
+	return Angle.fromDegrees((1.0-v) * angle1._degrees + v * angle2._degrees);
+  }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: boolean isNan() const
@@ -119,7 +132,6 @@ public class Angle
 //ORIGINAL LINE: double radians() const
   public final double radians()
   {
-	//return _degrees / 180.0 * GMath.pi();
 	return _radians;
   }
 
@@ -229,6 +241,21 @@ public class Angle
 	return Angle.fromDegrees(dif);
   }
 
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: Angle normalized() const
+  public final Angle normalized()
+  {
+	double degrees = _degrees;
+	while (degrees < 0)
+	{
+	  degrees += 360;
+	}
+	while (degrees >= 360)
+	{
+	  degrees -= 360;
+	}
+	return new Angle(degrees);
+  }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: boolean isZero() const
@@ -259,6 +286,11 @@ public class Angle
 		}
 		return true;
 	}
+
+  public void dispose()
+  {
+
+  }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: const String description() const

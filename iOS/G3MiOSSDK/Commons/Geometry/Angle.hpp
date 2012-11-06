@@ -19,9 +19,6 @@
 
 class Angle {
 private:
-  const double _degrees;
-  const double _radians;
-  
   Angle(const double degrees) :
   _degrees( degrees ),
   _radians( degrees / 180.0 * /*GMath.pi()*/ 3.14159265358979323846264338327950288 )
@@ -29,28 +26,47 @@ private:
   }
   
 public:
+  const double _degrees;
+  const double _radians;
+
   static Angle lerp(const Angle& start,
                     const Angle& end,
                     float percent) {
     return start.add(end.sub(start).times(percent));
   }
   
-  static Angle fromDegrees(const double degrees) {
+  static Angle fromDegrees(double degrees) {
     return Angle(degrees);
   }
   
-  static Angle fromRadians(const double radians) {
+  static Angle fromDegreesMinutes(double degrees,
+                                  double minutes) {
+    return Angle( degrees + ( minutes / 60.0) );
+  }
+  
+  static Angle fromDegreesMinutesSeconds(double degrees,
+                                         double minutes,
+                                         double seconds) {
+    return Angle( degrees + ( minutes / 60.0) + ( seconds / 3600.0 ) );
+  }
+  
+  static Angle fromRadians(double radians) {
     return Angle::fromDegrees(radians / GMath.pi() * 180.0);
   }
   
-  static Angle getMin(const Angle& a1, const Angle& a2) {
-    if (a1._degrees < a2._degrees) return a1;
-    else return a2;
+  static Angle min(const Angle& a1,
+                   const Angle& a2) {
+    //    if (a1._degrees < a2._degrees) return a1;
+    //    else return a2;
+    
+    return (a1._degrees < a2._degrees) ? a1 : a2;
   }
   
-  static Angle getMax(const Angle& a1, const Angle& a2) {
-    if (a1._degrees > a2._degrees) return a1;
-    else return a2;
+  static Angle max(const Angle& a1,
+                   const Angle& a2) {
+//    if (a1._degrees > a2._degrees) return a1;
+//    else return a2;
+    return (a1._degrees > a2._degrees) ? a1 : a2;
   }
   
   static Angle zero() {
@@ -62,10 +78,13 @@ public:
   }
   
   static Angle midAngle(const Angle& angle1, const Angle& angle2) {
-    return Angle::fromDegrees((angle1.degrees() + angle2.degrees()) / 2);
+    return Angle::fromDegrees((angle1._degrees + angle2._degrees) / 2);
+  }
+  
+  static Angle interpolation(const Angle& angle1, const Angle& angle2, double v) {
+    return Angle::fromDegrees( (1.0-v) * angle1._degrees + v * angle2._degrees );
   }
 
-  
   bool isNan() const {
     return IMathUtils::instance()->isNan(_degrees);
   }
@@ -88,12 +107,11 @@ public:
   double degrees() const {
     return _degrees;
   }
-  
+
   double radians() const {
-    //return _degrees / 180.0 * GMath.pi();
     return _radians;
   }
-  
+
   bool closeTo(const Angle& other) const {
     return (GMath.abs(_degrees - other._degrees) < THRESHOLD);
   }
@@ -135,8 +153,18 @@ public:
   Angle nearestAngleInInterval(const Angle& min, const Angle& max) const;
   
   Angle distanceTo(const Angle& other) const;
-  
-  
+
+  Angle normalized() const {
+    double degrees = _degrees;
+    while (degrees < 0) {
+      degrees += 360;
+    }
+    while (degrees >= 360) {
+      degrees -= 360;
+    }
+    return Angle(degrees);
+  }
+
   bool isZero() const {
     return (_degrees == 0);
   }
@@ -165,7 +193,11 @@ public:
         return true;
 	}
 #endif
-  
+
+  ~Angle() {
+
+  }
+
   const std::string description() const;
 };
 

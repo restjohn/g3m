@@ -85,16 +85,15 @@ public class Tile
 	//  if (projectedSize <= (parameters->_tileTextureWidth * parameters->_tileTextureHeight * 2)) {
 	//    return true;
 	//  }
-	final Vector2D ex = extent.projectedExtent(rc);
+	final Vector2I ex = extent.projectedExtent(rc);
 	//const double t = extent.maxAxis() * 2;
-	final double t = (ex._x + ex._y);
+	final int t = (ex._x + ex._y);
 	if (t <= ((parameters._tileTextureWidth + parameters._tileTextureHeight) * 1.75))
 	{
 	  return true;
 	}
   
   
-	int __TODO_tune_render_budget;
 	if (trc.getParameters()._useTilesSplitBudget)
 	{
 	  if (_subtiles == null) // the tile needs to create the subtiles
@@ -158,8 +157,6 @@ public class Tile
   
 		if (needsToCallTexturizer)
 		{
-		  int __TODO_tune_render_budget;
-  
 		  _texturizedMesh = texturizer.texturize(rc, trc, this, tessellatorMesh, _texturizedMesh);
 		}
   
@@ -201,37 +198,6 @@ public class Tile
 	return _subtiles;
   }
 
-  private void prune(TileRenderContext trc)
-  {
-	if (_subtiles != null)
-	{
-  
-	  //    printf("= pruned tile %s\n", getKey().description().c_str());
-  
-	  TileTexturizer texturizer = (trc == null) ? null : trc.getTexturizer();
-  
-	  final int subtilesSize = _subtiles.size();
-	  for (int i = 0; i < subtilesSize; i++)
-	  {
-		Tile subtile = _subtiles.get(i);
-  
-		subtile.setIsVisible(false, trc);
-  
-		subtile.prune(trc);
-		if (texturizer != null)
-		{
-		  texturizer.tileToBeDeleted(subtile, subtile._texturizedMesh);
-		}
-		if (subtile != null)
-			subtile.dispose();
-	  }
-  
-	  _subtiles = null;
-	  _subtiles = null;
-  
-	}
-  }
-
 //C++ TO JAVA CONVERTER TODO TASK: The implementation of the following method could not be found:
 //  Tile(Tile that);
 
@@ -259,7 +225,7 @@ public class Tile
   }
 
   private boolean _isVisible;
-  private void setIsVisible(boolean isVisible, TileRenderContext trc)
+  private void setIsVisible(boolean isVisible, TileTexturizer texturizer)
   {
 	if (_isVisible != isVisible)
 	{
@@ -267,17 +233,16 @@ public class Tile
   
 	  if (!_isVisible)
 	  {
-		deleteTexturizedMesh(trc);
+		deleteTexturizedMesh(texturizer);
 	  }
 	}
   }
 
-  private void deleteTexturizedMesh(TileRenderContext trc)
+  private void deleteTexturizedMesh(TileTexturizer texturizer)
   {
 	if ((_level > 0) && (_texturizedMesh != null))
 	{
   
-	  TileTexturizer texturizer = trc.getTexturizer();
 	  if (texturizer != null)
 	  {
 		texturizer.tileMeshToBeDeleted(this, _texturizedMesh);
@@ -330,27 +295,15 @@ public class Tile
 	prune(null);
   
 	if (_debugMesh != null)
-	{
-	  if (_debugMesh != null)
-		  _debugMesh.dispose();
-	}
+		_debugMesh.dispose();
   
 	if (_tessellatorMesh != null)
-	{
-	  if (_tessellatorMesh != null)
-		  _tessellatorMesh.dispose();
-	}
+		_tessellatorMesh.dispose();
   
-	if (_texturizerData != null)
-	{
 	  _texturizerData = null;
-	}
   
 	if (_texturizedMesh != null)
-	{
-	  if (_texturizedMesh != null)
-		  _texturizedMesh.dispose();
-	}
+		_texturizedMesh.dispose();
   }
 
 
@@ -403,11 +356,13 @@ public class Tile
 	statistics.computeTileProcessed(this);
 	if (isVisible(rc, trc))
 	{
-	  setIsVisible(true, trc);
+	  setIsVisible(true, trc.getTexturizer());
   
 	  statistics.computeVisibleTile(this);
   
-	  if ((toVisitInNextIteration == null) || meetsRenderCriteria(rc, trc))
+	  final boolean isRawRender = ((toVisitInNextIteration == null) || meetsRenderCriteria(rc, trc) || (trc.getParameters()._incrementalTileQuality && !_textureSolved));
+  
+	  if (isRawRender)
 	  {
 		rawRender(rc, trc);
 		if (trc.getParameters()._renderDebug)
@@ -417,7 +372,7 @@ public class Tile
   
 		statistics.computeTileRendered(this);
   
-		prune(trc);
+		prune(trc.getTexturizer());
 	  }
 	  else
 	  {
@@ -439,9 +394,9 @@ public class Tile
 	}
 	else
 	{
-	  setIsVisible(false, trc);
+	  setIsVisible(false, trc.getTexturizer());
   
-	  prune(trc);
+	  prune(trc.getTexturizer());
 	}
   }
 
@@ -533,6 +488,37 @@ public class Tile
 	}
   
 	return null;
+  }
+
+  public final void prune(TileTexturizer texturizer)
+  {
+	if (_subtiles != null)
+	{
+  
+	  //    printf("= pruned tile %s\n", getKey().description().c_str());
+  
+  //    TileTexturizer* texturizer = (trc == NULL) ? NULL : trc->getTexturizer();
+  
+	  final int subtilesSize = _subtiles.size();
+	  for (int i = 0; i < subtilesSize; i++)
+	  {
+		Tile subtile = _subtiles.get(i);
+  
+		subtile.setIsVisible(false, texturizer);
+  
+		subtile.prune(texturizer);
+		if (texturizer != null)
+		{
+		  texturizer.tileToBeDeleted(subtile, subtile._texturizedMesh);
+		}
+		if (subtile != null)
+			subtile.dispose();
+	  }
+  
+	  _subtiles = null;
+	  _subtiles = null;
+  
+	}
   }
 
 }

@@ -30,7 +30,6 @@ package org.glob3.mobile.generated;
 
 public class GL
 {
-
   private final INativeGL _gl;
 
   private MutableMatrix44D _modelView = new MutableMatrix44D();
@@ -56,17 +55,17 @@ public class GL
 
   private int _cullFace_face;
 
-
-
-
   private float _scaleX;
   private float _scaleY;
   private float _translationX;
   private float _translationY;
 
   private IFloatBuffer _vertices;
+  private int _verticesTimestamp;
   private IFloatBuffer _textureCoordinates;
+  private int _textureCoordinatesTimestamp;
   private IFloatBuffer _colors;
+  private int _colorsTimestamp;
 
   private float _flatColorR;
   private float _flatColorG;
@@ -196,8 +195,11 @@ public class GL
 	  _texturesIdGetCounter = 0;
 	  _texturesIdTakeCounter = 0;
 	  _vertices = null;
+	  _verticesTimestamp = 0;
 	  _textureCoordinates = null;
+	  _textureCoordinatesTimestamp = 0;
 	  _colors = null;
+	  _colorsTimestamp = 0;
 	  _flatColorR = 0F;
 	  _flatColorG = 0F;
 	  _flatColorB = 0F;
@@ -335,10 +337,11 @@ public class GL
 	  _enableVertexColor = true;
 	}
   
-	if ((_colors != colors) || (_colors.timestamp() != colors.timestamp()))
+	if ((_colors != colors) || (_colorsTimestamp != colors.timestamp()))
 	{
 	  _gl.vertexAttribPointer(GlobalMembersGL.Attributes.Color, 4, false, 0, colors);
 	  _colors = colors;
+	  _colorsTimestamp = _colors.timestamp();
 	}
   
 	_gl.uniform1f(GlobalMembersGL.Uniforms.ColorPerVertexIntensity, intensity);
@@ -383,11 +386,11 @@ public class GL
 
   public final void vertexPointer(int size, int stride, IFloatBuffer vertices)
   {
-	if ((_vertices != vertices) || (_vertices.timestamp() != vertices.timestamp()))
+	if ((_vertices != vertices) || (_verticesTimestamp != vertices.timestamp()))
 	{
-  
 	  _gl.vertexAttribPointer(GlobalMembersGL.Attributes.Position, size, false, stride, vertices);
 	  _vertices = vertices;
+	  _verticesTimestamp = _vertices.timestamp();
 	}
   }
 
@@ -396,9 +399,19 @@ public class GL
 	_gl.drawElements(GLPrimitive.triangleStrip(), indices.size(), indices);
   }
 
+  public final void drawTriangleFan(IIntBuffer indices)
+  {
+	_gl.drawElements(GLPrimitive.triangleFan(), indices.size(), indices);
+  }
+
   public final void drawLines(IIntBuffer indices)
   {
-	_gl.drawElements(GLPrimitive.lineLoop(), indices.size(), indices);
+	_gl.drawElements(GLPrimitive.lines(), indices.size(), indices);
+  }
+
+  public final void drawLineStrip(IIntBuffer indices)
+  {
+	_gl.drawElements(GLPrimitive.lineStrip(), indices.size(), indices);
   }
 
   public final void drawLineLoop(IIntBuffer indices)
@@ -533,12 +546,13 @@ public class GL
   //                                  int textureWidth, int textureHeight,
   //                                  bool generateMipmap);
 
-  public final void setTextureCoordinates(int size, int stride, IFloatBuffer texcoord)
+  public final void setTextureCoordinates(int size, int stride, IFloatBuffer textureCoordinates)
   {
-	if ((_textureCoordinates != texcoord) || (_textureCoordinates.timestamp() != texcoord.timestamp()))
+	if ((_textureCoordinates != textureCoordinates) || (_textureCoordinatesTimestamp != textureCoordinates.timestamp()))
 	{
-	  _gl.vertexAttribPointer(GlobalMembersGL.Attributes.TextureCoord, size, false, stride, texcoord);
-	  _textureCoordinates = texcoord;
+	  _gl.vertexAttribPointer(GlobalMembersGL.Attributes.TextureCoord, size, false, stride, textureCoordinates);
+	  _textureCoordinates = textureCoordinates;
+	  _textureCoordinatesTimestamp = _textureCoordinates.timestamp();
 	}
   }
 
@@ -710,20 +724,11 @@ public class GL
 //    }
 
 	if (_vertices != null)
-	{
-	  if (_vertices != null)
-		  _vertices.dispose();
-	}
+		_vertices.dispose();
 	if (_textureCoordinates != null)
-	{
-	  if (_textureCoordinates != null)
-		  _textureCoordinates.dispose();
-	}
+		_textureCoordinates.dispose();
 	if (_colors != null)
-	{
-	  if (_colors != null)
-		  _colors.dispose();
-	}
+		_colors.dispose();
 
   }
 

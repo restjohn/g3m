@@ -29,9 +29,10 @@ public class IndexedMesh extends Mesh
   private final MutableMatrix44D _translationMatrix;
   private IFloatBuffer _vertices;
   private IIntBuffer _indices;
-  private final Color _flatColor;
+  private Color _flatColor;
   private IFloatBuffer _colors;
   private final float _colorsIntensity;
+  private final float _lineWidth;
 
   private Extent _extent;
 
@@ -82,21 +83,21 @@ public class IndexedMesh extends Mesh
   }
 
 
-  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices, Color flatColor, IFloatBuffer colors)
+  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices, float lineWidth, Color flatColor, IFloatBuffer colors)
   {
-	  this(primitive, owner, center, vertices, indices, flatColor, colors, (float)0.0);
+	  this(primitive, owner, center, vertices, indices, lineWidth, flatColor, colors, (float)0.0);
   }
-  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices, Color flatColor)
+  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices, float lineWidth, Color flatColor)
   {
-	  this(primitive, owner, center, vertices, indices, flatColor, null, (float)0.0);
+	  this(primitive, owner, center, vertices, indices, lineWidth, flatColor, null, (float)0.0);
   }
-  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices)
+  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices, float lineWidth)
   {
-	  this(primitive, owner, center, vertices, indices, null, null, (float)0.0);
+	  this(primitive, owner, center, vertices, indices, lineWidth, null, null, (float)0.0);
   }
 //C++ TO JAVA CONVERTER NOTE: Java does not allow default values for parameters. Overloaded methods are inserted above.
-//ORIGINAL LINE: IndexedMesh(const int primitive, boolean owner, const Vector3D& center, IFloatBuffer* vertices, IIntBuffer* indices, const Color* flatColor = null, IFloatBuffer* colors = null, const float colorsIntensity = (float)0.0) : _primitive(primitive), _owner(owner), _vertices(vertices), _indices(indices), _flatColor(flatColor), _colors(colors), _colorsIntensity(colorsIntensity), _extent(null), _center(center), _translationMatrix(center.isNan()? null: new MutableMatrix44D(MutableMatrix44D::createTranslationMatrix(center)))
-  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices, Color flatColor, IFloatBuffer colors, float colorsIntensity)
+//ORIGINAL LINE: IndexedMesh(const int primitive, boolean owner, const Vector3D& center, IFloatBuffer* vertices, IIntBuffer* indices, float lineWidth, Color* flatColor = null, IFloatBuffer* colors = null, const float colorsIntensity = (float)0.0) : _primitive(primitive), _owner(owner), _vertices(vertices), _indices(indices), _flatColor(flatColor), _colors(colors), _colorsIntensity(colorsIntensity), _extent(null), _center(center), _translationMatrix((center.isNan() || center.isZero()) ? null : new MutableMatrix44D(MutableMatrix44D::createTranslationMatrix(center))), _lineWidth(lineWidth)
+  public IndexedMesh(int primitive, boolean owner, Vector3D center, IFloatBuffer vertices, IIntBuffer indices, float lineWidth, Color flatColor, IFloatBuffer colors, float colorsIntensity)
   {
 	  _primitive = primitive;
 	  _owner = owner;
@@ -107,12 +108,12 @@ public class IndexedMesh extends Mesh
 	  _colorsIntensity = colorsIntensity;
 	  _extent = null;
 	  _center = new Vector3D(center);
-	  _translationMatrix = center.isNan()? null: new MutableMatrix44D(MutableMatrix44D.createTranslationMatrix(center));
+	  _translationMatrix = (center.isNan() || center.isZero()) ? null : new MutableMatrix44D(MutableMatrix44D.createTranslationMatrix(center));
+	  _lineWidth = lineWidth;
   }
 
   public void dispose()
   {
-  ///#ifdef C_CODE
 	if (_owner)
 	{
 	  if (_vertices != null)
@@ -120,16 +121,13 @@ public class IndexedMesh extends Mesh
 	  if (_indices != null)
 		  _indices.dispose();
 	  if (_colors != null)
-		  if (_colors != null)
-			  _colors.dispose();
+		  _colors.dispose();
+	  _flatColor = null;
 	}
   
-	if (_extent != null)
-		_extent = null;
+	_extent = null;
 	if (_translationMatrix != null)
-		if (_translationMatrix != null)
-			_translationMatrix.dispose();
-  ///#endif
+		_translationMatrix.dispose();
   }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
@@ -160,6 +158,8 @@ public class IndexedMesh extends Mesh
   
 	gl.vertexPointer(3, 0, _vertices);
   
+	gl.lineWidth(_lineWidth);
+  
 	if (_translationMatrix != null)
 	{
 	  gl.pushMatrix();
@@ -170,9 +170,17 @@ public class IndexedMesh extends Mesh
 	{
 	  gl.drawTriangleStrip(_indices);
 	}
+	else if (_primitive == GLPrimitive.triangleFan())
+	{
+	  gl.drawTriangleFan(_indices);
+	}
 	else if (_primitive == GLPrimitive.lines())
 	{
 	  gl.drawLines(_indices);
+	}
+	else if (_primitive == GLPrimitive.lineStrip())
+	{
+	  gl.drawLineStrip(_indices);
 	}
 	else if (_primitive == GLPrimitive.lineLoop())
 	{

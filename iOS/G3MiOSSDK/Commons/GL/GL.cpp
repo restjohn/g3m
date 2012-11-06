@@ -73,24 +73,24 @@ public:
   
   void deleteUniformsIDs(){
 #ifdef C_CODE
-    if (Projection == NULL) delete Projection;
-    if (Modelview == NULL) delete Modelview;
-    if (Sampler == NULL) delete Sampler;
-    if (EnableTexture == NULL) delete EnableTexture;
-    if (FlatColor == NULL) delete FlatColor;
-    if (TranslationTexCoord == NULL) delete TranslationTexCoord;
-    if (ScaleTexCoord == NULL) delete ScaleTexCoord;
-    if (PointSize == NULL) delete PointSize;
+    delete Projection;
+    delete Modelview;
+    delete Sampler;
+    delete EnableTexture;
+    delete FlatColor;
+    delete TranslationTexCoord;
+    delete ScaleTexCoord;
+    delete PointSize;
     
     //FOR BILLBOARDING
-    if (BillBoard == NULL) delete BillBoard;
-    if (ViewPortRatio == NULL) delete ViewPortRatio;
+    delete BillBoard;
+    delete ViewPortRatio;
     
     //FOR COLOR MIXING
-    if (FlatColorIntensity == NULL) delete FlatColorIntensity;
-    if (EnableColorPerVertex == NULL) delete EnableColorPerVertex;
-    if (EnableFlatColor == NULL) delete EnableFlatColor;
-    if (ColorPerVertexIntensity == NULL) delete ColorPerVertexIntensity;
+    delete FlatColorIntensity;
+    delete EnableColorPerVertex;
+    delete EnableFlatColor;
+    delete ColorPerVertexIntensity;
 #endif
   }
   
@@ -278,10 +278,10 @@ void GL::disablePolygonOffset() {
 
 void GL::vertexPointer(int size, int stride, IFloatBuffer* vertices) {
   if ((_vertices != vertices) ||
-      (_vertices->timestamp() != vertices->timestamp()) ) {
-    
+      (_verticesTimestamp != vertices->timestamp()) ) {
     _gl->vertexAttribPointer(Attributes.Position, size, false, stride, vertices);
     _vertices = vertices;
+    _verticesTimestamp = _vertices->timestamp();
   }
 }
 
@@ -291,8 +291,20 @@ void GL::drawTriangleStrip(IIntBuffer* indices) {
                     indices);
 }
 
+void GL::drawTriangleFan(IIntBuffer* indices) {
+  _gl->drawElements(GLPrimitive::triangleFan(),
+                    indices->size(),
+                    indices);
+}
+
 void GL::drawLines(IIntBuffer* indices) {
-  _gl->drawElements(GLPrimitive::lineLoop(),
+  _gl->drawElements(GLPrimitive::lines(),
+                    indices->size(),
+                    indices);
+}
+
+void GL::drawLineStrip(IIntBuffer* indices) {
+  _gl->drawElements(GLPrimitive::lineStrip(),
                     indices->size(),
                     indices);
 }
@@ -347,11 +359,12 @@ const IGLTextureId* GL::uploadTexture(const IImage* image, int format, bool gene
   return texId;
 }
 
-void GL::setTextureCoordinates(int size, int stride, IFloatBuffer* texcoord) {
-  if ((_textureCoordinates != texcoord) ||
-      (_textureCoordinates->timestamp() != texcoord->timestamp()) ) {
-    _gl->vertexAttribPointer(Attributes.TextureCoord, size, false, stride, texcoord);
-    _textureCoordinates = texcoord;
+void GL::setTextureCoordinates(int size, int stride, IFloatBuffer* textureCoordinates) {
+  if ((_textureCoordinates != textureCoordinates) ||
+      (_textureCoordinatesTimestamp != textureCoordinates->timestamp()) ) {
+    _gl->vertexAttribPointer(Attributes.TextureCoord, size, false, stride, textureCoordinates);
+    _textureCoordinates = textureCoordinates;
+    _textureCoordinatesTimestamp = _textureCoordinates->timestamp();
   }
 }
 
@@ -437,9 +450,10 @@ void GL::enableVertexColor(IFloatBuffer* colors, float intensity) {
   }
   
   if ((_colors != colors) ||
-      (_colors->timestamp() != colors->timestamp()) ) {
+      (_colorsTimestamp != colors->timestamp()) ) {
     _gl->vertexAttribPointer(Attributes.Color, 4, false, 0, colors);
     _colors = colors;
+    _colorsTimestamp = _colors->timestamp();
   }
   
   _gl->uniform1f(Uniforms.ColorPerVertexIntensity, intensity);

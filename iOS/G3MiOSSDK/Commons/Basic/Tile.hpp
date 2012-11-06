@@ -79,8 +79,6 @@ private:
   
   inline std::vector<Tile*>* getSubTiles();
   
-  inline void prune(const TileRenderContext* trc);
-  
   Tile(const Tile& that);
   
   void ancestorTexturedSolvedChanged(Tile* ancestor,
@@ -88,9 +86,9 @@ private:
 
   bool _isVisible;
   void setIsVisible(bool isVisible,
-                    const TileRenderContext* trc);
+                    TileTexturizer* texturizer);
   
-  void deleteTexturizedMesh(const TileRenderContext* trc);
+  void deleteTexturizedMesh(TileTexturizer* texturizer);
   
   ITexturizerData* _texturizerData;
 
@@ -159,15 +157,15 @@ public:
   
   void setTexturizerData(ITexturizerData* texturizerData) {
 #ifdef C_CODE
-    if (_texturizerData != NULL) {
       delete _texturizerData;
-    }
 #endif
     _texturizerData = texturizerData;
   }
 
   const Tile* getDeepestTileContaining(const Geodetic3D& position) const;
-  
+
+  inline void prune(TileTexturizer* texturizer);
+
 };
 
 #endif

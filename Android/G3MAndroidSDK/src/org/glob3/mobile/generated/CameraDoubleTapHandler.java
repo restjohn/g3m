@@ -32,7 +32,7 @@ public class CameraDoubleTapHandler extends CameraEventHandler
   public final void onDown(EventContext eventContext, TouchEvent touchEvent, CameraContext cameraContext)
   {
 	// compute globe point where user tapped
-	final Vector2D pixel = touchEvent.getTouch(0).getPos();
+	final Vector2I pixel = touchEvent.getTouch(0).getPos();
 	Camera camera = cameraContext.getNextCamera();
 	final Vector3D initialPoint = camera.pixel2PlanetPoint(pixel);
 	if (initialPoint.isNan())
@@ -52,7 +52,8 @@ public class CameraDoubleTapHandler extends CameraEventHandler
 	// create effect
 	Effect effect = new DoubleTapEffect(TimeInterval.fromSeconds(0.75), axis, angle, distance);
   
-	eventContext.getEffectsScheduler().startEffect(effect, cameraContext);
+	EffectTarget target = cameraContext.getNextCamera().getEffectTarget();
+	eventContext.getEffectsScheduler().startEffect(effect, target);
   }
   public final void onMove(EventContext eventContext, TouchEvent touchEvent, CameraContext cameraContext)
   {

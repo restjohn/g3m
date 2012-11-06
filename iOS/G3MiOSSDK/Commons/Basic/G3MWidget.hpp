@@ -13,45 +13,49 @@ class Renderer;
 class TouchEvent;
 class Planet;
 class ILogger;
-class IFactory;
 class GL;
+class INativeGL;
 class TexturesHandler;
 class Downloader;
 class IDownloader;
 class Camera;
-class ITimer;
 class EffectsScheduler;
 class IStringUtils;
 class IThreadUtils;
+class GTask;
+class TimeInterval;
+class IFactory;
+class ITimer;
+class PeriodicalTask;
+class ICameraConstrainer;
+class FrameTasksExecutor;
+class TextureBuilder;
+class G3MWidget;
+class IStringBuilder;
+class IMathUtils;
+class IJSONParser;
+class Geodetic3D;
+class CameraRenderer;
 
 #include <vector>
 #include <string>
 
 #include "Color.hpp"
-
-class ICameraConstrainer;
-class FrameTasksExecutor;
-class TextureBuilder;
-
-class G3MWidget;
-
-class IStringBuilder;
-class IMathUtils;
-
+#include "Angle.hpp"
 
 class UserData {
 private:
   G3MWidget* _widget;
-  
+
 public:
   virtual ~UserData() {
-    
+
   }
-  
+
   void setWidget(G3MWidget* widget) {
     _widget = widget;
   }
-  
+
   G3MWidget* getWidget() const {
     return _widget;
   }
@@ -60,123 +64,146 @@ public:
 
 class G3MWidget {
 public:
-  
-  static G3MWidget* create(FrameTasksExecutor* frameTasksExecutor,
-                           IFactory*           factory,
-                           const IStringUtils* stringUtils,
-                           IThreadUtils*       threadUtils,
-                           IStringBuilder*     stringBuilder,
-                           IMathUtils*         mathUtils,
-                           ILogger*            logger,
-                           GL*                 gl,
-                           TexturesHandler*    texturesHandler,
-                           TextureBuilder*     textureBuilder,
-                           IDownloader*        downloader,
-                           const Planet*       planet,
-                           std::vector<ICameraConstrainer*> cameraConstraint,
-                           Renderer*           renderer,
-                           Renderer*           busyRenderer,
-                           EffectsScheduler*   scheduler,
-                           int                 width,
-                           int                 height,
-                           Color               backgroundColor,
-                           const bool          logFPS,
-                           const bool          logDownloaderStatistics);
-  
+
+  static void initSingletons(ILogger*             logger,
+                             IFactory*            factory,
+                             const IStringUtils*  stringUtils,
+                             IThreadUtils*        threadUtils,
+                             IStringBuilder*      stringBuilder,
+                             IMathUtils*          mathUtils,
+                             IJSONParser*         jsonParser);
+
+  static G3MWidget* create(INativeGL*                       nativeGL,
+                           IDownloader*                     downloader,
+                           const Planet*                    planet,
+                           std::vector<ICameraConstrainer*> cameraConstrainers,
+                           CameraRenderer*                  cameraRenderer,
+                           Renderer*                        mainRenderer,
+                           Renderer*                        busyRenderer,
+                           int                              width,
+                           int                              height,
+                           Color                            backgroundColor,
+                           const bool                       logFPS,
+                           const bool                       logDownloaderStatistics,
+                           GTask*                           initializationTask,
+                           bool                             autoDeleteInitializationTask,
+                           std::vector<PeriodicalTask*>     periodicalTasks);
+
   ~G3MWidget();
-  
+
   void render();
-  
+
   void onTouchEvent(const TouchEvent* myEvent);
-  
+
   void onResizeViewportEvent(int width, int height);
-  
+
   void onPause();
-  
+
   void onResume();
-  
+
   GL* getGL() const {
     return _gl;
   }
-  
-  /*  const Camera* getCurrentCamera() const {
-   return _currentCamera;
-   }*/
-  
+
+  //  const Camera* getCurrentCamera() const {
+  //    return _currentCamera;
+  //  }
+
   Camera* getNextCamera() const {
     return _nextCamera;
   }
-  
+
   void setUserData(UserData* userData) {
-    if (_userData != NULL) {
       delete _userData;
-    }
+        
     _userData = userData;
     if (_userData != NULL) {
       _userData->setWidget(this);
     }
   }
-  
+
   UserData* getUserData() const {
     return _userData;
   }
+
+  void addPeriodicalTask(PeriodicalTask* periodicalTask);
+
+  void addPeriodicalTask(const TimeInterval& interval,
+                         GTask* task);
+
+
+  void setCameraPosition(const Geodetic3D& position);
   
+  void setCameraHeading(const Angle& angle);
+  
+  void setCameraPitch(const Angle& angle);
+
+  void setAnimatedCameraPosition(const Geodetic3D& position);
+
+  void setAnimatedCameraPosition(const Geodetic3D& position,
+                                 const TimeInterval& interval);
+
+  void resetCameraPosition();
+
+  CameraRenderer* getCameraRenderer() const {
+    return _cameraRenderer;
+  }
+
 private:
   FrameTasksExecutor* _frameTasksExecutor;
-  IFactory*           _factory;
-  const IStringUtils* _stringUtils;
-  IThreadUtils*       _threadUtils;
-  ILogger*            _logger;
   GL*                 _gl;
   const Planet*       _planet;
-  Renderer*           _renderer;
+
+  CameraRenderer*     _cameraRenderer;
+  Renderer*           _mainRenderer;
   Renderer*           _busyRenderer;
+  bool                _mainRendererReady;
+  Renderer*           _selectedRenderer;
+
   EffectsScheduler*   _effectsScheduler;
-  
+
   std::vector<ICameraConstrainer*> _cameraConstrainers;
-  
+
   Camera*          _currentCamera;
   Camera*          _nextCamera;
   IDownloader*     _downloader;
   TexturesHandler* _texturesHandler;
   TextureBuilder*  _textureBuilder;
   const Color      _backgroundColor;
-  
+
   ITimer*          _timer;
   long             _renderCounter;
   long             _totalRenderTime;
   const bool       _logFPS;
   const bool       _logDownloaderStatistics;
   std::string      _lastCacheStatistics;
-  
-  bool      _rendererReady;
-  Renderer* _selectedRenderer;
-  
+
   ITimer* _renderStatisticsTimer;
-  
+
   UserData* _userData;
-  
+
+  GTask* _initializationTask;
+  bool   _autoDeleteInitializationTask;
+
+  std::vector<PeriodicalTask*> _periodicalTasks;
+
   void initializeGL();
-  
-  G3MWidget(FrameTasksExecutor* frameTasksExecutor,
-            IFactory*           factory,
-            const IStringUtils* stringUtils,
-            IThreadUtils*       threadUtils,
-            ILogger*            logger,
-            GL*                 gl,
-            TexturesHandler*    texturesHandler,
-            TextureBuilder*     textureBuilder,
-            IDownloader*        downloader,
-            const Planet*       planet,
-            std::vector<ICameraConstrainer*> cameraConstraint,
-            Renderer*           renderer,
-            Renderer*           busyRenderer,
-            EffectsScheduler*   scheduler,
-            int                 width,
-            int                 height,
-            Color               backgroundColor,
-            const bool          logFPS,
-            const bool          logDownloaderStatistics);
+
+  G3MWidget(INativeGL*                       nativeGL,
+            IDownloader*                     downloader,
+            const Planet*                    planet,
+            std::vector<ICameraConstrainer*> cameraConstrainers,
+            CameraRenderer*                  cameraRenderer,
+            Renderer*                        mainRenderer,
+            Renderer*                        busyRenderer,
+            int                              width,
+            int                              height,
+            Color                            backgroundColor,
+            const bool                       logFPS,
+            const bool                       logDownloaderStatistics,
+            GTask*                           initializationTask,
+            bool                             autoDeleteInitializationTask,
+            std::vector<PeriodicalTask*>     periodicalTasks);
   
 };
 

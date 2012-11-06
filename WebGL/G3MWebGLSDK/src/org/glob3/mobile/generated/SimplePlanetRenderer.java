@@ -26,7 +26,7 @@ package org.glob3.mobile.generated;
 //C++ TO JAVA CONVERTER NOTE: Java has no need of forward class declarations:
 //class IGLTextureId;
 
-public class SimplePlanetRenderer extends Renderer
+public class SimplePlanetRenderer extends LeafRenderer
 {
 
   private final String _textureFilename;
@@ -141,7 +141,7 @@ public class SimplePlanetRenderer extends Renderer
 	  flatColor = new Color(Color.fromRGBA((float) 0.0, (float) 1.0, (float) 0.0, (float) 1.0));
 	}
   
-	IndexedMesh im = new IndexedMesh(GLPrimitive.triangleStrip(), true, Vector3D.zero(), ver, ind, flatColor, vertexColors);
+	IndexedMesh im = new IndexedMesh(GLPrimitive.triangleStrip(), true, Vector3D.zero(), ver, ind, 1, flatColor, vertexColors);
   
 	//TEXTURED
 	if (true)
@@ -168,7 +168,7 @@ public class SimplePlanetRenderer extends Renderer
   
 	  TextureMapping texMap = new SimpleTextureMapping(texId, texC, true);
   
-	  _mesh = new TexturedMesh(im, true, texMap, true);
+	  _mesh = new TexturedMesh(im, true, texMap, true, false);
 	}
   
   

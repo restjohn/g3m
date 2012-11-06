@@ -11,7 +11,7 @@
 
 #include <vector>
 
-#include "Renderer.hpp"
+#include "LeafRenderer.hpp"
 #include "Context.hpp"
 #include "Effects.hpp"
 
@@ -35,7 +35,7 @@ enum Gesture {
   DoubleDrag
 };
 
-class CameraContext: public EffectTarget {
+class CameraContext {
 private:
   Gesture _currentGesture;
   Camera* _nextCamera;         
@@ -51,30 +51,37 @@ public:
   const Gesture getCurrentGesture() const { return _currentGesture; }
   void setCurrentGesture(const Gesture& gesture) { _currentGesture = gesture; }
   Camera* getNextCamera() { return _nextCamera; }
-  
-  void unusedMethod() const {
-  }
-
 };
 
 
 
-class CameraRenderer: public Renderer
-{
-  
-private:      
-  
+class CameraRenderer: public LeafRenderer {
+private:
+  bool _processTouchEvents;
   std::vector<CameraEventHandler *> _handlers;
-  
   CameraContext *_cameraContext;    
   
 public:
-  CameraRenderer(): _cameraContext(NULL) {}
-  ~CameraRenderer() { if (_cameraContext!=NULL) delete _cameraContext; }
+  CameraRenderer() :
+  _cameraContext(NULL),
+  _processTouchEvents(true)
+  {
+  }
+
+  ~CameraRenderer() {
+      delete _cameraContext;
+  }
     
-  void addHandler(CameraEventHandler *handler) { _handlers.push_back(handler); }
+  void addHandler(CameraEventHandler *handler) {
+    _handlers.push_back(handler);
+  }
+
+  void setProcessTouchEvents(bool processTouchEvents) {
+    _processTouchEvents = processTouchEvents;
+  }
   
   void render(const RenderContext* rc);
+
   void initialize(const InitializationContext* ic);
   
   bool onTouchEvent(const EventContext* ec,

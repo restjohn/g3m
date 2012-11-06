@@ -77,6 +77,21 @@ public class Geodetic2D
   }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: Geodetic2D times(const double magnitude) const
+  public final Geodetic2D times(double magnitude)
+  {
+	return new Geodetic2D(_latitude.times(magnitude), _longitude.times(magnitude));
+  }
+
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: Geodetic2D div(const double magnitude) const
+  public final Geodetic2D div(double magnitude)
+  {
+	return new Geodetic2D(_latitude.div(magnitude), _longitude.div(magnitude));
+  }
+
+
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: boolean closeTo(const Geodetic2D &other) const
   public final boolean closeTo(Geodetic2D other)
   {
@@ -93,6 +108,25 @@ public class Geodetic2D
   public final boolean isBetween(Geodetic2D min, Geodetic2D max)
   {
 	return _latitude.isBetween(min.latitude(), max.latitude()) && _longitude.isBetween(min.longitude(), max.longitude());
+  }
+
+  /**
+   * Returns the (initial) bearing from this point to the supplied point
+   *   see http: //williams.best.vwh.net/avform.htm#Crs
+   */
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: Angle bearingTo(const Geodetic2D& that) const
+  public final Angle bearingTo(Geodetic2D that)
+  {
+	final Angle dLon = that.longitude().sub(longitude());
+	final Angle lat1 = latitude();
+	final Angle lat2 = that.latitude();
+
+	final double y = dLon.sinus() * lat2.cosinus();
+	final double x = lat1.cosinus()*lat2.sinus() - lat1.sinus()*lat2.cosinus()*dLon.cosinus();
+	final double radians = IMathUtils.instance().atan2(y, x);
+
+	return Angle.fromRadians(radians);
   }
 
 

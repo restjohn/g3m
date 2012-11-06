@@ -36,24 +36,6 @@ public class Sector
   {
   }
 
-//  static Sector fromLowerAndUpper(const Geodetic2D& lower,
-//                           const Geodetic2D& upper){
-//    
-//    double upLat = upper.latitude().degrees();
-//    while (lower.latitude().degrees() > upLat){
-//      upLat += 360.0;
-//    }
-//    
-//    double upLon = upper.longitude().degrees();
-//    while (lower.latitude().degrees() > upLon){
-//      upLon += 360.0;
-//    }
-//    
-//    Geodetic2D upper2 = Geodetic2D::fromDegrees(upLat, upLon);
-//    
-//    return Sector(lower, upper2);
-//  }
-
   public Sector(Geodetic2D lower, Geodetic2D upper)
   {
 	  _lower = new Geodetic2D(lower);
@@ -111,12 +93,12 @@ public class Sector
 //ORIGINAL LINE: Sector intersection(const Sector& s) const
   public final Sector intersection(Sector s)
   {
-	final Angle lowLat = Angle.getMax(lower().latitude(), s.lower().latitude());
-	final Angle lowLon = Angle.getMax(lower().longitude(), s.lower().longitude());
+	final Angle lowLat = Angle.max(lower().latitude(), s.lower().latitude());
+	final Angle lowLon = Angle.max(lower().longitude(), s.lower().longitude());
 	final Geodetic2D low = new Geodetic2D(lowLat, lowLon);
   
-	final Angle upLat = Angle.getMin(upper().latitude(), s.upper().latitude());
-	final Angle upLon = Angle.getMin(upper().longitude(), s.upper().longitude());
+	final Angle upLat = Angle.min(upper().latitude(), s.upper().latitude());
+	final Angle upLon = Angle.min(upper().longitude(), s.upper().longitude());
 	final Geodetic2D up = new Geodetic2D(upLat, upLon);
   
 	return new Sector(low, up);
@@ -270,12 +252,6 @@ public class Sector
 	final Vector3D view = camera.getViewDirection().times(-1);
 	final double dot = normal.dot(view);
   
-   /*
-	if (dot<0 && _upper.latitude().degrees()>89) {
-	  getClosestPoint(center);
-	  printf ("ehh\n");
-	}  */
-  
 	return (dot < 0) ? true : false;
   }
 
@@ -289,16 +265,16 @@ public class Sector
   
 	// test longitude
 	Geodetic2D center = getCenter();
-	double lon = pos.longitude().degrees();
-	double centerLon = center.longitude().degrees();
+	double lon = pos.longitude()._degrees;
+	double centerLon = center.longitude()._degrees;
 	double oppLon1 = centerLon - 180;
 	double oppLon2 = centerLon + 180;
 	if (lon<oppLon1)
 	  lon+=360;
 	if (lon>oppLon2)
 	  lon-=360;
-	double minLon = _lower.longitude().degrees();
-	double maxLon = _upper.longitude().degrees();
+	double minLon = _lower.longitude()._degrees;
+	double maxLon = _upper.longitude()._degrees;
 	//bool insideLon    = true;
 	if (lon < minLon)
 	{
@@ -312,9 +288,9 @@ public class Sector
 	}
   
 	// test latitude
-	double lat = pos.latitude().degrees();
-	double minLat = _lower.latitude().degrees();
-	double maxLat = _upper.latitude().degrees();
+	double lat = pos.latitude()._degrees;
+	double minLat = _lower.latitude()._degrees;
+	double maxLat = _upper.latitude()._degrees;
 	//bool insideLat    = true;
 	if (lat < minLat)
 	{

@@ -13,49 +13,36 @@
 #include "G3MWidget.hpp"
 #include "CompositeRenderer.hpp"
 #include "Planet.hpp"
-
 #include "CameraRenderer.hpp"
 #include "CameraSingleDragHandler.hpp"
 #include "CameraDoubleDragHandler.hpp"
 #include "CameraRotationHandler.hpp"
 #include "CameraDoubleTapHandler.hpp"
 #include "CameraConstraints.hpp"
-
 #include "TileRenderer.hpp"
-#include "Effects.hpp"
 #include "EllipsoidalTileTessellator.hpp"
-
 #include "SQLiteStorage_iOS.hpp"
 #include "BusyMeshRenderer.hpp"
 #include "CPUTextureBuilder.hpp"
 #include "LayerSet.hpp"
-
 #include "CachedDownloader.hpp"
 #include "Downloader_iOS.hpp"
-
 #include "INativeGL.hpp"
 #include "GL.hpp"
-
 #include "MultiLayerTileTexturizer.hpp"
 #include "TilesRenderParameters.hpp"
-#include "FrameTasksExecutor.hpp"
-
 #include "IStringBuilder.hpp"
-#include "StringBuilder_iOS.hpp"
-
 #include "Box.hpp"
-
 #include "TexturesHandler.hpp"
-
+#include "WMSLayer.hpp"
+#include "MathUtils_iOS.hpp"
+#include "ThreadUtils_iOS.hpp"
 #include "Logger_iOS.hpp"
 #include "Factory_iOS.hpp"
 #include "NativeGL2_iOS.hpp"
 #include "StringUtils_iOS.hpp"
-#include "SingleImageTileTexturizer.hpp"
-#include "WMSLayer.hpp"
-
-#include "MathUtils_iOS.hpp"
-#include "ThreadUtils_iOS.hpp"
+#include "JSONParser_iOS.hpp"
+#include "StringBuilder_iOS.hpp"
 
 @interface G3MWidget_iOS ()
 @property(nonatomic, getter=isAnimating) BOOL animating;
@@ -79,8 +66,11 @@
 
 - (void) initWidgetWithCameraConstraints: (std::vector<ICameraConstrainer*>) cameraConstraints
                                 layerSet: (LayerSet*) layerSet
+                  incrementalTileQuality: (bool) incrementalTileQuality
                                renderers: (std::vector<Renderer*>) renderers
                                 userData: (UserData*) userData
+                      initializationTask: (GTask *) initializationTask
+                         periodicalTasks: (std::vector<PeriodicalTask*>) periodicalTasks
 {
   // creates default camera-renderer and camera-handlers
   CameraRenderer *cameraRenderer = new CameraRenderer();
@@ -101,14 +91,17 @@
   
   TilesRenderParameters* parameters = TilesRenderParameters::createDefault(renderDebug,
                                                                            useTilesSplitBudget,
-                                                                           forceTopLevelTilesRenderOnStart);
+                                                                           forceTopLevelTilesRenderOnStart,
+                                                                           incrementalTileQuality);
   
   [self initWidgetWithCameraRenderer: cameraRenderer
                    cameraConstraints: cameraConstraints
                             layerSet: layerSet
                tilesRenderParameters: parameters
                            renderers: renderers
-                            userData: userData];
+                            userData: userData
+                  initializationTask: initializationTask
+                     periodicalTasks: periodicalTasks];
 }
 
 - (void) initWidgetWithCameraRenderer: (CameraRenderer*) cameraRenderer
@@ -117,19 +110,14 @@
                 tilesRenderParameters: (TilesRenderParameters*) parameters
                             renderers: (std::vector<Renderer*>) renderers
                              userData: (UserData*) userData
+                   initializationTask: (GTask*) initializationTask
+                      periodicalTasks: (std::vector<PeriodicalTask*>) periodicalTasks
 {
   
-  // create GLOB3M WIDGET
-  int width = (int) [self frame].size.width;
-  int height = (int) [self frame].size.height;
+  const int width  = (int) [self frame].size.width;
+  const int height = (int) [self frame].size.height;
   
-  IStringBuilder* stringBuilder = new StringBuilder_iOS();
-  IMathUtils*     mathUtils     = new MathUtils_iOS();
-  IFactory*       factory       = new Factory_iOS();
-  ILogger*        logger        = new Logger_iOS(ErrorLevel);
-  NativeGL2_iOS*  nGL           = new NativeGL2_iOS();
-
-  GL* gl = new GL(nGL);
+  NativeGL2_iOS* nativeGL = new NativeGL2_iOS();
   
   IStorage* storage = new SQLiteStorage_iOS("g3m.cache");
   const bool saveInBackground = true;
@@ -137,88 +125,42 @@
                                                  storage,
                                                  saveInBackground);
   
-  CompositeRenderer* composite = new CompositeRenderer();
-  
-  composite->addRenderer(cameraRenderer);
+  CompositeRenderer* mainRenderer = new CompositeRenderer();
   
   if (layerSet != NULL) {
-    if (layerSet->size() > 0) {
-      TileTexturizer* texturizer = new MultiLayerTileTexturizer(layerSet);
-      //IImage *singleWorldImage = factory->createImageFromFileName("mercator.jpg");
-      //TileTexturizer* texturizer = new SingleImageTileTexturizer(parameters, singleWorldImage, false);
-      
-      //Single Mercator image
-      //IImage *singleWorldImage = factory->createImageFromFileName("tissot.png");
-      //TileTexturizer* texturizer = new SingleImageTileTexturizer(parameters, singleWorldImage, true);
-      
-      const bool showStatistics = false;
-      TileRenderer* tr = new TileRenderer(new EllipsoidalTileTessellator(parameters->_tileResolution, true),
-                                          texturizer,
-                                          parameters,
-                                          showStatistics);
-      composite->addRenderer(tr);
-    }
+    TileTexturizer* texturizer = new MultiLayerTileTexturizer();
+    
+    const bool showStatistics = false;
+    TileRenderer* tr = new TileRenderer(new EllipsoidalTileTessellator(parameters->_tileResolution, true),
+                                        texturizer,
+                                        layerSet,
+                                        parameters,
+                                        showStatistics);
+    mainRenderer->addRenderer(tr);
   }
   
   for (int i = 0; i < renderers.size(); i++) {
-    composite->addRenderer(renderers[i]);
+    mainRenderer->addRenderer(renderers[i]);
   }
-  
-  
-  
-  
-  TextureBuilder* textureBuilder = new CPUTextureBuilder();
-  TexturesHandler* texturesHandler = new TexturesHandler(gl, false);
   
   const Planet* planet = Planet::createEarth();
   
   Renderer* busyRenderer = new BusyMeshRenderer();
   
-  EffectsScheduler* scheduler = new EffectsScheduler();
-  
-  FrameTasksExecutor* frameTasksExecutor = new FrameTasksExecutor();
-  
-  const IStringUtils* stringUtils = new StringUtils_iOS();
-  //  if (true) {
-  //    int __REMOVE_STRING_UTILS_TESTS;
-  //
-  //    std::vector<std::string> lines = stringUtils->splitLines("line1\nline2");
-  //
-  //    printf("%s\n", stringUtils->left("Diego", 1).c_str());
-  //    printf("%s\n", stringUtils->substring("Diego", 1).c_str());
-  //
-  //    std::string line = "name=value";
-  //    int equalsPosition = stringUtils->indexOf(line, "=");
-  //    std::string name = stringUtils->left(line, equalsPosition);
-  //    std::string value = stringUtils->substring(line, equalsPosition+1);
-  //    printf("\"%s\"=\"%s\"\n", name.c_str(), value.c_str());
-  //
-  //    printf("\n");
-  //  }
-  
-  IThreadUtils* threadUtils = new ThreadUtils_iOS();
-  
-  _widgetVP = G3MWidget::create(frameTasksExecutor,
-                                factory,
-                                stringUtils,
-                                threadUtils,
-                                stringBuilder,
-                                mathUtils,
-                                logger,
-                                gl,
-                                texturesHandler,
-                                textureBuilder,
+  _widgetVP = G3MWidget::create(nativeGL,
                                 downloader,
                                 planet,
                                 cameraConstraints,
-                                composite,
+                                cameraRenderer,
+                                mainRenderer,
                                 busyRenderer,
-                                scheduler,
                                 width, height,
                                 Color::fromRGBA((float)0, (float)0.1, (float)0.2, (float)1),
                                 true,
-                                false);
-  
+                                false,
+                                initializationTask,
+                                true,
+                                periodicalTasks);
   [self widget]->setUserData(userData);
 }
 
@@ -296,7 +238,9 @@
     CGPoint tapPoint = [sender locationInView:sender.view.superview];
     
     std::vector<const Touch*> pointers = std::vector<const Touch*>();
-    Touch *touch = new Touch(Vector2D(tapPoint.x, tapPoint.y), Vector2D(0.0, 0.0), 1);
+    Touch *touch = new Touch(Vector2I( GMath.toInt(tapPoint.x), GMath.toInt(tapPoint.y)),
+                             Vector2I(0, 0),
+                             1);
     pointers.push_back(touch);
     lastTouchEvent = TouchEvent::create(LongPress, pointers);
     [self widget]->onTouchEvent(lastTouchEvent);
@@ -392,16 +336,15 @@
     CGPoint previous        = [touch previousLocationInView:self];
     unsigned char tapCount  = (unsigned char) [touch tapCount];
     
-    Touch *touch = new Touch(Vector2D(current.x, current.y),
-                             Vector2D(previous.x, previous.y),
+    Touch *touch = new Touch(Vector2I( GMath.toInt(current.x), GMath.toInt(current.y) ),
+                             Vector2I( GMath.toInt(previous.x), GMath.toInt(previous.y) ),
                              tapCount);
     
     pointers.push_back(touch);
   }
   
-  if (lastTouchEvent!=NULL) {
-    delete lastTouchEvent;
-  }
+  delete lastTouchEvent;
+      
   lastTouchEvent = TouchEvent::create(Down, pointers);
   [self widget]->onTouchEvent(lastTouchEvent);
 }
@@ -420,8 +363,8 @@
     CGPoint current  = [touch locationInView:self];
     CGPoint previous = [touch previousLocationInView:self];
     
-    Touch *touch = new Touch(Vector2D(current.x, current.y),
-                             Vector2D(previous.x, previous.y));
+    Touch *touch = new Touch(Vector2I( GMath.toInt(current.x), GMath.toInt(current.y) ),
+                             Vector2I( GMath.toInt(previous.x), GMath.toInt(previous.y) ));
     
     pointers.push_back(touch);
   }
@@ -429,9 +372,9 @@
   // test if finger orders are the same that in the previous gesture
   if (lastTouchEvent!=NULL) {
     if (pointers.size()==2 && lastTouchEvent->getTouchCount()==2) {
-      Vector2D current0 = pointers[0]->getPrevPos();
-      Vector2D last0 = lastTouchEvent->getTouch(0)->getPos();
-      Vector2D last1 = lastTouchEvent->getTouch(1)->getPos();
+      Vector2I current0 = pointers[0]->getPrevPos();
+      Vector2I last0 = lastTouchEvent->getTouch(0)->getPos();
+      Vector2I last1 = lastTouchEvent->getTouch(1)->getPos();
       delete lastTouchEvent;
       double dist0 = current0.sub(last0).squaredLength();
       double dist1 = current0.sub(last1).squaredLength();
@@ -473,27 +416,37 @@
     
     [touch timestamp];
     
-    Touch *touch = new Touch(Vector2D(current.x, current.y),
-                             Vector2D(previous.x, previous.y));
+    Touch *touch = new Touch(Vector2I( GMath.toInt(current.x), GMath.toInt(current.y) ),
+                             Vector2I( GMath.toInt(previous.x), GMath.toInt(previous.y) ) );
     
     pointers.push_back(touch);
   }
   
-  if (lastTouchEvent!=NULL) {
-    delete lastTouchEvent;
-  }
+  delete lastTouchEvent;
+  
   lastTouchEvent = TouchEvent::create(Up, pointers);
   [self widget]->onTouchEvent(lastTouchEvent);
 }
 
 - (void)dealloc {
-  if (lastTouchEvent!=NULL) {
-    delete lastTouchEvent;
-  }
+  delete lastTouchEvent;
 }
 
 - (G3MWidget*) widget {
   return (G3MWidget*) _widgetVP;
+}
+
+- (void)initSingletons {
+
+    ILogger*            logger          = new Logger_iOS(WarningLevel);
+    IFactory*           factory         = new Factory_iOS();
+    const IStringUtils* stringUtils     = new StringUtils_iOS();
+    IThreadUtils*       threadUtils     = new ThreadUtils_iOS();
+    IStringBuilder*     stringBuilder   = new StringBuilder_iOS();
+    IMathUtils*         mathUtils       = new MathUtils_iOS();
+    IJSONParser*        jsonParser      = new JSONParser_iOS();
+    
+    G3MWidget::initSingletons(logger, factory, stringUtils, threadUtils, stringBuilder, mathUtils, jsonParser);
 }
 
 @end

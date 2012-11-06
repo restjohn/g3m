@@ -15,9 +15,11 @@
 #include "Context.hpp"
 #include "IFactory.hpp"
 #include "Geodetic3D.hpp"
-#include "Vector2D.hpp"
+#include "Vector2I.hpp"
 #include "MutableMatrix44D.hpp"
 #include "Frustum.hpp"
+
+#include "Effects.hpp"
 
 class ILogger;
 
@@ -129,7 +131,8 @@ public:
   _frustum((that._frustum == NULL) ? NULL : new Frustum(*that._frustum)),
   _frustumInModelCoordinates((that._frustumInModelCoordinates == NULL) ? NULL : new Frustum(*that._frustumInModelCoordinates)),
   _halfFrustum((that._halfFrustum == NULL) ? NULL : new Frustum(*that._halfFrustum)),
-  _halfFrustumInModelCoordinates((that._halfFrustumInModelCoordinates == NULL) ? NULL : new Frustum(*that._halfFrustumInModelCoordinates))
+  _halfFrustumInModelCoordinates((that._halfFrustumInModelCoordinates == NULL) ? NULL : new Frustum(*that._halfFrustumInModelCoordinates)),
+  _camEffectTarget(new CameraEffectTarget())
   {
   }
 
@@ -137,25 +140,12 @@ public:
   
   ~Camera() {
 #ifdef C_CODE
-    if (_frustum != NULL) {
-      delete _frustum;
-    }
-    
-    if (_frustumInModelCoordinates != NULL) {
-      delete _frustumInModelCoordinates;
-    }
-
-    if (_halfFrustum != NULL) {
-      delete _halfFrustum;
-    }
-    
-    if (_halfFrustumInModelCoordinates != NULL) {
-      delete _halfFrustumInModelCoordinates;
-    }
-    
-    if (_geodeticCenterOfView != NULL) {
-      delete _geodeticCenterOfView;
-    }
+    delete _camEffectTarget;
+    delete _frustum;
+    delete _frustumInModelCoordinates;
+    delete _halfFrustum;
+    delete _halfFrustumInModelCoordinates;
+    delete _geodeticCenterOfView;
 #endif
 
   }
@@ -166,17 +156,21 @@ public:
   
   void render(const RenderContext* rc) const;
   
-  Vector3D pixel2Ray(const Vector2D& pixel) const;
+  Vector3D pixel2Ray(const Vector2I& pixel) const;
   
-  Vector3D pixel2PlanetPoint(const Vector2D& pixel) const;
+  Vector3D pixel2PlanetPoint(const Vector2I& pixel) const;
   
-  Vector2D point2Pixel(const Vector3D& point) const;
+  Vector2I point2Pixel(const Vector3D& point) const;
   
   int getWidth() const { return _width; }
   int getHeight() const { return _height; }
   
   float getViewPortRatio() const {
     return (float) _width / _height;
+  }
+  
+  EffectTarget* getEffectTarget(){
+    return _camEffectTarget;
   }
   
   Vector3D getCartesianPosition() const { return _position.asVector3D(); }
@@ -205,7 +199,7 @@ public:
     if (_dirtyFlags._frustumMC) {
       _dirtyFlags._frustumMC = false;
 #ifdef C_CODE
-      if (_frustumInModelCoordinates!=NULL) delete _frustumInModelCoordinates;
+      delete _frustumInModelCoordinates;
 #endif
       _frustumInModelCoordinates = getFrustum()->transformedBy_P(getModelMatrix());
     }
@@ -216,12 +210,12 @@ public:
     return getHalfFrustumMC();
   }
   
-  void setPosition(const Geodetic3D& g3d);
-  
-      
+  void setPosition(const Geodetic3D& position);
+
   Vector3D getHorizontalVector();
     
-  Angle compute3DAngularDistance(const Vector2D& pixel0, const Vector2D& pixel1);
+  Angle compute3DAngularDistance(const Vector2I& pixel0,
+                                 const Vector2I& pixel1);
   
   void initialize(const InitializationContext* ic); 
 
@@ -233,9 +227,20 @@ public:
       _dirtyFlags.setAll(true);
     }
   }
+  
+  Angle getHeading() const;
+  void setHeading(const Angle& angle);
+  Angle getPitch() const;
+  void setPitch(const Angle& angle);
+  
+  void orbitTo(const Vector3D& pos);
+  void orbitTo(const Geodetic3D& g3d) {
+    orbitTo(_planet->toCartesian(g3d));
+  }
     
 private:
-  
+  Angle getHeading(const Vector3D& normal) const;
+
   //IF A NEW ATTRIBUTE IS ADDED CHECK CONSTRUCTORS AND RESET() !!!!
   int _width;
   int _height;
@@ -257,6 +262,13 @@ private:
   mutable Frustum* _frustumInModelCoordinates;
   mutable Frustum* _halfFrustum;                    // ONLY FOR DEBUG
   mutable Frustum* _halfFrustumInModelCoordinates;  // ONLY FOR DEBUG
+  
+  //The Camera Effect Target
+  class CameraEffectTarget: public EffectTarget{
+  public:
+    void unusedMethod() const {}
+  };
+  CameraEffectTarget* _camEffectTarget;
   
   void applyTransform(const MutableMatrix44D& mat);
 
@@ -326,7 +338,7 @@ private:
     if (_dirtyFlags._geodeticCenterOfView) {
       _dirtyFlags._geodeticCenterOfView = false;
 #ifdef C_CODE
-      if (_geodeticCenterOfView) delete _geodeticCenterOfView;
+      delete _geodeticCenterOfView;
 #endif
       _geodeticCenterOfView = new Geodetic3D(_planet->toGeodetic3D(getXYZCenterOfView()));
     }
@@ -338,7 +350,7 @@ private:
     if (_dirtyFlags._frustum) {
       _dirtyFlags._frustum = false;
 #ifdef C_CODE
-      if (_frustum!=NULL) delete _frustum;
+      delete _frustum;
 #endif
       _frustum = new Frustum(getFrustumData());
     }
@@ -352,7 +364,7 @@ private:
     if (_dirtyFlags._halfFrustum) {
       _dirtyFlags._halfFrustum = false;
 #ifdef C_CODE
-      if (_halfFrustum!=NULL) delete _halfFrustum;
+      delete _halfFrustum;
 #endif
       FrustumData data = getFrustumData();
       _halfFrustum = new Frustum(data._left/4, data._right/4,
@@ -366,7 +378,7 @@ private:
     if (_dirtyFlags._halfFrustumMC) {
       _dirtyFlags._halfFrustumMC = false;
 #ifdef C_CODE
-      if (_halfFrustumInModelCoordinates!=NULL) delete _halfFrustumInModelCoordinates;
+      delete _halfFrustumInModelCoordinates;
 #endif
       _halfFrustumInModelCoordinates = getHalfFrustum()->transformedBy_P(getModelMatrix());
     }

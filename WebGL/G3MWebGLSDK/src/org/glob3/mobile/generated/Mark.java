@@ -64,6 +64,10 @@ public class Mark
 
   private boolean _textureSolved;
   private IImage _textureImage;
+  private int _textureWidth;
+  private int _textureHeight;
+
+  private boolean _renderedMark;
 
   public Mark(String name, URL textureURL, Geodetic3D position)
   {
@@ -75,21 +79,18 @@ public class Mark
 	  _vertices = null;
 	  _textureSolved = false;
 	  _textureImage = null;
+	  _renderedMark = false;
+	  _textureWidth = 0;
+	  _textureHeight = 0;
 
   }
 
   public void dispose()
   {
 	if (_cartesianPosition != null)
-	{
-	  if (_cartesianPosition != null)
-		  _cartesianPosition.dispose();
-	}
+		_cartesianPosition.dispose();
 	if (_vertices != null)
-	{
-	  if (_vertices != null)
-		  _vertices.dispose();
-	}
+		_vertices.dispose();
   }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
@@ -130,15 +131,15 @@ public class Mark
 	final Vector3D markPosition = getCartesianPosition(planet);
   
 	final Vector3D markCameraVector = markPosition.sub(cameraPosition);
-	//  const double distanceToCamera = markCameraVector.length();
-	//  const bool renderMark = distanceToCamera <= minDistanceToCamera;
-	final boolean renderMark = true;
+	final double distanceToCamera = markCameraVector.length();
+	_renderedMark = distanceToCamera <= minDistanceToCamera;
+  //  const bool renderMark = true;
   
-	if (renderMark)
+	if (_renderedMark)
 	{
 	  final Vector3D normalAtMarkPosition = planet.geodeticSurfaceNormal(markPosition);
   
-	  if (normalAtMarkPosition.angleBetween(markCameraVector).radians() > IMathUtils.instance().halfPi())
+	  if (normalAtMarkPosition.angleBetween(markCameraVector)._radians > IMathUtils.instance().halfPi())
 	  {
 		GL gl = rc.getGL();
   
@@ -184,6 +185,12 @@ public class Mark
 	return _textureSolved;
   }
 
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: boolean isRendered() const
+  public final boolean isRendered()
+  {
+	return _renderedMark;
+  }
 
   public final void onTextureDownloadError()
   {
@@ -196,6 +203,30 @@ public class Mark
   {
 	_textureSolved = true;
 	_textureImage = image.shallowCopy();
+	_textureWidth = _textureImage.getWidth();
+	_textureHeight = _textureImage.getHeight();
+  }
+
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: int getTextureWidth() const
+  public final int getTextureWidth()
+  {
+  //  return (_textureImage == NULL) ? 0 : _textureImage->getWidth();
+	return _textureWidth;
+  }
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: int getTextureHeight() const
+  public final int getTextureHeight()
+  {
+  //  return (_textureImage == NULL) ? 0 : _textureImage->getHeight();
+	return _textureHeight;
+  }
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: Vector2I getTextureExtent() const
+  public final Vector2I getTextureExtent()
+  {
+  //  return (_textureImage == NULL) ? Vector2I::zero() : _textureImage->getExtent();
+	return new Vector2I(_textureWidth, _textureHeight);
   }
 
 }

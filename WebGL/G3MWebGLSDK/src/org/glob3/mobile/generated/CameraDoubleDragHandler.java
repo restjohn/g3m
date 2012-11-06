@@ -96,7 +96,7 @@ public class CameraDoubleDragHandler extends CameraEventHandler
   //
   //
   //      //Geodetic2D g = _planet->toGeodetic2D(_initialPoint.asVector3D());
-  //      //printf ("zoom with initial point = (%f, %f)\n", g.latitude().degrees(), g.longitude().degrees());
+  //      //printf ("zoom with initial point = (%f, %f)\n", g.latitude()._degrees, g.longitude()._degrees);
   //    }
   //  }
   
@@ -109,9 +109,9 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 	cameraContext.setCurrentGesture(Gesture.DoubleDrag);
   
 	// double dragging
-	Vector2D pixel0 = touchEvent.getTouch(0).getPos();
+	Vector2I pixel0 = touchEvent.getTouch(0).getPos();
 	_initialPoint0 = _camera0.pixel2PlanetPoint(pixel0).asMutableVector3D();
-	Vector2D pixel1 = touchEvent.getTouch(1).getPos();
+	Vector2I pixel1 = touchEvent.getTouch(1).getPos();
 	_initialPoint1 = _camera0.pixel2PlanetPoint(pixel1).asMutableVector3D();
   
 	// both pixels must intersect globe
@@ -129,9 +129,9 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 	_initialPoint = planet.toCartesian(g).asMutableVector3D();
   
 	// fingers difference
-	Vector2D difPixel = pixel1.sub(pixel0);
+	Vector2I difPixel = pixel1.sub(pixel0);
 	_initialFingerSeparation = difPixel.length();
-	_initialFingerInclination = difPixel.orientation().radians();
+	_initialFingerInclination = difPixel.orientation()._radians;
   
 	//printf ("down 2 finger\n");
   }
@@ -142,9 +142,9 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 	if (_initialPoint.isNan())
 		return;
   
-	Vector2D pixel0 = touchEvent.getTouch(0).getPos();
-	Vector2D pixel1 = touchEvent.getTouch(1).getPos();
-	Vector2D difPixel = pixel1.sub(pixel0);
+	Vector2I pixel0 = touchEvent.getTouch(0).getPos();
+	Vector2I pixel1 = touchEvent.getTouch(1).getPos();
+	Vector2I difPixel = pixel1.sub(pixel0);
 	double finalFingerSeparation = difPixel.length();
 	double factor = finalFingerSeparation/_initialFingerSeparation;
   
@@ -153,7 +153,7 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 	{
 	  Camera tempCamera = new Camera(_camera0);
 	  Angle originalAngle = _initialPoint0.angleBetween(_initialPoint1);
-	  double angle = originalAngle.degrees();
+	  double angle = originalAngle._degrees;
   
 	  // compute estimated camera translation
 	  Vector3D centerPoint = tempCamera.getXYZCenterOfView();
@@ -162,7 +162,7 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 	  tempCamera.moveForward(d);
 	  dAccum += d;
 	  //tempCamera.updateModelMatrix();
-	  double angle0 = tempCamera.compute3DAngularDistance(pixel0, pixel1).degrees();
+	  double angle0 = tempCamera.compute3DAngularDistance(pixel0, pixel1)._degrees;
 	  if (IMathUtils.instance().isNan(angle0))
 		  return;
 	  //printf("distancia angular original = %.4f     d=%.1f   angulo step0=%.4f\n", angle, d, angle0);
@@ -174,7 +174,7 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 	  tempCamera.moveForward(d);
 	  dAccum += d;
 	  //tempCamera.updateModelMatrix();
-	  double angle1 = tempCamera.compute3DAngularDistance(pixel0, pixel1).degrees();
+	  double angle1 = tempCamera.compute3DAngularDistance(pixel0, pixel1)._degrees;
 	  double angle_n1 = angle0;
 	  double angle_n = angle1;
   
@@ -190,7 +190,7 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 		dAccum += d;
 		//tempCamera.updateModelMatrix();
 		angle_n1 = angle_n;
-		angle_n = tempCamera.compute3DAngularDistance(pixel0, pixel1).degrees();
+		angle_n = tempCamera.compute3DAngularDistance(pixel0, pixel1)._degrees;
 	  }
 	  //printf("-----------  iteraciones=%d  precision=%f angulo final=%.4f  distancia final=%.1f\n", iter, precision, angle_n, dAccum);
 	}
@@ -277,7 +277,7 @@ public class CameraDoubleDragHandler extends CameraEventHandler
 	  Vector3D normal = planet.geodeticSurfaceNormal(centerPoint2);
 	  Vector3D v0 = _initialPoint0.asVector3D().sub(centerPoint2).projectionInPlane(normal);
 	  Vector3D v1 = tempCamera.pixel2PlanetPoint(pixel0).sub(centerPoint2).projectionInPlane(normal);
-	  double angle = v0.angleBetween(v1).degrees();
+	  double angle = v0.angleBetween(v1)._degrees;
 	  double sign = v1.cross(v0).dot(normal);
 	  if (sign<0)
 		  angle = -angle;

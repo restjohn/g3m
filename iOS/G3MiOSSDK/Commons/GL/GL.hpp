@@ -29,7 +29,6 @@ class IGLUniformID;
 
 class GL {
 private:
-  
   INativeGL* const _gl;
   
   MutableMatrix44D            _modelView;
@@ -55,17 +54,17 @@ private:
   
   int _cullFace_face;
 
-  
-  
-  
   float _scaleX;
   float _scaleY;
   float _translationX;
   float _translationY;
   
   IFloatBuffer* _vertices;
+  int           _verticesTimestamp;
   IFloatBuffer* _textureCoordinates;
+  int           _textureCoordinatesTimestamp;
   IFloatBuffer* _colors;
+  int           _colorsTimestamp;
   
   float _flatColorR;
   float _flatColorG;
@@ -115,8 +114,11 @@ public:
   _texturesIdGetCounter(0),
   _texturesIdTakeCounter(0),
   _vertices(NULL),
+  _verticesTimestamp(0),
   _textureCoordinates(NULL),
+  _textureCoordinatesTimestamp(0),
   _colors(NULL),
+  _colorsTimestamp(0),
   _flatColorR(0),
   _flatColorG(0),
   _flatColorB(0),
@@ -177,9 +179,13 @@ public:
   
   void vertexPointer(int size, int stride, IFloatBuffer* vertices);
   
-  void drawTriangleStrip(IIntBuffer* indices) ;
-  
+  void drawTriangleStrip(IIntBuffer* indices);
+
+  void drawTriangleFan(IIntBuffer* indices);
+
   void drawLines(IIntBuffer* indices);
+  
+  void drawLineStrip(IIntBuffer* indices);
   
   void drawLineLoop(IIntBuffer* indices);
   
@@ -292,15 +298,9 @@ public:
 //      _lastImageData = NULL;
 //    }
 
-    if (_vertices != NULL) {
-      delete _vertices;
-    }
-    if (_textureCoordinates != NULL) {
-      delete _textureCoordinates;
-    }
-    if (_colors != NULL) {
-      delete _colors;
-    }
+    delete _vertices;
+    delete _textureCoordinates;
+    delete _colors;
      
   }
   

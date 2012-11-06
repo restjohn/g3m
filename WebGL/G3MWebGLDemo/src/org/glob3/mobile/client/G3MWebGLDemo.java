@@ -6,13 +6,16 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.glob3.mobile.generated.Angle;
+import org.glob3.mobile.generated.GTask;
 import org.glob3.mobile.generated.Geodetic3D;
 import org.glob3.mobile.generated.ICameraConstrainer;
 import org.glob3.mobile.generated.ILogger;
 import org.glob3.mobile.generated.LayerSet;
 import org.glob3.mobile.generated.LevelTileCondition;
 import org.glob3.mobile.generated.Mark;
+import org.glob3.mobile.generated.MarkTouchListener;
 import org.glob3.mobile.generated.MarksRenderer;
+import org.glob3.mobile.generated.PeriodicalTask;
 import org.glob3.mobile.generated.Renderer;
 import org.glob3.mobile.generated.Sector;
 import org.glob3.mobile.generated.SimpleCameraConstrainer;
@@ -23,6 +26,7 @@ import org.glob3.mobile.generated.WMSServerVersion;
 import org.glob3.mobile.specific.G3MWidget_WebGL;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -42,10 +46,9 @@ public class G3MWebGLDemo
       if (_widget == null) {
          final Panel g3mWidgetHolder = RootPanel.get(g3mWidgetHolderId);
 
-         final int delayMillis = 10;
          final String proxy = jsDefineDefaultProxy();
 
-         _widget = new G3MWidget_WebGL(delayMillis, proxy);
+         _widget = new G3MWidget_WebGL(proxy);
          g3mWidgetHolder.add(_widget);
 
          initWidgetDemo();
@@ -62,11 +65,11 @@ public class G3MWebGLDemo
       cameraConstraints.add(scc);
 
       final LayerSet layerSet = new LayerSet();
-      final boolean useBing = true;
+      final boolean useBing = false;
       if (useBing) {
          final WMSLayer bing = new WMSLayer( //
                   "ve", //
-                  new URL("http://worldwind27.arc.nasa.gov/wms/virtualearth?"), //
+                  new URL("http://worldwind27.arc.nasa.gov/wms/virtualearth?", false), //
                   WMSServerVersion.WMS_1_1_0, //
                   Sector.fullSphere(), //
                   "image/png", //
@@ -82,7 +85,7 @@ public class G3MWebGLDemo
       if (usePnoa) {
          final WMSLayer pnoa = new WMSLayer( //
                   "PNOA", //
-                  new URL("http://www.idee.es/wms/PNOA/PNOA"), //
+                  new URL("http://www.idee.es/wms/PNOA/PNOA", false), //
                   WMSServerVersion.WMS_1_1_0, Sector.fromDegrees(21, -18, 45, 6), //
                   "image/png", //
                   "EPSG:4326", //
@@ -96,7 +99,7 @@ public class G3MWebGLDemo
       if (useOSMLatLon) {
          //         final WMSLayer osm = new WMSLayer( //
          //                  "osm", //
-         //                  new URL("http://wms.latlon.org/"), //
+         //                  new URL("http://wms.latlon.org/", false), //
          //                  WMSServerVersion.WMS_1_1_0, //
          //                  Sector.fromDegrees(-85.05, -180.0, 85.5, 180.0), //
          //                  "image/jpeg", //
@@ -108,15 +111,32 @@ public class G3MWebGLDemo
 
          final WMSLayer osm = new WMSLayer( //
                   "osm_auto:all", //
-                  new URL("http://129.206.228.72/cached/osm"), //
+                  new URL("http://129.206.228.72/cached/osm", false), //
                   WMSServerVersion.WMS_1_1_0, //
-                  Sector.fromDegrees(-85.05, -180.0, 85.05, 180.0), //
+                  // Sector.fromDegrees(-85.05, -180.0, 85.05, 180.0), //
+                  Sector.fullSphere(), //
                   "image/jpeg", //
                   "EPSG:4326", //
                   "", //
                   false, //
-                  new LevelTileCondition(3, 100));
+                  // new LevelTileCondition(3, 100));
+                  null);
          layerSet.addLayer(osm);
+      }
+
+
+      final boolean testURLescape = false;
+      if (testURLescape) {
+         final WMSLayer ayto = new WMSLayer(URL.escape("Ejes de via"), //
+                  new URL("http://sig.caceres.es/wms_callejero.mapdef?", false), //
+                  WMSServerVersion.WMS_1_1_0,//  
+                  Sector.fullSphere(), //
+                  "image/png", //
+                  "EPSG:4326", //
+                  "", //
+                  true, //
+                  null);
+         layerSet.addLayer(ayto);
       }
 
 
@@ -134,22 +154,31 @@ public class G3MWebGLDemo
       if (useMarkers) {
          // marks renderer
          final boolean readyWhenMarksReady = false;
-         final MarksRenderer marks = new MarksRenderer(readyWhenMarksReady);
-         renderers.add(marks);
+         final MarksRenderer marksRenderer = new MarksRenderer(readyWhenMarksReady);
+         renderers.add(marksRenderer);
+
+         marksRenderer.setMarkTouchListener(new MarkTouchListener() {
+            @Override
+            public boolean touchedMark(final Mark mark) {
+               Window.alert("Touched on mark: " + mark.getName());
+               return true;
+            }
+         }, true);
+
 
          final Mark m1 = new Mark(//
                   "Fuerteventura", //
-                  new URL("http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"), //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
                   new Geodetic3D(Angle.fromDegrees(28.05), Angle.fromDegrees(-14.36), 0));
          //m1->addTouchListener(listener);
-         marks.addMark(m1);
+         marksRenderer.addMark(m1);
 
          final Mark m2 = new Mark( //
                   "Las Palmas", //
-                  new URL("http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"), //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
                   new Geodetic3D(Angle.fromDegrees(28.05), Angle.fromDegrees(-15.36), 0));
          //m2->addTouchListener(listener);
-         marks.addMark(m2);
+         marksRenderer.addMark(m2);
 
          final boolean randomMarkers = false;
          if (randomMarkers) {
@@ -159,9 +188,10 @@ public class G3MWebGLDemo
                final Angle longitude = Angle.fromDegrees((random.nextInt() % 360) - 180);
                //NSLog(@"lat=%f, lon=%f", latitude.degrees(), longitude.degrees());
 
-               marks.addMark(new Mark("Random", new URL(
-                        "http://www.glob3mobile.com/wp-content/themes/glob3mobile/images/logo_s.png"), new Geodetic3D(latitude,
-                        longitude, 0)));
+               marksRenderer.addMark(new Mark( //
+                        "Random", //
+                        new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
+                        new Geodetic3D(latitude, longitude, 0)));
             }
          }
 
@@ -174,7 +204,11 @@ public class G3MWebGLDemo
 
       final ArrayList<String> imagesToPreload = new ArrayList<String>();
       //      imagesToPreload.add("../images/world.jpg");
-      _widget.initWidget(cameraConstraints, layerSet, renderers, userData, imagesToPreload);
+      final GTask initializationTask = null;
+      final ArrayList<PeriodicalTask> periodicalTasks = null;
+      final boolean incrementalTileQuality = true;
+      _widget.initWidget(cameraConstraints, layerSet, renderers, userData, imagesToPreload, initializationTask, periodicalTasks,
+               incrementalTileQuality);
    }
 
 

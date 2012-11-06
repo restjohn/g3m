@@ -43,9 +43,33 @@ public:
   }
   
   static Vector3D zero() {
-    return Vector3D(0.0, 0.0, 0.0);
+    return Vector3D(0, 0, 0);
+  }
+
+  static Vector3D upX() {
+    return Vector3D(1,0,0);
+  }
+
+  static Vector3D downX() {
+    return Vector3D(-1,0,0);
   }
   
+  static Vector3D upY() {
+    return Vector3D(0,1,0);
+  }
+
+  static Vector3D downY() {
+    return Vector3D(0,-1,0);
+  }
+
+  static Vector3D upZ() {
+    return Vector3D(0,0,1);
+  }
+
+  static Vector3D downZ() {
+    return Vector3D(0,0,-1);
+  }
+
   bool isNan() const {
     return (GMath.isNan(_x) || GMath.isNan(_y) || GMath.isNan(_z));
   }
@@ -111,6 +135,7 @@ public:
   }
   
   Angle angleBetween(const Vector3D& other) const;
+  Angle signedAngleBetween(const Vector3D& other, const Vector3D& up) const;
   
   Vector3D rotateAroundAxis(const Vector3D& axis,
                             const Angle& theta) const;

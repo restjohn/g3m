@@ -16,9 +16,9 @@ public class RenderContext extends Context
   private TextureBuilder _textureBuilder;
   private ITimer _frameStartTimer;
 
-  public RenderContext(FrameTasksExecutor frameTasksExecutor, IFactory factory, IStringUtils stringUtils, IThreadUtils threadUtils, ILogger logger, Planet planet, GL gl, Camera currentCamera, Camera nextCamera, TexturesHandler texturesHandler, TextureBuilder textureBuilder, IDownloader downloader, EffectsScheduler scheduler, ITimer frameStartTimer)
+  public RenderContext(FrameTasksExecutor frameTasksExecutor, IFactory factory, IStringUtils stringUtils, IThreadUtils threadUtils, ILogger logger, IMathUtils mathUtils, IJSONParser jsonParser, Planet planet, GL gl, Camera currentCamera, Camera nextCamera, TexturesHandler texturesHandler, TextureBuilder textureBuilder, IDownloader downloader, EffectsScheduler scheduler, ITimer frameStartTimer)
   {
-	  super(factory, stringUtils, threadUtils, logger, planet, downloader, scheduler);
+	  super(factory, stringUtils, threadUtils, logger, mathUtils, jsonParser, planet, downloader, scheduler);
 	  _frameTasksExecutor = frameTasksExecutor;
 	  _gl = gl;
 	  _currentCamera = currentCamera;
@@ -80,8 +80,8 @@ public class RenderContext extends Context
 
   public void dispose()
   {
-	if (_frameStartTimer != null)
-		_frameStartTimer.dispose();
+  //  delete _frameStartTimer;
+	IFactory.instance().deleteTimer(_frameStartTimer);
   }
 
 }

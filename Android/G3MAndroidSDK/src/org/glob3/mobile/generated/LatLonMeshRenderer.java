@@ -19,7 +19,7 @@ package org.glob3.mobile.generated;
 
 
 
-public class LatLonMeshRenderer extends Renderer
+public class LatLonMeshRenderer extends LeafRenderer
 {
 
   private Mesh _mesh;
@@ -46,7 +46,7 @@ public class LatLonMeshRenderer extends Renderer
   
 	Color flatColor = new Color(Color.fromRGBA((float)1.0, (float)1.0, (float)0.0, (float)1.0));
   
-	_mesh = new IndexedMesh(GLPrimitive.triangleStrip(), true, vertices.getCenter(), vertices.create(), index.create(), flatColor);
+	_mesh = new IndexedMesh(GLPrimitive.triangleStrip(), true, vertices.getCenter(), vertices.create(), index.create(), 1, flatColor);
   
   }
 

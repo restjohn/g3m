@@ -19,6 +19,12 @@ package org.glob3.mobile.generated;
 
 public abstract class Renderer
 {
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: virtual boolean isEnable() const = 0;
+  public abstract boolean isEnable();
+
+  public abstract void setEnable(boolean enable);
+
   public abstract void onResume(InitializationContext ic);
 
   public abstract void onPause(InitializationContext ic);
@@ -29,6 +35,11 @@ public abstract class Renderer
 
   public abstract void render(RenderContext rc);
 
+  /*
+   Gives to Renderer the opportunity to process touch, events.
+   
+   The Renderer answer true if the event was processed.
+   */
   public abstract boolean onTouchEvent(EventContext ec, TouchEvent touchEvent);
 
   public abstract void onResizeViewportEvent(EventContext ec, int width, int height);

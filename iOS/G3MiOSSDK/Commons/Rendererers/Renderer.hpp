@@ -16,6 +16,10 @@ class EventContext;
 
 class Renderer {
 public:
+  virtual bool isEnable() const = 0;
+  
+  virtual void setEnable(bool enable) = 0;
+  
   virtual void onResume(const InitializationContext* ic) = 0;
   
   virtual void onPause(const InitializationContext* ic) = 0;
@@ -25,7 +29,12 @@ public:
   virtual bool isReadyToRender(const RenderContext* rc) = 0;
   
   virtual void render(const RenderContext* rc) = 0;
-  
+
+  /*
+   Gives to Renderer the opportunity to process touch, events.
+   
+   The Renderer answer true if the event was processed.
+   */
   virtual bool onTouchEvent(const EventContext* ec,
                             const TouchEvent* touchEvent) = 0;
   

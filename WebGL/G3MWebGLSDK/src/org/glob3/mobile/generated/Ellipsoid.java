@@ -59,6 +59,13 @@ public class Ellipsoid
   }
 
 //C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: Vector3D geodeticSurfaceNormal(const MutableVector3D& positionOnEllipsoid) const
+  public final Vector3D geodeticSurfaceNormal(MutableVector3D positionOnEllipsoid)
+  {
+	return positionOnEllipsoid.times(_oneOverRadiiSquared).normalized().asVector3D();
+  }
+
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
 //ORIGINAL LINE: Vector3D geodeticSurfaceNormal(const Geodetic3D& geodetic) const
   public final Vector3D geodeticSurfaceNormal(Geodetic3D geodetic)
   {
@@ -241,7 +248,7 @@ public class Ellipsoid
 	}
   
 	Vector3D normal = start.cross(stop).normalized();
-	double theta = start.angleBetween(stop).radians();
+	double theta = start.angleBetween(stop)._radians;
   
 	//int n = max((int)(theta / granularity) - 1, 0);
 	int n = ((int)(theta / granularity) - 1) > 0 ? (int)(theta / granularity) - 1 : 0;
@@ -283,14 +290,14 @@ public class Ellipsoid
   {
 	final Vector3D radius = _radii;
 	double R = (radius._x + radius._y + radius._z) / 3;
-	double medLat = g1.latitude().degrees();
-	double medLon = g1.longitude().degrees();
+	double medLat = g1.latitude()._degrees;
+	double medLon = g1.longitude()._degrees;
   
 	// spheric distance from P to Q
 	// this is the right form, but it's the most complex
 	// theres is a minimum error considering sphere instead of ellipsoid
-	double latP = g2.latitude().radians();
-	double lonP = g2.longitude().radians();
+	double latP = g2.latitude()._radians;
+	double lonP = g2.longitude()._radians;
 	double latQ = medLat / 180 * IMathUtils.instance().pi();
 	double lonQ = medLon / 180 * IMathUtils.instance().pi();
 	double coslatP = IMathUtils.instance().cos(latP);
@@ -314,15 +321,15 @@ public class Ellipsoid
 	final Vector3D radius = _radii;
 	double R = (radius._x + radius._y + radius._z) / 3;
   
-	double medLat = g1.latitude().degrees();
-	double medLon = g1.longitude().degrees();
+	double medLat = g1.latitude()._degrees;
+	double medLon = g1.longitude()._degrees;
   
 	// this way is faster, and works properly further away from the poles
 	//double diflat = fabs(g.latitude()-medLat);
-	double diflat = IMathUtils.instance().abs(g2.latitude().degrees() - medLat);
+	double diflat = IMathUtils.instance().abs(g2.latitude()._degrees - medLat);
 	if (diflat > 180)
 		diflat = 360 - diflat;
-	double diflon = IMathUtils.instance().abs(g2.longitude().degrees() - medLon);
+	double diflon = IMathUtils.instance().abs(g2.longitude()._degrees - medLon);
 	if (diflon > 180)
 		diflon = 360 - diflon;
 	double dist = IMathUtils.instance().sqrt(diflat * diflat + diflon * diflon);
@@ -387,4 +394,16 @@ public class Ellipsoid
 	}
 	return pos.add(ray.times(distances.get(0)));
   }
+
+
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: MutableMatrix44D createGeodeticTransformMatrix(const Geodetic3D& position) const
+  public final MutableMatrix44D createGeodeticTransformMatrix(Geodetic3D position)
+  {
+	final MutableMatrix44D translation = MutableMatrix44D.createTranslationMatrix(toCartesian(position));
+	final MutableMatrix44D rotation = MutableMatrix44D.createGeodeticRotationMatrix(position);
+  
+	return translation.multiply(rotation);
+  }
+
 }

@@ -61,13 +61,13 @@ std::vector<Petition*> WMSLayer::getMapPetitions(const RenderContext* rc,
       isb->addInt(height);
       
       isb->addString("&BBOX=");
-      isb->addDouble(sector.lower().latitude().degrees());
+      isb->addDouble(sector.lower().latitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.lower().longitude().degrees());
+      isb->addDouble(sector.lower().longitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().latitude().degrees());
+      isb->addDouble(sector.upper().latitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().longitude().degrees());
+      isb->addDouble(sector.upper().longitude()._degrees);
       
       req += isb->getString();
       delete isb;
@@ -90,13 +90,13 @@ std::vector<Petition*> WMSLayer::getMapPetitions(const RenderContext* rc,
       isb->addInt(height);
       
       isb->addString("&BBOX=");
-      isb->addDouble(sector.lower().longitude().degrees());
+      isb->addDouble(sector.lower().longitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.lower().latitude().degrees());
+      isb->addDouble(sector.lower().latitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().longitude().degrees());
+      isb->addDouble(sector.upper().longitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().latitude().degrees());
+      isb->addDouble(sector.upper().latitude()._degrees);
       
       req += isb->getString();
       delete isb;
@@ -131,7 +131,7 @@ std::vector<Petition*> WMSLayer::getMapPetitions(const RenderContext* rc,
     req += "&TRANSPARENT=FALSE";
   }
   
-  Petition *petition = new Petition(sector, URL(req));
+  Petition *petition = new Petition(sector, URL(req, false));
   petitions.push_back(petition);
   
 	return petitions;
@@ -187,13 +187,13 @@ URL WMSLayer::getFeatureInfoURL(const Geodetic2D& g,
       isb->addInt(height);
       
       isb->addString("&BBOX=");
-      isb->addDouble(sector.lower().latitude().degrees());
+      isb->addDouble(sector.lower().latitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.lower().longitude().degrees());
+      isb->addDouble(sector.lower().longitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().latitude().degrees());
+      isb->addDouble(sector.upper().latitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().longitude().degrees());
+      isb->addDouble(sector.upper().longitude()._degrees);
       
       req += isb->getString();
       
@@ -217,13 +217,13 @@ URL WMSLayer::getFeatureInfoURL(const Geodetic2D& g,
       isb->addInt(height);
       
       isb->addString("&BBOX=");
-      isb->addDouble(sector.lower().longitude().degrees());
+      isb->addDouble(sector.lower().longitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.lower().latitude().degrees());
+      isb->addDouble(sector.lower().latitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().longitude().degrees());
+      isb->addDouble(sector.upper().longitude()._degrees);
       isb->addString(",");
-      isb->addDouble(sector.upper().latitude().degrees());
+      isb->addDouble(sector.upper().latitude()._degrees);
       
       req += isb->getString();
       
@@ -251,5 +251,5 @@ URL WMSLayer::getFeatureInfoURL(const Geodetic2D& g,
   req += isb->getString();
   delete isb;
   
-	return URL(req);
+	return URL(req, false);
 }

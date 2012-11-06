@@ -41,8 +41,7 @@ bool CameraSingleDragHandler::onTouchEvent(const EventContext *eventContext,
 
 void CameraSingleDragHandler::onDown(const EventContext *eventContext,
                                      const TouchEvent& touchEvent, 
-                                     CameraContext *cameraContext) 
-{  
+                                     CameraContext *cameraContext) {  
   Camera *camera = cameraContext->getNextCamera();
   _camera0.copyFrom(*camera);
   cameraContext->setCurrentGesture(Drag); 
@@ -50,13 +49,12 @@ void CameraSingleDragHandler::onDown(const EventContext *eventContext,
   _lastRadians = _radiansStep = 0.0;
   
   // dragging
-  const Vector2D pixel = touchEvent.getTouch(0)->getPos();
-  _initialPixel = pixel.asMutableVector2D();
+  const Vector2I pixel = touchEvent.getTouch(0)->getPos();
+  _initialPixel = pixel.asMutableVector2I();
   _initialPoint = _camera0.pixel2PlanetPoint(pixel).asMutableVector3D();
   
   //printf ("down 1 finger. Initial point = %f %f %f\n", _initialPoint.x(), _initialPoint.y(), _initialPoint.z());
 }
-
 
 void CameraSingleDragHandler::onMove(const EventContext *eventContext,
                                      const TouchEvent& touchEvent, 
@@ -70,7 +68,7 @@ void CameraSingleDragHandler::onMove(const EventContext *eventContext,
     return;
   }
       
-  const Vector2D pixel = touchEvent.getTouch(0)->getPos();
+  const Vector2I pixel = touchEvent.getTouch(0)->getPos();
   
 //  const Vector2D pixel = Vector2D(touchEvent.getTouch(0)->getPos().x(), _initialPixel.y());
   
@@ -104,20 +102,22 @@ void CameraSingleDragHandler::onUp(const EventContext *eventContext,
   if (_useInertia) {
     // test if animation is needed
     const Touch *touch = touchEvent.getTouch(0);
-    Vector2D currPixel = touch->getPos();
-    Vector2D prevPixel = touch->getPrevPos();
+    Vector2I currPixel = touch->getPos();
+    Vector2I prevPixel = touch->getPrevPos();
     double desp        = currPixel.sub(prevPixel).length();
 
     if (cameraContext->getCurrentGesture()==Drag && !_axis.isNan() && desp>2) {
       // start inertial effect
       Effect *effect = new SingleDragEffect(_axis.asVector3D(), Angle::fromRadians(_radiansStep));
-      eventContext->getEffectsScheduler()->startEffect(effect, cameraContext);
+      
+      EffectTarget* target = cameraContext->getNextCamera()->getEffectTarget();
+      eventContext->getEffectsScheduler()->startEffect(effect, target);
     }
   }
   
   // update gesture
   cameraContext->setCurrentGesture(None);
-  _initialPixel = MutableVector2D::nan();
+  _initialPixel = MutableVector2I::zero();
 }
 
 void CameraSingleDragHandler::render(const RenderContext* rc, CameraContext *cameraContext)
@@ -141,7 +141,7 @@ void CameraSingleDragHandler::render(const RenderContext* rc, CameraContext *cam
 //      gl->popMatrix();
 //            
 //      //Geodetic2D g = _planet->toGeodetic2D(_initialPoint.asVector3D());
-//      //printf ("zoom with initial point = (%f, %f)\n", g.latitude().degrees(), g.longitude().degrees());
+//      //printf ("zoom with initial point = (%f, %f)\n", g.latitude()._degrees, g.longitude()._degrees);
 //    }
 //  }
 }
