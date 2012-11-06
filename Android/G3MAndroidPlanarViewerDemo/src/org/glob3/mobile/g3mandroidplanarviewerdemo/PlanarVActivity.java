@@ -9,11 +9,9 @@ import org.glob3.mobile.generated.URL;
 import org.glob3.mobile.specific.Browser_Android;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MotionEvent;
 import android.webkit.WebView;
 
 
@@ -25,12 +23,11 @@ public class PlanarVActivity
    public void onCreate(final Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       //setContentView(R.layout.planar_viewer_activity);
-
       //final WebView wv = (WebView) this.findViewById(R.id.webView1);
 
-      final MyWebView wv = new MyWebView(this);
-      //final WebView wv = new WebView(getApplicationContext());
-      //final MyWebView wv = new MyWebView(getApplicationContext());
+      //final MyWebView wv = new MyWebView(this);
+      final WebView wv = new WebView(this);
+
       setContentView(wv);
       //getIntent().setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
@@ -55,23 +52,23 @@ public class PlanarVActivity
       return true;
    }
 
-   private class MyWebView
-            extends
-               WebView {
-
-      public MyWebView(final Context context) {
-         super(context);
-      }
-
-
-      @Override
-      public boolean onTouchEvent(final MotionEvent event) {
-
-         Log.i("onTouchEvent: ", event.toString());
-         //super.onTouchEvent(event);
-         return super.onTouchEvent(event);
-         //return true;
-      }
-
-   }
+   //   private class MyWebView
+   //            extends
+   //               WebView {
+   //
+   //      public MyWebView(final Context context) {
+   //         super(context);
+   //      }
+   //
+   //
+   //      @Override
+   //      public boolean onTouchEvent(final MotionEvent event) {
+   //
+   //         Log.i("onTouchEvent: ", event.toString());
+   //         //super.onTouchEvent(event);
+   //         return super.onTouchEvent(event);
+   //         //return true;
+   //      }
+   //
+   //   }
 }
