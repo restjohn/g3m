@@ -27,6 +27,7 @@ private:
   const std::string _name;
   URL               _textureURL;
   const Geodetic3D  _position;
+  void* _userData;
   
 #ifdef C_CODE
   const IGLTextureId* _textureId;
@@ -51,10 +52,12 @@ private:
 public:
   Mark(const std::string name,
        const URL         textureURL,
-       const Geodetic3D  position) :
+       const Geodetic3D  position,
+       void* userData=NULL) :
   _name(name),
   _textureURL(textureURL),
   _position(position),
+  _userData(userData),
   _textureId(NULL),
   _cartesianPosition(NULL),
   _vertices(NULL),
@@ -95,6 +98,12 @@ public:
   int getTextureWidth() const;
   int getTextureHeight() const;
   Vector2I getTextureExtent() const;
+  
+  const void* getUserData() const {
+        return _userData;
+  }
+    
+  void setUserData(void* userData);
   
 };
 
