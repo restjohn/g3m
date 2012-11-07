@@ -132,6 +132,7 @@ public class GPlanarPanoramicViewer
          //_removeWhileLoading = false;
          if (GImageLoader.isDownloadingImage(_tileUrl)) {
             _removeWhileLoading = false;
+            System.out.println("Ya pedida: " + tileToString());
             return;
          }
          //final GRectangle bounds = calculateBounds();
@@ -233,10 +234,11 @@ public class GPlanarPanoramicViewer
             _image.removeFromParent();
             //_container.clear();
             if (_debug) {
-               System.out.println("Borrando: " + toString());
+               System.out.println("Borrando: " + tileToString());
             }
          }
          if (GImageLoader.isDownloadingImage(_tileUrl)) {
+            System.out.println("Borrando mientras: " + tileToString());
             _removeWhileLoading = true;
          }
       }
@@ -295,6 +297,7 @@ public class GPlanarPanoramicViewer
             else {
                if (_removeWhileLoading) {
                   _removeWhileLoading = false;
+                  System.out.println("Tirando: " + tileToString());
                   return;
                }
                //_image = new GImage(_tileUrl);
@@ -305,10 +308,10 @@ public class GPlanarPanoramicViewer
                   _image.setSize(_imgSize);
                   cropPanel.add(_image, _left, _top);
                   cropPanel.setPixelSize(GPlanarPanoramicZoomLevel.TILE_WIDTH, GPlanarPanoramicZoomLevel.TILE_HEIGHT);
-                  _container.setWidget(cropPanel, _xPos, _yPos);
+                  _container.setImage(cropPanel, _xPos, _yPos);
                }
                else {
-                  _container.setWidget(_image, _xPos, _yPos);
+                  _container.setImage(_image, _xPos, _yPos);
                }
                if (_debug) {
                   System.out.println("Loaded: " + tileToString());
@@ -829,13 +832,6 @@ public class GPlanarPanoramicViewer
    }
 
 
-   //   private void recreateZoomWidtgets() {
-   //      super.remove(_buttonZoomIn);
-   //      super.remove(_buttonZoomOut);
-   //      createZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
-   //   }
-
-
    private void createZoomWidgets(final int buttonExtent,
                                   final int margin) {
 
@@ -934,70 +930,65 @@ public class GPlanarPanoramicViewer
       _offsetX = offsetX;
       _offsetY = offsetY;
 
-      //updateTilesGrid();
-      //layoutTiles();
-      recreateTiles(); // ??
+      updateTilesGrid();
+      layoutTiles();
+      //recreateTiles(); // ??
    }
 
 
-   //   private void updateTilesGrid() {
-   //
-   //      removeNotVisibleTiles();
-   //
-   //      final List<Tile> tilesToCreate = new ArrayList<Tile>();
-   //
-   //      final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
-   //
-   //      //      final GRectangle containerBounds = new GRectangle(0, 0, (int) container.getBounds().getWidth(),
-   //      //               (int) container.getBounds().getHeight());
-   //      final GRectangle containerBounds = getContainerBound();
-   //
-   //      for (int x = 0; x < currentZoomLevel.getWidthInTiles(); x++) {
-   //         for (int y = 0; y < currentZoomLevel.getHeightInTiles(); y++) {
-   //            final Tile tile = new Tile(this, currentZoomLevel, x, y);
-   //            if (tile.touches(containerBounds)) {
-   //               if (!hasTileInTheSamePosition(tile)) {
-   //                  tilesToCreate.add(tile);
-   //               }
-   //            }
-   //         }
-   //      }
-   //
-   //      for (final Tile tileToCreate : tilesToCreate) {
-   //         _tiles.add(tileToCreate);
-   //         //container.add(tileToCreate);
-   //         tileToCreate.positionate();
-   //      }
-   //
-   //   }
-   //
-   //
-   //   private boolean hasTileInTheSamePosition(final Tile tile) {
-   //      for (final Tile each : _tiles) {
-   //         if ((each._x == tile._x) && (each._y == tile._y)) {
-   //            return true;
-   //         }
-   //      }
-   //      return false;
-   //   }
-   //
-   //
-   //   private void removeNotVisibleTiles() {
-   //      //      final GRectangle containerBounds = new GRectangle(0, 0, (int) container.getBounds().getWidth(),
-   //      //               (int) container.getBounds().getHeight());
-   //
-   //      final GRectangle containerBounds = getContainerBound();
-   //
-   //      final Iterator<Tile> iterator = _tiles.iterator();
-   //      while (iterator.hasNext()) {
-   //         final Tile tile = iterator.next();
-   //         if (!tile.touches(containerBounds)) {
-   //            tile.remove();
-   //            iterator.remove();
-   //            //container.remove(tile);
-   //         }
-   //      }
-   //   }
+   //TODO
+   private void updateTilesGrid() {
+
+      removeNotVisibleTiles();
+
+      final List<Tile> tilesToCreate = new ArrayList<Tile>();
+
+      final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
+      final GRectangle containerBounds = getContainerBound();
+
+      for (int x = 0; x < currentZoomLevel.getWidthInTiles(); x++) {
+         for (int y = 0; y < currentZoomLevel.getHeightInTiles(); y++) {
+            final Tile tile = new Tile(this, currentZoomLevel, x, y);
+            if (tile.touches(containerBounds)) {
+               if (!hasTileInTheSamePosition(tile)) {
+                  tilesToCreate.add(tile);
+               }
+            }
+         }
+      }
+
+      _tiles.addAll(tilesToCreate);
+
+      //to force redraw 
+      super.clear();
+      createHUD();
+   }
+
+
+   private boolean hasTileInTheSamePosition(final Tile tile) {
+      for (final Tile each : _tiles) {
+         if ((each._x == tile._x) && (each._y == tile._y)) {
+            return true;
+         }
+      }
+      return false;
+   }
+
+
+   private void removeNotVisibleTiles() {
+
+      final List<Tile> tilesToRemove = new ArrayList<Tile>();
+      final GRectangle containerBounds = getContainerBound();
+
+      for (final Tile tile : _tiles) {
+         if (!tile.touches(containerBounds)) {
+            tile.remove();
+            tilesToRemove.add(tile);
+         }
+      }
+
+      _tiles.removeAll(tilesToRemove);
+   }
 
 
    private GDimension getContainerSize() {
@@ -1039,6 +1030,7 @@ public class GPlanarPanoramicViewer
       if (_debug) {
          System.out.println("Posicionando..");
       }
+
       layoutTiles();
 
       // force redraw
@@ -1056,6 +1048,8 @@ public class GPlanarPanoramicViewer
 
 
    private void layoutTiles() {
+      //      super.clear();
+      //      createHUD();
       for (final Tile tile : _tiles) {
          tile.positionate();
       }
@@ -1063,11 +1057,8 @@ public class GPlanarPanoramicViewer
 
 
    private void createTiles() {
+
       final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
-
-      //      final GRectangle containerBounds = new GRectangle(0, 0, (int) container.getBounds().getWidth(),
-      //               (int) container.getBounds().getHeight());
-
       final GRectangle containerBounds = getContainerBound();
 
       for (int x = 0; x < currentZoomLevel.getWidthInTiles(); x++) {
@@ -1089,7 +1080,6 @@ public class GPlanarPanoramicViewer
    private void removeTiles() {
       for (final Tile tile : _tiles) {
          tile.remove();
-         //container.remove(tile);
       }
       //super.clear();
       _tiles.clear();
