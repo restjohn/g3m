@@ -42,14 +42,18 @@ public class GContainer
             HasMouseMoveHandlers {
 
    private final AbsolutePanel _panel    = new AbsolutePanel();
+   //private final AbsolutePanel _controlPanel = new AbsolutePanel();
    private final SimplePanel   _topPanel = new SimplePanel();
 
 
    public GContainer() {
       super();
       initWidget(_panel);
+      //DOM.setIntStyleAttribute(_controlPanel.getElement(), "zIndex", 49);
       DOM.setIntStyleAttribute(_topPanel.getElement(), "zIndex", 50);
-      setWidget(_topPanel, 0, 0);
+      //setWidget(_topPanel, 0, 0);
+      //_panel.add(_controlPanel, 0, 0);
+      _panel.add(_topPanel, 0, 0);
    }
 
 
@@ -104,6 +108,14 @@ public class GContainer
    public void setWidget(final Widget widget,
                          final int left,
                          final int top) {
+      //_controlPanel.add(widget, left, top);
+      _panel.add(widget, left, top);
+   }
+
+
+   public void setImage(final Widget widget,
+                        final int left,
+                        final int top) {
       _panel.add(widget, left, top);
    }
 
@@ -117,11 +129,14 @@ public class GContainer
                        final int height) {
       super.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
       _topPanel.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
+      //_controlPanel.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
    }
 
 
    public void clear() {
       _panel.clear();
+      //_panel.add(_controlPanel, 0, 0);
+      _panel.add(_topPanel, 0, 0);
    }
 
 
