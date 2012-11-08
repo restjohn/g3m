@@ -51,10 +51,13 @@ public class GPlanarPanoramicViewer
    //private static Logger        logger               = Logger.getLogger("NameOfYourLogger");
    //GWT.log("ERROR");
 
-   private static final int HORIZONTAL_INCREMENT = GPlanarPanoramicZoomLevel.TILE_WIDTH / 3;
-   private static final int VERTICAL_INCREMENT   = GPlanarPanoramicZoomLevel.TILE_HEIGHT / 3;
-   private static final int BUTTONEXTEND         = 48;
-   private static final int BUTTONMARGIN         = 2;
+   private static final int HORIZONTAL_INCREMENT  = GPlanarPanoramicZoomLevel.TILE_WIDTH / 3;
+   private static final int VERTICAL_INCREMENT    = GPlanarPanoramicZoomLevel.TILE_HEIGHT / 3;
+   private static final int BUTTONEXTEND          = 48;
+   private static final int BUTTONMARGIN          = 2;
+   private static final int MIN_TOUCH_MOVE_EVENTS = 3;
+   private static final int ZOOM_SCALE_DELTA      = 10;
+   private static final int MIN_OFFSET_DISTANCE   = 6;
 
 
    private class Tile {
@@ -347,9 +350,14 @@ public class GPlanarPanoramicViewer
    private double                                _touchesDistance     = 0;
    private double                                _referenceScale      = 0;
    private boolean                               _isScaling           = false;
+   private int                                   _touchMoveCounter    = 0;
 
    private PushButton                            _buttonZoomIn;
    private PushButton                            _buttonZoomOut;
+   private PushButton                            _buttonUp;
+   private PushButton                            _buttonDown;
+   private PushButton                            _buttonLeft;
+   private PushButton                            _buttonRight;
 
 
    public GPlanarPanoramicViewer(final String url,
@@ -416,7 +424,7 @@ public class GPlanarPanoramicViewer
             setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
             updateZoomLevelFromContainerSize(_currentLevel);
             //recreateTiles();
-            recreateZoomWidtgets(BUTTONEXTEND, BUTTONMARGIN);
+            recreateZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
          }
       });
 
@@ -505,7 +513,7 @@ public class GPlanarPanoramicViewer
                                                  @Override
                                                  public void onTouchStart(final TouchStartEvent event) {
                                                     event.preventDefault();
-
+                                                    _touchMoveCounter = 0;
                                                     final JsArray<Touch> touches = event.getTargetTouches();
                                                     if (touches.length() > 1) {
                                                        _isScaling = true;
@@ -540,7 +548,12 @@ public class GPlanarPanoramicViewer
                                                  @Override
                                                  public void onTouchMove(final TouchMoveEvent event) {
                                                     event.preventDefault();
-
+                                                    // filter because there are too many touch-move events
+                                                    _touchMoveCounter++;
+                                                    if (_touchMoveCounter < MIN_TOUCH_MOVE_EVENTS) {
+                                                       return;
+                                                    }
+                                                    _touchMoveCounter = 0;
                                                     final JsArray<Touch> touches = event.getTargetTouches();
                                                     if (_isScaling) {
                                                        final Touch t0 = touches.get(0);
@@ -553,11 +566,11 @@ public class GPlanarPanoramicViewer
                                                        if (_debug) {
                                                           Window.alert("delta distance: " + distanceDelta);
                                                        }
-                                                       if (distanceDelta > (_referenceScale / 10)) {
+                                                       if (distanceDelta > (_referenceScale / ZOOM_SCALE_DELTA)) {
                                                           _touchesDistance = currentDistance;
                                                           setZoomLevel(_currentLevel + 1);
                                                        }
-                                                       else if (distanceDelta < -(_referenceScale / 10)) {
+                                                       else if (distanceDelta < -(_referenceScale / ZOOM_SCALE_DELTA)) {
                                                           _touchesDistance = currentDistance;
                                                           setZoomLevel(_currentLevel - 1);
                                                        }
@@ -574,14 +587,14 @@ public class GPlanarPanoramicViewer
                                                        }
 
                                                        // to filter spurious offsets
-                                                       if (Math.abs(deltaX) < 6) {
+                                                       if (Math.abs(deltaX) < MIN_OFFSET_DISTANCE) {
                                                           deltaX = 0;
                                                        }
                                                        else {
                                                           _touch0LastXPosition = t.getScreenX();
                                                        }
 
-                                                       if (Math.abs(deltaY) < 6) {
+                                                       if (Math.abs(deltaY) < MIN_OFFSET_DISTANCE) {
                                                           deltaY = 0;
                                                        }
                                                        else {
@@ -748,11 +761,15 @@ public class GPlanarPanoramicViewer
 
 
    private void createHUD() {
-      //      final int buttonExtent = 20;
-      //      final int margin = 2;
       createNavigationButtons(BUTTONEXTEND, BUTTONMARGIN);
       createZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
    }
+
+
+   //   private void recreateHUD() {
+   //      recreateNavigationButtons(BUTTONEXTEND, BUTTONMARGIN);
+   //      recreateZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
+   //   }
 
 
    private void createNavigationButtons(final int buttonExtent,
@@ -763,68 +780,82 @@ public class GPlanarPanoramicViewer
       // up button
       final Image imgUp = new Image("./IMG/go-up.png");
       imgUp.setSize(buttonSize, buttonSize);
-      final PushButton buttonUp = new PushButton(imgUp);
-      buttonUp.addClickHandler(new ClickHandler() {
+      _buttonUp = new PushButton(imgUp);
+      _buttonUp.addClickHandler(new ClickHandler() {
 
          @Override
          public void onClick(final ClickEvent event) {
-            moveUp();
+            event.preventDefault();
             _isDragging = false;
+            moveUp();
          }
       });
-      buttonUp.setSize(buttonSize, buttonSize);
-      DOM.setIntStyleAttribute(buttonUp.getElement(), "zIndex", 101);
-      super.setWidget(buttonUp, margin + buttonExtent, margin + 0);
+      _buttonUp.setSize(buttonSize, buttonSize);
+      DOM.setIntStyleAttribute(_buttonUp.getElement(), "zIndex", 101);
+      super.setWidget(_buttonUp, margin + buttonExtent, margin + 0);
 
       // down button
       final Image imgDown = new Image("./IMG/go-down.png");
       imgDown.setSize(buttonSize, buttonSize);
-      final PushButton buttonDown = new PushButton(imgDown);
-      buttonDown.addClickHandler(new ClickHandler() {
+      _buttonDown = new PushButton(imgDown);
+      _buttonDown.addClickHandler(new ClickHandler() {
 
          @Override
          public void onClick(final ClickEvent event) {
-            moveDown();
+            event.preventDefault();
             _isDragging = false;
+            moveDown();
          }
       });
-      buttonDown.setSize(buttonSize, buttonSize);
-      DOM.setIntStyleAttribute(buttonDown.getElement(), "zIndex", 101);
-      super.setWidget(buttonDown, margin + buttonExtent, margin + (buttonExtent * 2));
+      _buttonDown.setSize(buttonSize, buttonSize);
+      DOM.setIntStyleAttribute(_buttonDown.getElement(), "zIndex", 101);
+      super.setWidget(_buttonDown, margin + buttonExtent, margin + (buttonExtent * 2));
 
       // left button
       final Image imgLeft = new Image("./IMG/go-left.png");
       imgLeft.setSize(buttonSize, buttonSize);
-      final PushButton buttonLeft = new PushButton(imgLeft);
-      buttonLeft.addClickHandler(new ClickHandler() {
+      _buttonLeft = new PushButton(imgLeft);
+      _buttonLeft.addClickHandler(new ClickHandler() {
 
          @Override
          public void onClick(final ClickEvent event) {
-            moveLeft();
+            event.preventDefault();
             _isDragging = false;
+            moveLeft();
          }
       });
-      buttonLeft.setSize(buttonSize, buttonSize);
-      DOM.setIntStyleAttribute(buttonLeft.getElement(), "zIndex", 101);
-      super.setWidget(buttonLeft, margin + 0, margin + buttonExtent);
+      _buttonLeft.setSize(buttonSize, buttonSize);
+      DOM.setIntStyleAttribute(_buttonLeft.getElement(), "zIndex", 101);
+      super.setWidget(_buttonLeft, margin + 0, margin + buttonExtent);
 
       // right button
       final Image imgRight = new Image("./IMG/go-right.png");
       imgRight.setSize(buttonSize, buttonSize);
-      final PushButton buttonRight = new PushButton(imgRight);
-      buttonRight.addClickHandler(new ClickHandler() {
+      _buttonRight = new PushButton(imgRight);
+      _buttonRight.addClickHandler(new ClickHandler() {
 
          @Override
          public void onClick(final ClickEvent event) {
-            moveRight();
+            event.preventDefault();
             _isDragging = false;
+            moveRight();
          }
       });
-      buttonRight.setSize(buttonSize, buttonSize);
-      DOM.setIntStyleAttribute(buttonRight.getElement(), "zIndex", 101);
-      super.setWidget(buttonRight, margin + (buttonExtent * 2), margin + buttonExtent);
+      _buttonRight.setSize(buttonSize, buttonSize);
+      DOM.setIntStyleAttribute(_buttonRight.getElement(), "zIndex", 101);
+      super.setWidget(_buttonRight, margin + (buttonExtent * 2), margin + buttonExtent);
 
    }
+
+
+   //   private void recreateNavigationButtons(final int buttonExtent,
+   //                                          final int margin) {
+   //
+   //      super.setWidget(_buttonUp, margin + buttonExtent, margin + 0);
+   //      super.setWidget(_buttonDown, margin + buttonExtent, margin + (buttonExtent * 2));
+   //      super.setWidget(_buttonLeft, margin + 0, margin + buttonExtent);
+   //      super.setWidget(_buttonRight, margin + (buttonExtent * 2), margin + buttonExtent);
+   //   }
 
 
    private String asCssString(final int value) {
@@ -846,8 +877,9 @@ public class GPlanarPanoramicViewer
 
          @Override
          public void onClick(final ClickEvent event) {
-            setZoomLevel(_currentLevel + 1);
+            event.preventDefault();
             _isDragging = false;
+            setZoomLevel(_currentLevel + 1);
          }
       });
       _buttonZoomIn.setSize(buttonSize, buttonSize);
@@ -863,8 +895,9 @@ public class GPlanarPanoramicViewer
 
          @Override
          public void onClick(final ClickEvent event) {
-            setZoomLevel(_currentLevel - 1);
+            event.preventDefault();
             _isDragging = false;
+            setZoomLevel(_currentLevel - 1);
          }
       });
       _buttonZoomOut.setSize(buttonSize, buttonSize);
@@ -874,8 +907,8 @@ public class GPlanarPanoramicViewer
    }
 
 
-   private void recreateZoomWidtgets(final int buttonExtent,
-                                     final int margin) {
+   private void recreateZoomWidgets(final int buttonExtent,
+                                    final int margin) {
 
       final int rightPosition = getContainerSize().getWidth() - (buttonExtent) - margin;
 
@@ -958,10 +991,6 @@ public class GPlanarPanoramicViewer
       }
 
       _tiles.addAll(tilesToCreate);
-
-      //to force redraw 
-      super.clear();
-      createHUD();
    }
 
 
@@ -1030,13 +1059,7 @@ public class GPlanarPanoramicViewer
       if (_debug) {
          System.out.println("Posicionando..");
       }
-
       layoutTiles();
-
-      // force redraw
-      //      container.invalidate();
-      //      container.doLayout();
-      //      container.repaint();
    }
 
 
@@ -1048,8 +1071,9 @@ public class GPlanarPanoramicViewer
 
 
    private void layoutTiles() {
-      //      super.clear();
-      //      createHUD();
+      //super.clear();
+      clearTiles();
+      //createHUD();
       for (final Tile tile : _tiles) {
          tile.positionate();
       }
@@ -1081,8 +1105,14 @@ public class GPlanarPanoramicViewer
       for (final Tile tile : _tiles) {
          tile.remove();
       }
-      //super.clear();
       _tiles.clear();
+   }
+
+
+   private void clearTiles() {
+      for (final Tile tile : _tiles) {
+         tile.remove();
+      }
    }
 
 

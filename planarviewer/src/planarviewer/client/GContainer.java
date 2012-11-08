@@ -27,7 +27,6 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.AbsolutePanel;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 
@@ -43,7 +42,7 @@ public class GContainer
 
    private final AbsolutePanel _panel    = new AbsolutePanel();
    //private final AbsolutePanel _controlPanel = new AbsolutePanel();
-   private final SimplePanel   _topPanel = new SimplePanel();
+   private final AbsolutePanel _topPanel = new AbsolutePanel();
 
 
    public GContainer() {
@@ -110,6 +109,7 @@ public class GContainer
                          final int top) {
       //_controlPanel.add(widget, left, top);
       _panel.add(widget, left, top);
+      //_topPanel.add(widget, left, top);
    }
 
 
