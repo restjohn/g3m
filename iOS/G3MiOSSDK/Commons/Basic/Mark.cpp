@@ -177,3 +177,8 @@ Vector2I Mark::getTextureExtent() const {
 //  return (_textureImage == NULL) ? Vector2I::zero() : _textureImage->getExtent();
   return Vector2I(_textureWidth, _textureHeight);
 }
+
+
+void Mark::setUserData(void* userData){
+    _userData = userData;
+}

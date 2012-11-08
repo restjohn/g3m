@@ -31,6 +31,7 @@ public class Mark
   private final String _name;
   private URL _textureURL = new URL();
   private final Geodetic3D _position ;
+  private Object _userData;
 
   private IGLTextureId _textureId;
 
@@ -71,9 +72,16 @@ public class Mark
 
   public Mark(String name, URL textureURL, Geodetic3D position)
   {
+	  this(name, textureURL, position, null);
+  }
+//C++ TO JAVA CONVERTER NOTE: Java does not allow default values for parameters. Overloaded methods are inserted above.
+//ORIGINAL LINE: Mark(const String name, const URL textureURL, const Geodetic3D position, Object* userData=null) : _name(name), _textureURL(textureURL), _position(position), _userData(userData), _textureId(null), _cartesianPosition(null), _vertices(null), _textureSolved(false), _textureImage(null), _renderedMark(false), _textureWidth(0), _textureHeight(0)
+  public Mark(String name, URL textureURL, Geodetic3D position, Object userData)
+  {
 	  _name = name;
 	  _textureURL = new URL(textureURL);
 	  _position = new Geodetic3D(position);
+	  _userData = userData;
 	  _textureId = null;
 	  _cartesianPosition = null;
 	  _vertices = null;
@@ -227,6 +235,18 @@ public class Mark
   {
   //  return (_textureImage == NULL) ? Vector2I::zero() : _textureImage->getExtent();
 	return new Vector2I(_textureWidth, _textureHeight);
+  }
+
+//C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in Java:
+//ORIGINAL LINE: const Object* getUserData() const
+  public final Object getUserData()
+  {
+		return _userData;
+  }
+
+  public final void setUserData(Object userData)
+  {
+	  _userData = userData;
   }
 
 }
