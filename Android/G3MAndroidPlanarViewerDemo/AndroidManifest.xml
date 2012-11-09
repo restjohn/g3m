@@ -16,14 +16,19 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".PlanarVActivity"
+            android:name=".G3MAndroidDemoActivity"
             android:label="@string/title_activity_planar_v" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
         </activity>
+        <activity
+            android:name=".PlanarViewerActivity"
+            android:label="@string/title_activity_planar_viewer_webview" >
+        </activity>
+        
     </application>
 
 </manifest>

@@ -5,16 +5,17 @@ package org.glob3.mobile.specific;
 import org.glob3.mobile.generated.URL;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.os.Bundle;
 import android.util.Log;
-import android.webkit.JsResult;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
 public class Browser_Android {
 
-   //private final Activity _activity;
-   private final WebView _webView;
+   private Activity _activity;
+   private WebView  _webView;
 
 
    //public Browser_Android(final Activity activity) {
@@ -23,6 +24,20 @@ public class Browser_Android {
       _webView = webView;
       //      _webView = new WebView(_activity.getApplicationContext());
       //      _activity.setContentView(_webView);
+   }
+
+
+   public Browser_Android(final Activity activity) {
+      _activity = activity;
+      _webView = new WebView(_activity);
+      _activity.setContentView(_webView);
+   }
+
+
+   public void openInBrowser(final String targetUrl) {
+
+      final URL url = new URL(targetUrl, false);
+      openInBrowser(url);
    }
 
 
@@ -44,19 +59,28 @@ public class Browser_Android {
       //_webView.getSettings().setUseWideViewPort(true);
 
       //      _webView.setWebViewClient(new WebViewClient());
-      _webView.setWebChromeClient(new WebChromeClient() {
+      //      _webView.setWebChromeClient(new WebChromeClient() {
+      //         @Override
+      //         public boolean onJsAlert(final WebView view,
+      //                                  final String url,
+      //                                  final String message,
+      //                                  final JsResult result) {
+      //            return super.onJsAlert(view, url, message, result);
+      //         }
+      //      });
+
+      _webView.setWebViewClient(new WebViewClient() {
+
          @Override
-         public boolean onJsAlert(final WebView view,
-                                  final String url,
-                                  final String message,
-                                  final JsResult result) {
-            return super.onJsAlert(view, url, message, result);
+         public boolean shouldOverrideUrlLoading(final WebView view,
+                                                 final String url) {
+            view.loadUrl(url);
+            return true;
          }
       });
 
       Log.v("Opening url: ", targetUrl.getPath());
       _webView.loadUrl(targetUrl.getPath());
-
    }
 
    //   public Browser_Android(final Activity activity) {
@@ -76,4 +100,17 @@ public class Browser_Android {
    //      _activity.startActivity(intent);
    //
    //   }
+
+   private class ViewerActivity
+            extends
+               Activity {
+
+      @Override
+      public void onCreate(final Bundle savedInstanceState) {
+         super.onCreate(savedInstanceState);
+         _webView = new WebView(this);
+         setContentView(_webView);
+      }
+
+   }
 }
