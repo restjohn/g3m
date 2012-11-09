@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, G3MAndroidDemoActivity!</string>
     <string name="app_name">G3MAndroidDemo</string>
+    <string name="title_activity_planar_viewer_webview">PlanarViewerActivity</string>
 
 </resources>

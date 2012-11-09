@@ -2,6 +2,8 @@
 
 package org.glob3.mobile.demo;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -24,18 +26,52 @@ import org.glob3.mobile.generated.URL;
 import org.glob3.mobile.generated.UserData;
 import org.glob3.mobile.generated.WMSLayer;
 import org.glob3.mobile.generated.WMSServerVersion;
-import org.glob3.mobile.specific.G3MBaseActivity;
 import org.glob3.mobile.specific.G3MWidget_Android;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.os.Bundle;
 
 
 public class G3MAndroidDemoActivity
          extends
-            G3MBaseActivity {
+            Activity {
+
+   private G3MWidget_Android _g3mWidget = null;
+
 
    @Override
-   protected void initializeWidget(final G3MWidget_Android widget) {
+   public void onCreate(final Bundle savedInstanceState) {
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.activity_globe_demo);
+
+
+      //Widget inicialization, need to refactoring
+      if (_g3mWidget == null) { //Just the first time
+         _g3mWidget = (G3MWidget_Android) findViewById(R.id.g3mWidget);
+
+         //GUI
+         //initializeInfoPanel();
+         //initializeToolbar();
+
+         initializeWidget(_g3mWidget);
+      }
+   }
+
+
+   @Override
+   protected void onDestroy() {
+      super.onDestroy();
+      //needed to close SQLlite for the cache storage
+      _g3mWidget.closeStorage();
+   }
+
+
+   private void initializeWidget(final G3MWidget_Android widget) {
+
+      //_g3mWidget = widget;
+
       final LayerSet layerSet = new LayerSet();
 
       final boolean useBing = false;
@@ -137,6 +173,7 @@ public class G3MAndroidDemoActivity
       if (useMarkers) {
          final boolean readyWhenMarksReady = false;
          final MarksRenderer marksRenderer = new MarksRenderer(readyWhenMarksReady);
+         final MarksRenderer panoMarksRenderer = new MarksRenderer(readyWhenMarksReady);
 
          marksRenderer.setMarkTouchListener(new MarkTouchListener() {
             @Override
@@ -157,7 +194,26 @@ public class G3MAndroidDemoActivity
             }
          }, true);
 
+         panoMarksRenderer.setMarkTouchListener(new MarkTouchListener() {
+            @Override
+            public boolean touchedMark(final Mark mark) {
+               G3MAndroidDemoActivity.this.runOnUiThread(new Runnable() {
+                  @Override
+                  public void run() {
+
+                     final String url = (String) mark.getUserData();
+                     final Intent intent = new Intent(getApplicationContext(), PlanarViewerActivity.class);
+                     intent.putExtra("markUrl", url);
+                     G3MAndroidDemoActivity.this.startActivity(intent);
+                  }
+               });
+
+               return true;
+            }
+         }, true);
+
          renderers.add(marksRenderer);
+         renderers.add(panoMarksRenderer);
 
          final Mark m1 = new Mark(//
                   "Fuerteventura", //
@@ -185,6 +241,22 @@ public class G3MAndroidDemoActivity
 
             }
          }
+
+         //-- add markers for planar panoramics --------------------
+         URL panoUrl = null;
+         try {
+            panoUrl = new URL("file:///android_asset/www/planarpanoramic.html?url="
+                              + URLEncoder.encode("http://192.168.1.20/caminomontana", "UTF-8"), false);
+            final Mark pano1 = new Mark( //
+                     "caminomontana", //
+                     new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
+                     new Geodetic3D(Angle.fromDegrees(39.49), Angle.fromDegrees(-6.32), 0), panoUrl.getPath());
+            panoMarksRenderer.addMark(pano1);
+         }
+         catch (final UnsupportedEncodingException e) {
+            e.printStackTrace();
+         }
+         //---------------------------------------------------------
 
       }
 
