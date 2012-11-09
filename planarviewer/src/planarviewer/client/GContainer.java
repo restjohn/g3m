@@ -49,6 +49,7 @@ public class GContainer
       super();
       initWidget(_panel);
       //DOM.setIntStyleAttribute(_controlPanel.getElement(), "zIndex", 49);
+      DOM.setIntStyleAttribute(_panel.getElement(), "border", 0);
       DOM.setIntStyleAttribute(_topPanel.getElement(), "zIndex", 50);
       //setWidget(_topPanel, 0, 0);
       //_panel.add(_controlPanel, 0, 0);

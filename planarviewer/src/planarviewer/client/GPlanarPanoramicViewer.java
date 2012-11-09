@@ -135,7 +135,6 @@ public class GPlanarPanoramicViewer
          //_removeWhileLoading = false;
          if (GImageLoader.isDownloadingImage(_tileUrl)) {
             _removeWhileLoading = false;
-            System.out.println("Ya pedida: " + tileToString());
             return;
          }
          //final GRectangle bounds = calculateBounds();
@@ -241,7 +240,6 @@ public class GPlanarPanoramicViewer
             }
          }
          if (GImageLoader.isDownloadingImage(_tileUrl)) {
-            System.out.println("Borrando mientras: " + tileToString());
             _removeWhileLoading = true;
          }
       }
@@ -300,7 +298,6 @@ public class GPlanarPanoramicViewer
             else {
                if (_removeWhileLoading) {
                   _removeWhileLoading = false;
-                  System.out.println("Tirando: " + tileToString());
                   return;
                }
                //_image = new GImage(_tileUrl);
@@ -969,7 +966,6 @@ public class GPlanarPanoramicViewer
    }
 
 
-   //TODO
    private void updateTilesGrid() {
 
       removeNotVisibleTiles();
