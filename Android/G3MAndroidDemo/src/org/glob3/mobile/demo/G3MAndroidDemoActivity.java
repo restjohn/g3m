@@ -2,8 +2,6 @@
 
 package org.glob3.mobile.demo;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -243,27 +241,21 @@ public class G3MAndroidDemoActivity
          }
 
          //-- add markers for planar panoramics --------------------
-         URL panoUrl = null;
-         try {
-            panoUrl = new URL("file:///android_asset/www/planarpanoramic.html?url="
-                              + URLEncoder.encode("http://glob3m.glob3mobile.com/panos/esmeralda2", "UTF-8"), false);
-            final Mark pano1 = new Mark( //
-                     "esmeralda2", //
-                     new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
-                     new Geodetic3D(Angle.fromDegrees(39.4348), Angle.fromDegrees(-6.3938), 0), panoUrl.getPath());
-            panoMarksRenderer.addMark(pano1);
+         final Mark pano1 = new Mark(
+                  //
+                  "esmeralda2", //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
+                  new Geodetic3D(Angle.fromDegrees(39.4348), Angle.fromDegrees(-6.3938), 0),
+                  "http://glob3m.glob3mobile.com/panos/esmeralda2");
+         panoMarksRenderer.addMark(pano1);
 
-            panoUrl = new URL("file:///android_asset/www/planarpanoramic.html?url="
-                              + URLEncoder.encode("http://glob3m.glob3mobile.com/panos/lospinos2", "UTF-8"), false);
-            final Mark pano2 = new Mark( //
-                     "lospinos2", //
-                     new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
-                     new Geodetic3D(Angle.fromDegrees(39.4569), Angle.fromDegrees(-6.3892), 0), panoUrl.getPath());
-            panoMarksRenderer.addMark(pano2);
-         }
-         catch (final UnsupportedEncodingException e) {
-            e.printStackTrace();
-         }
+         final Mark pano2 = new Mark(
+                  //
+                  "lospinos2", //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
+                  new Geodetic3D(Angle.fromDegrees(39.4569), Angle.fromDegrees(-6.3892), 0),
+                  "http://glob3m.glob3mobile.com/panos/lospinos2");
+         panoMarksRenderer.addMark(pano2);
          //---------------------------------------------------------
 
       }

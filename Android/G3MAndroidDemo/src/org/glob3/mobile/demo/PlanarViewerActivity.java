@@ -2,6 +2,9 @@
 
 package org.glob3.mobile.demo;
 
+import java.net.URLEncoder;
+
+import org.glob3.mobile.generated.URL;
 import org.glob3.mobile.specific.Browser_Android;
 
 import android.app.Activity;
@@ -18,11 +21,12 @@ public class PlanarViewerActivity
    public void onCreate(final Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_planar_viewer_webview);
-      final String markUrl = getIntent().getStringExtra("markUrl");
       final WebView webView = (WebView) findViewById(R.id.webView);
+      final String markUrl = getIntent().getStringExtra("markUrl");
+      final URL url = new URL("file:///android_asset/www/planarpanoramic.html?url=" + URLEncoder.encode(markUrl), false);
 
       final Browser_Android ba = new Browser_Android(webView);
-      ba.openInBrowser(markUrl);
+      ba.openInBrowser(url);
    }
 
 
