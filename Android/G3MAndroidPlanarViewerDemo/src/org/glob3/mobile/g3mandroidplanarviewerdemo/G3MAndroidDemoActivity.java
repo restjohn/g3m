@@ -171,15 +171,13 @@ public class G3MAndroidDemoActivity
                   public void run() {
 
                      final String url = (String) mark.getUserData();
-
+                     final Intent intent = new Intent(getApplicationContext(), PlanarViewerActivity.class);
+                     intent.putExtra("markUrl", url);
+                     G3MAndroidDemoActivity.this.startActivity(intent);
                      //                     final WebView wv = new WebView(G3MAndroidDemoActivity.this);
                      //                     setContentView(wv);
                      //                     final Browser_Android ba = new Browser_Android(wv);
                      //                     ba.openInBrowser(url);
-
-                     final Intent intent = new Intent(getApplicationContext(), PlanarViewerActivity.class);
-                     intent.putExtra("markUrl", url);
-                     G3MAndroidDemoActivity.this.startActivity(intent);
                   }
                });
 

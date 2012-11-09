@@ -6,24 +6,18 @@ import org.glob3.mobile.generated.URL;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 
 public class Browser_Android {
 
-   private Activity _activity;
-   private WebView  _webView;
+   private Activity      _activity;
+   private final WebView _webView;
 
 
-   //public Browser_Android(final Activity activity) {
    public Browser_Android(final WebView webView) {
-      //_activity = activity;
       _webView = webView;
-      //      _webView = new WebView(_activity.getApplicationContext());
-      //      _activity.setContentView(_webView);
    }
 
 
@@ -47,15 +41,14 @@ public class Browser_Android {
       _webView.getSettings().setAllowFileAccess(true);
       _webView.getSettings().setJavaScriptEnabled(true);
       _webView.getSettings().setAppCacheEnabled(true);
-      //_webView.setAlwaysDrawnWithCacheEnabled(true);
       _webView.setClickable(true);
-      //      _webView.getSettings().setDomStorageEnabled(true);
-      //      _webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-
+      _webView.getSettings().setLightTouchEnabled(true);
+      //_webView.setAlwaysDrawnWithCacheEnabled(true);
+      //_webView.getSettings().setDomStorageEnabled(true);
+      //_webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
       //_webView.setLongClickable(false);
       //_webView.getSettings().setSupportZoom(true);
       //_webView.getSettings().setBuiltInZoomControls(true);
-      _webView.getSettings().setLightTouchEnabled(true);
       //_webView.getSettings().setUseWideViewPort(true);
 
       //      _webView.setWebViewClient(new WebViewClient());
@@ -69,25 +62,20 @@ public class Browser_Android {
       //         }
       //      });
 
-      _webView.setWebViewClient(new WebViewClient() {
-
-         @Override
-         public boolean shouldOverrideUrlLoading(final WebView view,
-                                                 final String url) {
-            view.loadUrl(url);
-            return true;
-         }
-      });
+      //      _webView.setWebViewClient(new WebViewClient() {
+      //
+      //         @Override
+      //         public boolean shouldOverrideUrlLoading(final WebView view,
+      //                                                 final String url) {
+      //            view.loadUrl(url);
+      //            return true;
+      //         }
+      //      });
 
       Log.v("Opening url: ", targetUrl.getPath());
       _webView.loadUrl(targetUrl.getPath());
    }
 
-   //   public Browser_Android(final Activity activity) {
-   //      _activity = activity;
-   //   }
-   //
-   //
    //   public void openInBrowser(final URL url) {
    //
    //
@@ -101,16 +89,4 @@ public class Browser_Android {
    //
    //   }
 
-   private class ViewerActivity
-            extends
-               Activity {
-
-      @Override
-      public void onCreate(final Bundle savedInstanceState) {
-         super.onCreate(savedInstanceState);
-         _webView = new WebView(this);
-         setContentView(_webView);
-      }
-
-   }
 }
