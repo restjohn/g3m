@@ -155,12 +155,27 @@ public class G3MWebGLDemo
          // marks renderer
          final boolean readyWhenMarksReady = false;
          final MarksRenderer marksRenderer = new MarksRenderer(readyWhenMarksReady);
+         final MarksRenderer panoMarksRenderer = new MarksRenderer(readyWhenMarksReady);
          renderers.add(marksRenderer);
+         renderers.add(panoMarksRenderer);
 
          marksRenderer.setMarkTouchListener(new MarkTouchListener() {
             @Override
             public boolean touchedMark(final Mark mark) {
                Window.alert("Touched on mark: " + mark.getName());
+               return true;
+            }
+         }, true);
+
+         panoMarksRenderer.setMarkTouchListener(new MarkTouchListener() {
+            @Override
+            public boolean touchedMark(final Mark mark) {
+               final String markUrl = (String) mark.getUserData();
+
+               final String url = "http://glob3m.glob3mobile.com/panos/planarviewer/planarpanoramic.html?url="
+                                  + com.google.gwt.http.client.URL.encode(markUrl);
+
+               Window.open(url, mark.getName(), "");
                return true;
             }
          }, true);
@@ -194,6 +209,22 @@ public class G3MWebGLDemo
                         new Geodetic3D(latitude, longitude, 0)));
             }
          }
+
+         //-- add markers for planar panoramics --------------------
+         final Mark pano1 = new Mark( //
+                  "esmeralda2", //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
+                  new Geodetic3D(Angle.fromDegrees(39.4348), Angle.fromDegrees(-6.3938), 0), //
+                  "http://glob3m.glob3mobile.com/panos/esmeralda2");
+         panoMarksRenderer.addMark(pano1);
+
+         final Mark pano2 = new Mark( //
+                  "lospinos2", //
+                  new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
+                  new Geodetic3D(Angle.fromDegrees(39.4569), Angle.fromDegrees(-6.3892), 0), //
+                  "http://glob3m.glob3mobile.com/panos/lospinos2");
+         panoMarksRenderer.addMark(pano2);
+         //---------------------------------------------------------
 
       }
 

@@ -52,3 +52,10 @@ planarviewer/gwt-unitCache/
 planarviewer/war/WEB-INF/
 planarviewer/war/planarviewer.planarviewer/
 
+WebGL/G3MWebGLPlanarViewerDemo/.gwt/
+WebGL/G3MWebGLPlanarViewerDemo/gwt-unitCache/
+WebGL/G3MWebGLPlanarViewerDemo/war/org.glob3.mobile.G3MWebGLDemo/
+WebGL/G3MWebGLPlanarViewerDemo/war/WEB-INF/classes/
+WebGL/G3MWebGLPlanarViewerDemo/war/WEB-INF/deploy/
+
+
