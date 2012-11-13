@@ -228,10 +228,11 @@ public class G3MAndroidDemoActivity
 
             panoUrl = new URL("file:///android_asset/www/planarpanoramic.html?url="
                               + URLEncoder.encode("http://glob3m.glob3mobile.com/panos/esmeralda2", "UTF-8"), false);
-            final Mark pano1 = new Mark( //
+            final Mark pano1 = new Mark(//
                      "esmeralda2", //
                      new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
-                     new Geodetic3D(Angle.fromDegrees(39.4348), Angle.fromDegrees(-6.3938), 0), panoUrl.getPath());
+                     new Geodetic3D(Angle.fromDegrees(39.4348), Angle.fromDegrees(-6.3938), 0), //
+                     panoUrl.getPath());
             panoMarksRenderer.addMark(pano1);
 
             panoUrl = new URL("file:///android_asset/www/planarpanoramic.html?url="
@@ -239,7 +240,8 @@ public class G3MAndroidDemoActivity
             final Mark pano2 = new Mark( //
                      "lospinos2", //
                      new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
-                     new Geodetic3D(Angle.fromDegrees(39.4569), Angle.fromDegrees(-6.3892), 0), panoUrl.getPath());
+                     new Geodetic3D(Angle.fromDegrees(39.4569), Angle.fromDegrees(-6.3892), 0), //
+                     panoUrl.getPath());
             panoMarksRenderer.addMark(pano2);
          }
          catch (final UnsupportedEncodingException e) {
