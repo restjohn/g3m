@@ -3,6 +3,7 @@
 package planarviewer.client;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -15,14 +16,15 @@ public class GPlanarViewerEntryPoint
    public void onModuleLoad() {
 
       final String imgUrl = Location.getParameter("url");
+      final String[] splitedUrl = imgUrl.split("/");
+      final String name = splitedUrl[splitedUrl.length - 1];
       //System.out.println("url=" + imgUrl);
-      //ExporterUtil.exportAll();
-
-      System.out.println("> Arrancando panoramica..");
+      //System.out.println("> Arrancando panoramica..");
+      GWT.log("Starting panoramic viewer..");
 
       //final String imgUrl = "./IMG/caminomontana";
 
-      final GPlanarPanoramicViewer viewer = new GPlanarPanoramicViewer(imgUrl, "caminomontana", false);
+      final GPlanarPanoramicViewer viewer = new GPlanarPanoramicViewer(imgUrl, name, false);
       RootPanel.get().add(viewer);
 
    }
