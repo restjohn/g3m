@@ -178,7 +178,7 @@ public class G3MWebGLDemo
                final String url = "http://glob3m.glob3mobile.com/panos/planarviewer/planarpanoramic.html?url="
                                   + com.google.gwt.http.client.URL.encode(markUrl);
 
-               Window.open(url, mark.getName(), "");
+               Window.open(url, "_blank", "");
                return true;
             }
          }, true);
