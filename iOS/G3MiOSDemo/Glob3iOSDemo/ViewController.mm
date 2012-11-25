@@ -27,10 +27,44 @@
 //#include "CompositeShape.hpp"
 #include "SceneJSShapesParser.hpp"
 #include "G3MWidget.hpp"
+#include "StringUtils_iOS.hpp"
+
+//-----------------------------------
+@implementation NSURL (Additions)
+
+- (NSURL *)URLByAppendingQueryString:(NSString *)queryString {
+    if (![queryString length]) {
+        return self;
+    }
+    
+    NSString *URLString = [[NSString alloc] initWithFormat:@"%@%@%@", [self absoluteString],
+                           [self query] ? @"&" : @"?", queryString];
+    NSURL *theURL = [NSURL URLWithString:URLString];
+    //[URLString release];
+    return theURL;
+}
+
+@end
+
+
+@implementation NSString (Additions)
+
+-(NSString *)urlEncodeUsingEncoding {
+	return (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL,
+                                                                                 (CFStringRef)self,
+                                                                                 NULL,
+                                                                                 (CFStringRef)@"!*'\"();:@&=+$,/?%#[]% ",
+                                                                                 kCFStringEncodingUTF8));
+}
+
+@end
+//-----------------------------------
 
 @implementation ViewController
 
 @synthesize G3MWidget;
+
+id _thisInstance;
 
 - (void)didReceiveMemoryWarning
 {
@@ -49,6 +83,28 @@
   [self initWidgetDemo];
 
   [[self G3MWidget] startAnimation];
+    
+    _thisInstance = self;
+}
+
+- (void)loadUIWebView: (NSString*) urlString
+{
+    CGRect webFrame = [[UIScreen mainScreen] applicationFrame];
+    //UIWebView *webView = [[UIWebView alloc] initWithFrame:self.view.bounds];
+    UIWebView *webView = [[UIWebView alloc] initWithFrame:webFrame];
+    
+    NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"planarpanoramic" ofType:@"html" inDirectory:@"www"]];
+    NSString* encodedString = [urlString urlEncodeUsingEncoding];
+    NSString* requestString = [@"url=" stringByAppendingString: encodedString];
+    NSLog(@"REQUEST STRING: %@",requestString);
+    url = [url URLByAppendingQueryString:requestString];
+    //NSURL* urlPrueba = [NSURL URLWithString:@"http://www.google.com"];
+    NSLog(@"URL DESCRIPTION: %@",url.debugDescription);
+    //NSLog(@"URL RELATIVE STRING: %@", url.relativeString);
+    //NSLog(@"URL RELATIVE PATH: %@", url.relativePath);
+    [webView loadRequest:[NSURLRequest requestWithURL:url]];
+    [self.view addSubview:webView];
+    //[webView release];
 }
 
 - (void) initWidgetDemo
@@ -217,6 +273,37 @@
       }
     };
 
+            
+      class PanoMarkTouchListener : public MarkTouchListener {
+      public:
+          bool touchedMark(Mark* mark) {
+              
+              URL* panoUrl = (URL*) (mark->getUserData());
+
+              //NSLog(@"antes de convertir OK");
+              NSString* urlString = [ NSString stringWithCString: panoUrl->getPath().c_str()
+                                                   encoding: NSUTF8StringEncoding ];
+              
+              NSLog(@"PANO STRING %@",urlString);
+                            CGRect webFrame = [[UIScreen mainScreen] applicationFrame];
+//              NSLog(@"create webFrame");
+//              UIWebView* webView = [[UIWebView alloc] initWithFrame:webFrame];
+//              NSLog(@"create webView");
+//              
+//              NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"planarpanoramic" ofType:@"html" inDirectory:@"www"]];
+//              NSString* encodedString = [urlString urlEncodeUsingEncoding];
+//              NSString* requestString = [@"url=" stringByAppendingString: encodedString];
+//              url = [url URLByAppendingQueryString:requestString];
+//              //NSLog(url.debugDescription);
+//              [webView loadRequest:[NSURLRequest requestWithURL:url]];
+//              [self.view addSubview:webView];
+
+              [_thisInstance loadUIWebView: urlString];
+              return true;
+          }
+      };
+
+
 
     // marks renderer
     const bool readyWhenMarksReady = false;
@@ -224,6 +311,11 @@
     renderers.push_back(marksRenderer);
 
     marksRenderer->setMarkTouchListener(new TestMarkTouchListener(), true);
+    
+    MarksRenderer* panoMarksRenderer = new MarksRenderer(readyWhenMarksReady);
+    renderers.push_back(panoMarksRenderer);
+      
+    panoMarksRenderer->setMarkTouchListener(new PanoMarkTouchListener(), true);
 
     Mark* m1 = new Mark("Fuerteventura",
                         URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
@@ -246,6 +338,23 @@
                                         Geodetic3D(latitude, longitude, 0)));
       }
     }
+    
+    //-- add markers for planar panoramics --------------------
+     
+    //URL* pano1Url = new URL("http://glob3m.glob3mobile.com/panos/esmeralda2", false);
+    Mark* pano1 = new Mark("esmeralda2",
+                           URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                           Geodetic3D(Angle::fromDegrees(39.4348), Angle::fromDegrees(-6.3938), 0), new URL("http://glob3m.glob3mobile.com/panos/esmeralda2", false));
+    panoMarksRenderer->addMark(pano1);
+      
+    //URL* pano2Url = new URL("http://glob3m.glob3mobile.com/panos/lospinos2", false);
+    Mark* pano2 = new Mark("lospinos2",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4569), Angle::fromDegrees(-6.3892), 0), new URL("http://glob3m.glob3mobile.com/panos/lospinos2", false));
+    panoMarksRenderer->addMark(pano2);
+    //---------------------------------------------------------
+    
+    
   }
 
 //  if (true) {
@@ -432,3 +541,5 @@
 }
 
 @end
+
+
