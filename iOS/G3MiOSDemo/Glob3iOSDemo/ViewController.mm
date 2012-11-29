@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "PlanarViewerController.h"
 
 #include "LayerSet.hpp"
 #include "WMSLayer.hpp"
@@ -39,9 +40,7 @@
     
     NSString *URLString = [[NSString alloc] initWithFormat:@"%@%@%@", [self absoluteString],
                            [self query] ? @"&" : @"?", queryString];
-    NSURL *theURL = [NSURL URLWithString:URLString];
-    //[URLString release];
-    return theURL;
+    return [NSURL URLWithString:URLString];
 }
 
 @end
@@ -84,7 +83,7 @@ id _thisInstance;
 
   [[self G3MWidget] startAnimation];
     
-    _thisInstance = self;
+  _thisInstance = self;
 }
 
 - (void)loadUIWebView: (NSString*) urlString
@@ -96,16 +95,29 @@ id _thisInstance;
     NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"planarpanoramic" ofType:@"html" inDirectory:@"www"]];
     NSString* encodedString = [urlString urlEncodeUsingEncoding];
     NSString* requestString = [@"url=" stringByAppendingString: encodedString];
-    NSLog(@"REQUEST STRING: %@",requestString);
+    NSLog(@"ENCONDED URL: %@",requestString);
     url = [url URLByAppendingQueryString:requestString];
-    //NSURL* urlPrueba = [NSURL URLWithString:@"http://www.google.com"];
-    NSLog(@"URL DESCRIPTION: %@",url.debugDescription);
-    //NSLog(@"URL RELATIVE STRING: %@", url.relativeString);
-    //NSLog(@"URL RELATIVE PATH: %@", url.relativePath);
+    //NSLog(@"URL DESCRIPTION: %@",url.debugDescription);
     [webView loadRequest:[NSURLRequest requestWithURL:url]];
     [self.view addSubview:webView];
     //[webView release];
 }
+
+- (NSURL*) buildEncodedURL: (NSString*) urlString
+{
+    NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"planarpanoramic" ofType:@"html" inDirectory:@"www"]];
+    NSString* encodedString = [urlString urlEncodeUsingEncoding];
+    NSString* requestString = [@"url=" stringByAppendingString: encodedString];
+    
+    return [url URLByAppendingQueryString:requestString];
+}
+
+- (PlanarViewerController*) getPlanarViewerController
+{
+    UIStoryboard *storyboard = self.storyboard;
+    return[storyboard instantiateViewControllerWithIdentifier:@"PlanarViewerController"];
+}
+    
 
 - (void) initWidgetDemo
 {
@@ -280,25 +292,16 @@ id _thisInstance;
               
               URL* panoUrl = (URL*) (mark->getUserData());
 
-              //NSLog(@"antes de convertir OK");
               NSString* urlString = [ NSString stringWithCString: panoUrl->getPath().c_str()
                                                    encoding: NSUTF8StringEncoding ];
+              //NSLog(@"PANO STRING %@",urlString);
+              NSURL *url = [_thisInstance buildEncodedURL:urlString];
               
-              NSLog(@"PANO STRING %@",urlString);
-                            CGRect webFrame = [[UIScreen mainScreen] applicationFrame];
-//              NSLog(@"create webFrame");
-//              UIWebView* webView = [[UIWebView alloc] initWithFrame:webFrame];
-//              NSLog(@"create webView");
-//              
-//              NSURL *url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"planarpanoramic" ofType:@"html" inDirectory:@"www"]];
-//              NSString* encodedString = [urlString urlEncodeUsingEncoding];
-//              NSString* requestString = [@"url=" stringByAppendingString: encodedString];
-//              url = [url URLByAppendingQueryString:requestString];
-//              //NSLog(url.debugDescription);
-//              [webView loadRequest:[NSURLRequest requestWithURL:url]];
-//              [self.view addSubview:webView];
+              PlanarViewerController *vc = [_thisInstance getPlanarViewerController];
+              [_thisInstance presentModalViewController:vc animated:NO];
+              [vc loadPlanarViewerWebView:url];
 
-              [_thisInstance loadUIWebView: urlString];
+              //[_thisInstance loadUIWebView: urlString];
               return true;
           }
       };
