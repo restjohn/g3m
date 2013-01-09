@@ -669,39 +669,43 @@ public class GPlanarPanoramicViewer
             try {
                final int responseCode = response.getStatusCode() / 100;
                if (_url.startsWith("file:/") || (responseCode == 2)) {
+                  //System.out.println("Response= " + response.getText());
                   final JSONValue values = JSONParser.parseLenient(response.getText());
                   if (values != null) {
-                     final JSONArray valuesList = values.isArray();
-                     for (int i = 0; i < valuesList.size(); i++) {
-                        final JSONObject data = valuesList.get(i).isObject();
-                        final GPlanarPanoramicZoomLevel level = new GPlanarPanoramicZoomLevel(
-                                 (int) data.get("level").isNumber().doubleValue(),
-                                 (int) data.get("width").isNumber().doubleValue(),
-                                 (int) data.get("height").isNumber().doubleValue(),
-                                 (int) data.get("widthInTiles").isNumber().doubleValue(),
-                                 (int) data.get("heightInTiles").isNumber().doubleValue());
-                        _zoomLevels.add(level);
-                        if (_debug) {
-                           System.out.println("valores: " + level.toString());
+                     final JSONArray valuesList = values.isObject().get("levels").isArray();
+                     //final JSONArray valuesList = values.isArray();
+                     if (valuesList != null) {
+                        for (int i = 0; i < valuesList.size(); i++) {
+                           final JSONObject data = valuesList.get(i).isObject();
+                           final GPlanarPanoramicZoomLevel level = new GPlanarPanoramicZoomLevel(
+                                    (int) data.get("level").isNumber().doubleValue(),
+                                    (int) data.get("width").isNumber().doubleValue(),
+                                    (int) data.get("height").isNumber().doubleValue(),
+                                    (int) data.get("widthInTiles").isNumber().doubleValue(),
+                                    (int) data.get("heightInTiles").isNumber().doubleValue());
+                           _zoomLevels.add(level);
+                           if (_debug) {
+                              System.out.println("valores: " + level.toString());
+                           }
                         }
+
+                        // Complete initialization on zoom-level data received 
+                        int minLevel = Integer.MAX_VALUE;
+                        int maxLevel = Integer.MIN_VALUE;
+
+                        for (final GPlanarPanoramicZoomLevel zoomLevel : _zoomLevels) {
+                           final int currentLevel = zoomLevel.getLevel();
+                           minLevel = Math.min(minLevel, currentLevel);
+                           maxLevel = Math.max(maxLevel, currentLevel);
+                        }
+
+                        _minLevel = minLevel;
+                        _maxLevel = maxLevel;
+                        _currentLevel = minLevel;
+
+                        fillContainer();
+                        updateZoomLevelFromContainerSize(0);
                      }
-
-                     // Complete initialization on zoom-level data received 
-                     int minLevel = Integer.MAX_VALUE;
-                     int maxLevel = Integer.MIN_VALUE;
-
-                     for (final GPlanarPanoramicZoomLevel zoomLevel : _zoomLevels) {
-                        final int currentLevel = zoomLevel.getLevel();
-                        minLevel = Math.min(minLevel, currentLevel);
-                        maxLevel = Math.max(maxLevel, currentLevel);
-                     }
-
-                     _minLevel = minLevel;
-                     _maxLevel = maxLevel;
-                     _currentLevel = minLevel;
-
-                     fillContainer();
-                     updateZoomLevelFromContainerSize(0);
                   }
                }
                else {
@@ -727,6 +731,78 @@ public class GPlanarPanoramicViewer
          GWT.log("RequestException: " + e.toString());
       }
    }
+
+
+   //   private void readZoomLevelsAndGo() {
+   //
+   //      final RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, _url + "/info.txt");
+   //      //rb.setHeader("Access-Control-Allow-Origin", "*");
+   //      rb.setCallback(new RequestCallback() {
+   //         @Override
+   //         public void onResponseReceived(final Request request,
+   //                                        final Response response) {
+   //            try {
+   //               final int responseCode = response.getStatusCode() / 100;
+   //               if (_url.startsWith("file:/") || (responseCode == 2)) {
+   //                  System.out.println("Response= " + response.getText());
+   //                  final JSONValue values = JSONParser.parseLenient(response.getText());
+   //                  if (values != null) {
+   //                     final JSONArray valuesList = values.isArray();
+   //                     for (int i = 0; i < valuesList.size(); i++) {
+   //                        final JSONObject data = valuesList.get(i).isObject();
+   //                        final GPlanarPanoramicZoomLevel level = new GPlanarPanoramicZoomLevel(
+   //                                 (int) data.get("level").isNumber().doubleValue(),
+   //                                 (int) data.get("width").isNumber().doubleValue(),
+   //                                 (int) data.get("height").isNumber().doubleValue(),
+   //                                 (int) data.get("widthInTiles").isNumber().doubleValue(),
+   //                                 (int) data.get("heightInTiles").isNumber().doubleValue());
+   //                        _zoomLevels.add(level);
+   //                        if (_debug) {
+   //                           System.out.println("valores: " + level.toString());
+   //                        }
+   //                     }
+   //
+   //                     // Complete initialization on zoom-level data received 
+   //                     int minLevel = Integer.MAX_VALUE;
+   //                     int maxLevel = Integer.MIN_VALUE;
+   //
+   //                     for (final GPlanarPanoramicZoomLevel zoomLevel : _zoomLevels) {
+   //                        final int currentLevel = zoomLevel.getLevel();
+   //                        minLevel = Math.min(minLevel, currentLevel);
+   //                        maxLevel = Math.max(maxLevel, currentLevel);
+   //                     }
+   //
+   //                     _minLevel = minLevel;
+   //                     _maxLevel = maxLevel;
+   //                     _currentLevel = minLevel;
+   //
+   //                     fillContainer();
+   //                     updateZoomLevelFromContainerSize(0);
+   //                  }
+   //               }
+   //               else {
+   //                  GWT.log("HttpError#" + response.getStatusCode() + " - " + response.getText());
+   //               }
+   //            }
+   //            catch (final Throwable e) {
+   //               GWT.log("Exception: " + e.toString());
+   //            }
+   //         }
+   //
+   //
+   //         @Override
+   //         public void onError(final Request request,
+   //                             final Throwable exception) {
+   //            GWT.log("HttpError#" + request.toString() + "Exception: " + exception.toString());
+   //         }
+   //      });
+   //      try {
+   //         rb.send();
+   //      }
+   //      catch (final RequestException e) {
+   //         GWT.log("RequestException: " + e.toString());
+   //      }
+   //   }
 
 
    //   /*

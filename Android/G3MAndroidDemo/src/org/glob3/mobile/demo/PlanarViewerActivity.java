@@ -24,7 +24,6 @@ public class PlanarViewerActivity
       final WebView webView = (WebView) findViewById(R.id.webView);
       final String markUrl = getIntent().getStringExtra("markUrl");
       final URL url = new URL("file:///android_asset/www/planarpanoramic.html?url=" + URLEncoder.encode(markUrl), false);
-
       final Browser_Android ba = new Browser_Android(webView);
       ba.openInBrowser(url);
    }
