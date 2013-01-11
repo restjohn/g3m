@@ -5,6 +5,8 @@ package org.glob3.mobile.client;
 import java.util.ArrayList;
 
 import org.glob3.mobile.generated.Angle;
+import org.glob3.mobile.generated.BSONGenerator;
+import org.glob3.mobile.generated.BSONParser;
 import org.glob3.mobile.generated.BoxShape;
 import org.glob3.mobile.generated.BusyMeshRenderer;
 import org.glob3.mobile.generated.CameraDoubleDragHandler;
@@ -22,10 +24,16 @@ import org.glob3.mobile.generated.FloatBufferBuilderFromGeodetic;
 import org.glob3.mobile.generated.GInitializationTask;
 import org.glob3.mobile.generated.GLPrimitive;
 import org.glob3.mobile.generated.Geodetic3D;
+import org.glob3.mobile.generated.IBufferDownloadListener;
+import org.glob3.mobile.generated.IByteBuffer;
 import org.glob3.mobile.generated.ICameraConstrainer;
 import org.glob3.mobile.generated.IDownloader;
+import org.glob3.mobile.generated.ILogger;
 import org.glob3.mobile.generated.IStorage;
 import org.glob3.mobile.generated.IThreadUtils;
+import org.glob3.mobile.generated.ITimer;
+import org.glob3.mobile.generated.JSONBaseObject;
+import org.glob3.mobile.generated.JSONGenerator;
 import org.glob3.mobile.generated.LayerSet;
 import org.glob3.mobile.generated.Mark;
 import org.glob3.mobile.generated.MarkTouchListener;
@@ -40,6 +48,7 @@ import org.glob3.mobile.generated.ShapesRenderer;
 import org.glob3.mobile.generated.SimpleCameraConstrainer;
 import org.glob3.mobile.generated.TileRenderer;
 import org.glob3.mobile.generated.TileRendererBuilder;
+import org.glob3.mobile.generated.TimeInterval;
 import org.glob3.mobile.generated.URL;
 import org.glob3.mobile.generated.UserData;
 import org.glob3.mobile.generated.Vector3D;
@@ -49,10 +58,14 @@ import org.glob3.mobile.specific.Downloader_WebGL;
 import org.glob3.mobile.specific.G3MBuilder_WebGL;
 import org.glob3.mobile.specific.G3MWidget_WebGL;
 import org.glob3.mobile.specific.ThreadUtils_WebGL;
+import org.glob3.mobile.specific.Timer_WebGL;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -61,10 +74,13 @@ public class G3MWebGLDemo
          implements
             EntryPoint {
 
-   private final String    _g3mWidgetHolderId = "g3mWidgetHolder";
+   private final static String FILE_SERVER        = "http://glob3m.glob3mobile.com/test/";
+
+   private final String        _g3mWidgetHolderId = "g3mWidgetHolder";
 
 
-   private G3MWidget_WebGL _widget            = null;
+   private G3MWidget_WebGL     _widget            = null;
+   private ITimer              _timer;
 
 
    @Override
@@ -75,15 +91,186 @@ public class G3MWebGLDemo
          //         initWithoutBuilder();
 
          // initialize a default widget by using a builder
-         // initDefaultWithBuilder();
+         initDefaultWithBuilder();
 
          // initialize a customized widget by using a builder
-         initCustomizedWithBuilder();
-
+         //         initCustomizedWithBuilder();
+         //
          final Panel g3mWidgetHolder = RootPanel.get(_g3mWidgetHolderId);
          g3mWidgetHolder.add(_widget);
+
+         _timer = new Timer_WebGL();
+         _timer.start();
+
+         final Button bson2jsonBtn = new Button("BSON -> JSON");
+         bson2jsonBtn.getElement().getStyle().setProperty("position", "absolute");
+         bson2jsonBtn.getElement().getStyle().setProperty("top", "0");
+         bson2jsonBtn.getElement().getStyle().setProperty("left", "0");
+
+         bson2jsonBtn.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+               //               transformBSON2JSON();
+               transformBSON2JSON();
+
+            }
+         });
+
+         g3mWidgetHolder.add(bson2jsonBtn);
+
+
+         final Button json2bsonBtn = new Button("JSON -> BSON");
+         json2bsonBtn.getElement().getStyle().setProperty("position", "absolute");
+         json2bsonBtn.getElement().getStyle().setProperty("top", "30");
+         json2bsonBtn.getElement().getStyle().setProperty("left", "0");
+
+         json2bsonBtn.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(final ClickEvent event) {
+               //               transformBSON2JSON();
+               transformJSON2BSON();
+
+            }
+         });
+
+         g3mWidgetHolder.add(json2bsonBtn);
       }
    }
+
+
+   /******************* BEGIN BSON *************************************/
+
+
+   private void transformBSON2JSON() {
+
+      //      final String fileName = "ACCESS-A.2011020104.nc7.slice10.bson";
+      final String fileName = "ACCESS-test.bson";
+
+      _widget.getG3MContext().getDownloader().requestBuffer(//
+               new URL(FILE_SERVER + fileName, false), //
+               100000000L, //
+               TimeInterval.fromDays(30), //
+               new IBufferDownloadListener() {
+
+                  @Override
+                  public void onError(final URL url) {
+                     ILogger.instance().logError("error downloading");
+                  }
+
+
+                  @Override
+                  public void onDownload(final URL url,
+                                         final IByteBuffer buffer) {
+                     final JSONBaseObject jsonBO = parseBSON(buffer);
+                     generateJSON(jsonBO);
+                  }
+
+
+                  @Override
+                  public void onCanceledDownload(final URL url,
+                                                 final IByteBuffer data) {
+
+                  }
+
+
+                  @Override
+                  public void onCancel(final URL url) {
+
+                  }
+               }, //
+               true);
+   }
+
+
+   private void transformJSON2BSON() {
+
+      //    final String fileName = "seymour-plane.json";
+      //      final String fileName = "boundary_lines_land.geojson";
+      final String fileName = "ACCESS-test.json";
+
+      _widget.getG3MContext().getDownloader().requestBuffer(//
+               new URL(FILE_SERVER + fileName, false), //
+               100000000L, //
+               TimeInterval.fromDays(30), //
+               new IBufferDownloadListener() {
+
+                  @Override
+                  public void onError(final URL url) {
+                     ILogger.instance().logError("error downloading");
+                  }
+
+
+                  @Override
+                  public void onDownload(final URL url,
+                                         final IByteBuffer buffer) {
+                     final JSONBaseObject jsonBO = parseJSON(buffer);
+                     final IByteBuffer bufBSON = generateBSON(jsonBO);
+                  }
+
+
+                  @Override
+                  public void onCanceledDownload(final URL url,
+                                                 final IByteBuffer data) {
+
+                  }
+
+
+                  @Override
+                  public void onCancel(final URL url) {
+
+                  }
+               }, //
+               true);
+   }
+
+
+   public JSONBaseObject parseBSON(final IByteBuffer buffer) {
+      ILogger.instance().logInfo("BEGIN BSONParser.parse(buffer)");
+      final TimeInterval beginTime = _timer.now();
+      final JSONBaseObject bsonObj = BSONParser.parse(buffer);
+      final long elapsedTime = _timer.now().milliseconds() - beginTime.milliseconds();
+      ILogger.instance().logInfo("END BSONParser.parse(buffer):" + elapsedTime + "ms");
+
+      return bsonObj;
+   }
+
+
+   public JSONBaseObject parseJSON(final IByteBuffer buffer) {
+      ILogger.instance().logInfo("BEGIN _jsonParser.parse(buffer)");
+      final TimeInterval beginTime = _timer.now();
+      final JSONBaseObject jsonObj = _widget.getG3MContext().getJSONParser().parse(buffer);
+      final long elapsedTime = _timer.now().milliseconds() - beginTime.milliseconds();
+      ILogger.instance().logInfo("END _jsonParser.parse(buffer) " + elapsedTime + "ms");
+
+      return jsonObj;
+   }
+
+
+   public IByteBuffer generateBSON(final JSONBaseObject jsonObj) {
+      ILogger.instance().logInfo("BEGIN BSONGenerator.generate(jsonObj)");
+      final TimeInterval beginTime = _timer.now();
+      final IByteBuffer buffer = BSONGenerator.generate(jsonObj);
+      final long elapsedTime = _timer.now().milliseconds() - beginTime.milliseconds();
+      ILogger.instance().logInfo("END BSONGenerator.generate(jsonObj): " + elapsedTime + "ms");
+
+      return buffer;
+   }
+
+
+   public String generateJSON(final JSONBaseObject jsonObj) {
+      ILogger.instance().logInfo("BEGIN JSONGenerator.generate(jsonObj)");
+      final TimeInterval beginTime = _timer.now();
+      final String jsonString = JSONGenerator.generate(jsonObj);
+      final long elapsedTime = _timer.now().milliseconds() - beginTime.milliseconds();
+      ILogger.instance().logInfo("END JSONGenerator.generate(jsonObj): " + elapsedTime + "ms");
+
+      return jsonString;
+   }
+
+
+   /******************* BEGIN BSON *************************************/
 
 
    public void initDefaultWithBuilder() {

@@ -13,9 +13,10 @@
 
     <application
         android:icon="@drawable/g3mgen"
-        android:label="@string/app_name"      android:largeHeap="true">
+        android:label="@string/app_name"
+        android:largeHeap="true" >
         <activity
-            android:name=".G3MDemoActivity"
+            android:name="org.glob3.mobile.demo.G3MDemoActivity"
             android:configChanges="orientation"
             android:label="@string/app_name" >
             <intent-filter>
@@ -25,18 +26,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".G3MSimplestGlob3Activity"
+            android:name="org.glob3.mobile.demo.G3MSimplestGlob3Activity"
             android:label="@string/title_activity_g3_msimplest" >
         </activity>
-        <activity android:name="G3MDoubleGlob3Activity" >
+        <activity android:name="org.glob3.mobile.demo.G3MDoubleGlob3Activity" >
         </activity>
-            <activity android:name="G3MSwitchLayerActivity" >
+        <activity android:name="org.glob3.mobile.demo.G3MSwitchLayerActivity" >
         </activity>
-            <activity android:name="G3MDrawingShapesActivity" >
+        <activity android:name="org.glob3.mobile.demo.G3MDrawingShapesActivity" >
         </activity>
-            <activity android:name="G3MShowMarkersActivity" >
+        <activity android:name="org.glob3.mobile.demo.G3MShowMarkersActivity" >
         </activity>
-            <activity android:name="G3MNetCDFActivity" >
+        <activity android:name="org.glob3.mobile.demo.G3MNetCDFActivity" >
+        </activity>
+        <activity android:name="org.glob3.mobile.demo.G3MBSONActivity" >
         </activity>
     </application>
 

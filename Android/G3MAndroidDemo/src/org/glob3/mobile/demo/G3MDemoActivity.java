@@ -99,6 +99,13 @@ public class G3MDemoActivity
          }
       });
 
-
+      final Button bsonButton = (Button) findViewById(R.id.bsonButton);
+      bsonButton.setOnClickListener(new OnClickListener() {
+         @Override
+         public void onClick(final View v) {
+            final Intent intent = new Intent(getApplicationContext(), G3MBSONActivity.class);
+            startActivity(intent);
+         }
+      });
    }
 }
