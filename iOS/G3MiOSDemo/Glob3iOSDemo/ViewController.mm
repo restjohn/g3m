@@ -344,16 +344,16 @@ id _thisInstance;
     
     //-- add markers for planar panoramics --------------------
      
-    //URL* pano1Url = new URL("http://glob3m.glob3mobile.com/panos/esmeralda2", false);
+    //URL* pano1Url = new URL("http://glob3m.glob3mobile.com/planar/esmeralda2", false);
     Mark* pano1 = new Mark("esmeralda2",
                            URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
-                           Geodetic3D(Angle::fromDegrees(39.4348), Angle::fromDegrees(-6.3938), 0), new URL("http://glob3m.glob3mobile.com/panos/esmeralda2", false));
+                           Geodetic3D(Angle::fromDegrees(39.4348), Angle::fromDegrees(-6.3938), 0), new URL("http://glob3m.glob3mobile.com/planar/esmeralda2", false));
     panoMarksRenderer->addMark(pano1);
       
-    //URL* pano2Url = new URL("http://glob3m.glob3mobile.com/panos/lospinos2", false);
+    //URL* pano2Url = new URL("http://glob3m.glob3mobile.com/planar/lospinos2", false);
     Mark* pano2 = new Mark("lospinos2",
                              URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
-                             Geodetic3D(Angle::fromDegrees(39.4569), Angle::fromDegrees(-6.3892), 0), new URL("http://glob3m.glob3mobile.com/panos/lospinos2", false));
+                             Geodetic3D(Angle::fromDegrees(39.4569), Angle::fromDegrees(-6.3892), 0), new URL("http://glob3m.glob3mobile.com/planar/lospinos2", false));
     panoMarksRenderer->addMark(pano2);
     //---------------------------------------------------------
     
