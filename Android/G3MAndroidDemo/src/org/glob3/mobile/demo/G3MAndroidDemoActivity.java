@@ -245,14 +245,14 @@ public class G3MAndroidDemoActivity
                   "esmeralda2", //
                   new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
                   new Geodetic3D(Angle.fromDegrees(39.4348), Angle.fromDegrees(-6.3938), 0), //
-                  "http://glob3m.glob3mobile.com/panos/esmeralda2");
+                  "http://glob3m.glob3mobile.com/planar/esmeralda2");
          panoMarksRenderer.addMark(pano1);
 
          final Mark pano2 = new Mark( //
                   "lospinos2", //
                   new URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false), //
                   new Geodetic3D(Angle.fromDegrees(39.4569), Angle.fromDegrees(-6.3892), 0), //
-                  "http://glob3m.glob3mobile.com/panos/lospinos2");
+                  "http://glob3m.glob3mobile.com/planar/lospinos2");
          panoMarksRenderer.addMark(pano2);
          //---------------------------------------------------------
 
