@@ -80,6 +80,7 @@ public abstract class IStringUtils {
    * 1. Thus the length
    * of the substring is endIndex-beginIndex.
    */
+
   // C++ TO JAVA CONVERTER WARNING: 'const' methods are not available in
   // Java:
   // ORIGINAL LINE: virtual String substring(const String& String, int
@@ -95,6 +96,7 @@ public abstract class IStringUtils {
   // beginIndex) const
   public String substring(final String String,
                           final int beginIndex) {
+    // return substring(string, beginIndex, string.size() + 1);
     return substring(String, beginIndex, String.length());
   }
 

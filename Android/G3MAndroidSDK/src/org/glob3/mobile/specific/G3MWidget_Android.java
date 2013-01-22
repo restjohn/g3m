@@ -53,11 +53,12 @@ import android.view.MotionEvent;
 import android.view.MotionEvent.PointerCoords;
 
 
-public class G3MWidget_Android
+public final class G3MWidget_Android
     extends
       GLSurfaceView
     implements
       OnGestureListener {
+
 
   private G3MWidget _g3mWidget;
   private ES2Renderer _es2renderer;
@@ -316,8 +317,7 @@ public class G3MWidget_Android
     }
 
     final TextureBuilder textureBuilder = new CPUTextureBuilder();
-    final TexturesHandler texturesHandler = new TexturesHandler(gl, factory,
-        false);
+    final TexturesHandler texturesHandler = new TexturesHandler(gl, false);
 
     final Planet planet = Planet.createEarth();
 
@@ -326,6 +326,7 @@ public class G3MWidget_Android
     final EffectsScheduler scheduler = new EffectsScheduler();
 
     final FrameTasksExecutor frameTasksExecutor = new FrameTasksExecutor();
+
 
     final IStringUtils stringUtils = new StringUtils_Android();
 
@@ -345,6 +346,8 @@ public class G3MWidget_Android
         Color.fromRGBA(0, (float) 0.1, (float) 0.2, 1), true, false);
 
     _g3mWidget.setUserData(_userData);
+
+
   }
 
 
