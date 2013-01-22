@@ -9,6 +9,7 @@ http-cache
 temporary-data
 cachedir
 .DS_Store
+._.DS_Store
 _deploy
 _build
 generated_build.xml
@@ -45,5 +46,6 @@ Android/G3MAndroidPlanarViewerDemo/gen/
 planarviewer/gwt-unitCache/
 planarviewer/war/WEB-INF/
 planarviewer/war/planarviewer.planarviewer/
+
 
 

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		34D6F433165E933E00061310 /* www in Resources */ = {isa = PBXBuildFile; fileRef = 34D6F432165E933E00061310 /* www */; };
+		34DF43181666150300B9A9A8 /* PlanarViewerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 34DF43171666150300B9A9A8 /* PlanarViewerController.mm */; };
 		443BBC8315A5C22000EAE280 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 443BBC8215A5C21F00EAE280 /* CoreData.framework */; };
 		44EEB5E0159B2B8B0086F243 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 44EEB5DF159B2B8B0086F243 /* libsqlite3.dylib */; };
 		A717C99615EBA71D00EEC830 /* mercator.jpg in Resources */ = {isa = PBXBuildFile; fileRef = A717C99515EBA71D00EEC830 /* mercator.jpg */; };
@@ -64,6 +65,8 @@
 
 /* Begin PBXFileReference section */
 		34D6F432165E933E00061310 /* www */ = {isa = PBXFileReference; lastKnownFileType = folder; name = www; path = Resources/www; sourceTree = "<group>"; };
+		34DF43161666150300B9A9A8 /* PlanarViewerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlanarViewerController.h; sourceTree = "<group>"; };
+		34DF43171666150300B9A9A8 /* PlanarViewerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PlanarViewerController.mm; sourceTree = "<group>"; };
 		443BBC8215A5C21F00EAE280 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		44EEB5DF159B2B8B0086F243 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		A717C99515EBA71D00EEC830 /* mercator.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = mercator.jpg; sourceTree = "<group>"; };
@@ -171,6 +174,8 @@
 				D8EEF3911577920B003FEB5E /* Supporting Files */,
 				D8EEF4091577A93D003FEB5E /* G3W.h */,
 				D8EEF40A1577A93D003FEB5E /* G3W.mm */,
+				34DF43161666150300B9A9A8 /* PlanarViewerController.h */,
+				34DF43171666150300B9A9A8 /* PlanarViewerController.mm */,
 			);
 			name = G3MiOSDemo;
 			path = Glob3iOSDemo;
@@ -328,6 +333,7 @@
 				D8EEF39B1577920B003FEB5E /* AppDelegate.m in Sources */,
 				D8EEF3A41577920B003FEB5E /* ViewController.mm in Sources */,
 				D8EEF40B1577A93D003FEB5E /* G3W.mm in Sources */,
+				34DF43181666150300B9A9A8 /* PlanarViewerController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
