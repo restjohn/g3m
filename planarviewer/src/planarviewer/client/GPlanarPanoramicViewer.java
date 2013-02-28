@@ -10,6 +10,8 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.dom.client.Touch;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.MouseDownEvent;
 import com.google.gwt.event.dom.client.MouseDownHandler;
 import com.google.gwt.event.dom.client.MouseMoveEvent;
@@ -66,7 +68,7 @@ public class GPlanarPanoramicViewer
       private final GPlanarPanoramicZoomLevel _zoomLevel;
       private final int                       _x;
       private final int                       _y;
-      private GImage                          _image;
+      private GImage                          _image = null;
       private final String                    _tileUrl;
       private boolean                         _removeWhileLoading;
       private int                             _xPos, _yPos;
@@ -233,7 +235,7 @@ public class GPlanarPanoramicViewer
          if (_image != null) {
             _image.setVisible(false);
             _container.remove(_image);
-            _image.removeFromParent();
+            //_image.removeFromParent();
             //_container.clear();
             if (_debug) {
                System.out.println("Borrando: " + tileToString());
@@ -414,6 +416,9 @@ public class GPlanarPanoramicViewer
       addTouchEndHandler(_touchEndHandler);
       sinkEvents(Event.TOUCHEVENTS);
 
+      addDoubleClickHandler(_doubleClickHandler);
+      sinkEvents(Event.ONDBLCLICK);
+
       Window.addResizeHandler(new ResizeHandler() {
 
          @Override
@@ -428,197 +433,211 @@ public class GPlanarPanoramicViewer
       createHUD();
    }
 
-   final MouseWheelHandler _mouseWheelHandler = new MouseWheelHandler() {
+   final MouseWheelHandler  _mouseWheelHandler  = new MouseWheelHandler() {
 
-                                                 @Override
-                                                 public void onMouseWheel(final MouseWheelEvent event) {
-                                                    event.preventDefault();
-                                                    if (_debug) {
-                                                       System.out.println("MOUSE-WHEEL EVENT");
-                                                    }
-                                                    if (event.getDeltaY() < 0) {
-                                                       setZoomLevel(_currentLevel + 1, event.getX(), event.getY());
-                                                    }
-                                                    else {
-                                                       setZoomLevel(_currentLevel - 1, event.getX(), event.getY());
-                                                    }
+                                                   @Override
+                                                   public void onMouseWheel(final MouseWheelEvent event) {
+                                                      event.preventDefault();
+                                                      if (_debug) {
+                                                         System.out.println("MOUSE-WHEEL EVENT");
+                                                      }
+                                                      if (event.getDeltaY() < 0) {
+                                                         setZoomLevel(_currentLevel + 1, event.getX(), event.getY());
+                                                      }
+                                                      else {
+                                                         setZoomLevel(_currentLevel - 1, event.getX(), event.getY());
+                                                      }
 
-                                                 }
-                                              };
-
-
-   final MouseDownHandler  _mouseDownHandler  = new MouseDownHandler() {
-
-                                                 @Override
-                                                 public void onMouseDown(final MouseDownEvent event) {
-                                                    event.preventDefault();
-                                                    _dragLastXPosition = event.getNativeEvent().getScreenX();
-                                                    _dragLastYPosition = event.getNativeEvent().getScreenY();
-
-                                                    if (_debug) {
-                                                       System.out.println("MOUSE-DOWN EVENT");
-                                                       System.out.println("pos: (" + _dragLastXPosition + ","
-                                                                          + _dragLastYPosition + ")");
-                                                       Window.alert("MOUSE-DOWN EVENT: X=" + _dragLastXPosition + ", Y="
-                                                                    + _dragLastYPosition);
-                                                    }
-                                                    _isDragging = true;
-                                                 }
-                                              };
-
-   final MouseMoveHandler  _mouseMoveHandler  = new MouseMoveHandler() {
-
-                                                 @Override
-                                                 public void onMouseMove(final MouseMoveEvent event) {
-                                                    event.preventDefault();
-                                                    if (_isDragging) {
-                                                       final int deltaX = event.getNativeEvent().getScreenX()
-                                                                          - _dragLastXPosition;
-                                                       final int deltaY = event.getNativeEvent().getScreenY()
-                                                                          - _dragLastYPosition;
-                                                       _dragLastXPosition = event.getNativeEvent().getScreenX();
-                                                       _dragLastYPosition = event.getNativeEvent().getScreenY();
-
-                                                       if (_debug) {
-                                                          System.out.println("ON-MOUSE-MOVE EVENT");
-                                                          System.out.println("delta: (" + deltaX + "," + deltaY + ")");
-                                                          Window.alert("MOUSE-MOVE EVENT: deltaX=" + deltaX + ", deltaY="
-                                                                       + deltaY);
-                                                       }
-                                                       setOffset(_offsetX + deltaX, _offsetY + deltaY);
-                                                    }
-                                                 }
-                                              };
+                                                   }
+                                                };
 
 
-   final MouseUpHandler    _mouseUpHandler    = new MouseUpHandler() {
+   final MouseDownHandler   _mouseDownHandler   = new MouseDownHandler() {
 
-                                                 @Override
-                                                 public void onMouseUp(final MouseUpEvent event) {
-                                                    event.preventDefault();
+                                                   @Override
+                                                   public void onMouseDown(final MouseDownEvent event) {
+                                                      event.preventDefault();
+                                                      _dragLastXPosition = event.getNativeEvent().getScreenX();
+                                                      _dragLastYPosition = event.getNativeEvent().getScreenY();
 
-                                                    if (_debug) {
-                                                       System.out.println("MOUSE-UP EVENT");
-                                                       Window.alert("MOUSE-UP EVENT");
-                                                    }
-                                                    _isDragging = false;
-                                                 }
-                                              };
+                                                      if (_debug) {
+                                                         System.out.println("MOUSE-DOWN EVENT");
+                                                         System.out.println("pos: (" + _dragLastXPosition + ","
+                                                                            + _dragLastYPosition + ")");
+                                                         Window.alert("MOUSE-DOWN EVENT: X=" + _dragLastXPosition + ", Y="
+                                                                      + _dragLastYPosition);
+                                                      }
+                                                      _isDragging = true;
+                                                   }
+                                                };
 
-   final TouchStartHandler _touchStartHandler = new TouchStartHandler() {
+   final MouseMoveHandler   _mouseMoveHandler   = new MouseMoveHandler() {
 
-                                                 @Override
-                                                 public void onTouchStart(final TouchStartEvent event) {
-                                                    event.preventDefault();
-                                                    _touchMoveCounter = 0;
-                                                    final JsArray<Touch> touches = event.getTargetTouches();
-                                                    if (touches.length() > 1) {
-                                                       _isScaling = true;
-                                                    }
-                                                    if (_isScaling) {
-                                                       final Touch t0 = touches.get(0);
-                                                       final Touch t1 = touches.get(1);
-                                                       final int deltaX = t1.getScreenX() - t0.getScreenX();
-                                                       final int deltaY = t1.getScreenY() - t0.getScreenY();
-                                                       _touchesDistance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
-                                                       //                                                       _referenceScale = Math.max(getContainerSize().getHeight(),
-                                                       //                                                                getContainerSize().getWidth());
-                                                       _referenceScale = getContainerSize().getHeight();
-                                                       if (_debug) {
-                                                          Window.alert("TOUCHES distance: " + _touchesDistance);
-                                                       }
-                                                    }
-                                                    else {
-                                                       final Touch t = touches.get(0);
-                                                       _touch0LastXPosition = t.getScreenX();
-                                                       _touch0LastYPosition = t.getScreenY();
-                                                       if (_debug) {
-                                                          Window.alert("TOUCH-START EVENT: x=" + _touch0LastXPosition + ", y="
-                                                                       + _touch0LastYPosition);
-                                                       }
-                                                    }
-                                                 }
-                                              };
+                                                   @Override
+                                                   public void onMouseMove(final MouseMoveEvent event) {
+                                                      event.preventDefault();
+                                                      if (_isDragging) {
+                                                         final int deltaX = event.getNativeEvent().getScreenX()
+                                                                            - _dragLastXPosition;
+                                                         final int deltaY = event.getNativeEvent().getScreenY()
+                                                                            - _dragLastYPosition;
+                                                         _dragLastXPosition = event.getNativeEvent().getScreenX();
+                                                         _dragLastYPosition = event.getNativeEvent().getScreenY();
 
-   final TouchMoveHandler  _touchMoveHandler  = new TouchMoveHandler() {
+                                                         if (_debug) {
+                                                            System.out.println("ON-MOUSE-MOVE EVENT");
+                                                            System.out.println("delta: (" + deltaX + "," + deltaY + ")");
+                                                            Window.alert("MOUSE-MOVE EVENT: deltaX=" + deltaX + ", deltaY="
+                                                                         + deltaY);
+                                                         }
+                                                         setOffset(_offsetX + deltaX, _offsetY + deltaY);
+                                                      }
+                                                   }
+                                                };
 
-                                                 @Override
-                                                 public void onTouchMove(final TouchMoveEvent event) {
-                                                    event.preventDefault();
-                                                    // filter because there are too many touch-move events
-                                                    _touchMoveCounter++;
-                                                    if (_touchMoveCounter < MIN_TOUCH_MOVE_EVENTS) {
-                                                       return;
-                                                    }
-                                                    _touchMoveCounter = 0;
-                                                    final JsArray<Touch> touches = event.getTargetTouches();
-                                                    if (_isScaling) {
-                                                       final Touch t0 = touches.get(0);
-                                                       final Touch t1 = touches.get(1);
-                                                       final int deltaX = t1.getScreenX() - t0.getScreenX();
-                                                       final int deltaY = t1.getScreenY() - t0.getScreenY();
-                                                       final double currentDistance = Math.sqrt(Math.pow(deltaX, 2)
-                                                                                                + Math.pow(deltaY, 2));
-                                                       final double distanceDelta = currentDistance - _touchesDistance;
-                                                       if (_debug) {
-                                                          Window.alert("delta distance: " + distanceDelta);
-                                                       }
-                                                       if (distanceDelta > (_referenceScale / ZOOM_SCALE_DELTA)) {
-                                                          _touchesDistance = currentDistance;
-                                                          setZoomLevel(_currentLevel + 1);
-                                                       }
-                                                       else if (distanceDelta < -(_referenceScale / ZOOM_SCALE_DELTA)) {
-                                                          _touchesDistance = currentDistance;
-                                                          setZoomLevel(_currentLevel - 1);
-                                                       }
 
-                                                    }
-                                                    else {
-                                                       final Touch t = touches.get(0);
-                                                       int deltaX = t.getScreenX() - _touch0LastXPosition;
-                                                       int deltaY = t.getScreenY() - _touch0LastYPosition;
+   final MouseUpHandler     _mouseUpHandler     = new MouseUpHandler() {
 
-                                                       if (_debug) {
-                                                          Window.alert("TOUCH-MOVE EVENT: deltaX=" + deltaX + ", deltaY="
-                                                                       + deltaY);
-                                                       }
+                                                   @Override
+                                                   public void onMouseUp(final MouseUpEvent event) {
+                                                      event.preventDefault();
 
-                                                       // to filter spurious offsets
-                                                       if (Math.abs(deltaX) < MIN_OFFSET_DISTANCE) {
-                                                          deltaX = 0;
-                                                       }
-                                                       else {
-                                                          _touch0LastXPosition = t.getScreenX();
-                                                       }
+                                                      if (_debug) {
+                                                         System.out.println("MOUSE-UP EVENT");
+                                                         Window.alert("MOUSE-UP EVENT");
+                                                      }
+                                                      _isDragging = false;
+                                                   }
+                                                };
 
-                                                       if (Math.abs(deltaY) < MIN_OFFSET_DISTANCE) {
-                                                          deltaY = 0;
-                                                       }
-                                                       else {
-                                                          _touch0LastYPosition = t.getScreenY();
-                                                       }
+   final TouchStartHandler  _touchStartHandler  = new TouchStartHandler() {
 
-                                                       if ((deltaX != 0) || (deltaY != 0)) { // to filter controls touchs
-                                                          setOffset(_offsetX + deltaX, _offsetY + deltaY);
-                                                       }
-                                                    }
-                                                 }
-                                              };
+                                                   @Override
+                                                   public void onTouchStart(final TouchStartEvent event) {
+                                                      event.preventDefault();
+                                                      _touchMoveCounter = 0;
+                                                      final JsArray<Touch> touches = event.getTargetTouches();
+                                                      if (touches.length() > 1) {
+                                                         _isScaling = true;
+                                                      }
+                                                      if (_isScaling) {
+                                                         final Touch t0 = touches.get(0);
+                                                         final Touch t1 = touches.get(1);
+                                                         final int deltaX = t1.getScreenX() - t0.getScreenX();
+                                                         final int deltaY = t1.getScreenY() - t0.getScreenY();
+                                                         _touchesDistance = Math.sqrt(Math.pow(deltaX, 2) + Math.pow(deltaY, 2));
+                                                         //                                                       _referenceScale = Math.max(getContainerSize().getHeight(),
+                                                         //                                                                getContainerSize().getWidth());
+                                                         _referenceScale = getContainerSize().getHeight();
+                                                         if (_debug) {
+                                                            Window.alert("TOUCHES distance: " + _touchesDistance);
+                                                         }
+                                                      }
+                                                      else {
+                                                         final Touch t = touches.get(0);
+                                                         _touch0LastXPosition = t.getScreenX();
+                                                         _touch0LastYPosition = t.getScreenY();
+                                                         if (_debug) {
+                                                            Window.alert("TOUCH-START EVENT: x=" + _touch0LastXPosition + ", y="
+                                                                         + _touch0LastYPosition);
+                                                         }
+                                                      }
+                                                   }
+                                                };
 
-   final TouchEndHandler   _touchEndHandler   = new TouchEndHandler() {
+   final TouchMoveHandler   _touchMoveHandler   = new TouchMoveHandler() {
 
-                                                 @Override
-                                                 public void onTouchEnd(final TouchEndEvent event) {
-                                                    event.preventDefault();
-                                                    if (_isScaling && (event.getTargetTouches().length() == 0)) {
-                                                       _isScaling = false;
-                                                    }
+                                                   @Override
+                                                   public void onTouchMove(final TouchMoveEvent event) {
+                                                      event.preventDefault();
+                                                      // filter because there are too many touch-move events
+                                                      _touchMoveCounter++;
+                                                      if (_touchMoveCounter < MIN_TOUCH_MOVE_EVENTS) {
+                                                         return;
+                                                      }
+                                                      _touchMoveCounter = 0;
+                                                      final JsArray<Touch> touches = event.getTargetTouches();
+                                                      if (_isScaling) {
+                                                         final Touch t0 = touches.get(0);
+                                                         final Touch t1 = touches.get(1);
+                                                         final int deltaX = t1.getScreenX() - t0.getScreenX();
+                                                         final int deltaY = t1.getScreenY() - t0.getScreenY();
+                                                         final double currentDistance = Math.sqrt(Math.pow(deltaX, 2)
+                                                                                                  + Math.pow(deltaY, 2));
+                                                         final double distanceDelta = currentDistance - _touchesDistance;
+                                                         if (_debug) {
+                                                            Window.alert("delta distance: " + distanceDelta);
+                                                         }
+                                                         if (distanceDelta > (_referenceScale / ZOOM_SCALE_DELTA)) {
+                                                            _touchesDistance = currentDistance;
+                                                            setZoomLevel(_currentLevel + 1);
+                                                         }
+                                                         else if (distanceDelta < -(_referenceScale / ZOOM_SCALE_DELTA)) {
+                                                            _touchesDistance = currentDistance;
+                                                            setZoomLevel(_currentLevel - 1);
+                                                         }
 
-                                                    if (_debug) {
-                                                       Window.alert("TOUCH-END EVENT: " + event.getTargetTouches().length());
-                                                    }
-                                                 }
-                                              };
+                                                      }
+                                                      else {
+                                                         final Touch t = touches.get(0);
+                                                         int deltaX = t.getScreenX() - _touch0LastXPosition;
+                                                         int deltaY = t.getScreenY() - _touch0LastYPosition;
+
+                                                         if (_debug) {
+                                                            Window.alert("TOUCH-MOVE EVENT: deltaX=" + deltaX + ", deltaY="
+                                                                         + deltaY);
+                                                         }
+
+                                                         // to filter spurious offsets
+                                                         if (Math.abs(deltaX) < MIN_OFFSET_DISTANCE) {
+                                                            deltaX = 0;
+                                                         }
+                                                         else {
+                                                            _touch0LastXPosition = t.getScreenX();
+                                                         }
+
+                                                         if (Math.abs(deltaY) < MIN_OFFSET_DISTANCE) {
+                                                            deltaY = 0;
+                                                         }
+                                                         else {
+                                                            _touch0LastYPosition = t.getScreenY();
+                                                         }
+
+                                                         if ((deltaX != 0) || (deltaY != 0)) { // to filter controls touchs
+                                                            setOffset(_offsetX + deltaX, _offsetY + deltaY);
+                                                         }
+                                                      }
+                                                   }
+                                                };
+
+   final TouchEndHandler    _touchEndHandler    = new TouchEndHandler() {
+
+                                                   @Override
+                                                   public void onTouchEnd(final TouchEndEvent event) {
+                                                      event.preventDefault();
+                                                      if (_isScaling && (event.getTargetTouches().length() == 0)) {
+                                                         _isScaling = false;
+                                                      }
+
+                                                      if (_debug) {
+                                                         Window.alert("TOUCH-END EVENT: " + event.getTargetTouches().length());
+                                                      }
+                                                   }
+                                                };
+
+   final DoubleClickHandler _doubleClickHandler = new DoubleClickHandler() {
+
+                                                   @Override
+                                                   public void onDoubleClick(final DoubleClickEvent event) {
+                                                      event.preventDefault();
+                                                      if (_debug) {
+                                                         System.out.println("DOUBLE-CLICK EVENT");
+                                                         Window.alert("DOUBLE-CLICK EVENT");
+                                                      }
+
+                                                      setZoomLevel(_currentLevel + 1, event.getX(), event.getY());
+                                                   }
+                                                };
 
 
    //   private void forceDownloadLevelOne() { //TODO
@@ -824,7 +843,7 @@ public class GPlanarPanoramicViewer
 
       for (int i = _minLevel + 1; i < _maxLevel; i++) {
          final GPlanarPanoramicZoomLevel currentLevel = getZoomLevel(i);
-         if ((currentLevel.getWidth() <= currentWidth) && (currentLevel.getHeight() <= currentHeight)) {
+         if ((currentLevel.getWidth() <= currentWidth) || (currentLevel.getHeight() <= currentHeight)) {
             result = i;
          }
       }
@@ -1123,10 +1142,12 @@ public class GPlanarPanoramicViewer
          System.out.println("Quitando..");
       }
       removeTiles();
+      //clearTiles(); //TODO: 28/02/2012
       if (_debug) {
          System.out.println("Creando..");
       }
       createTiles();
+      //updateTilesGrid(); //TODO: 28/02/2012
       //addTiles();
       if (_debug) {
          System.out.println("Posicionando..");
@@ -1169,6 +1190,8 @@ public class GPlanarPanoramicViewer
          System.out.println("Level: " + currentZoomLevel.getLevel() + ", NUM Tiles: " + _tiles.size());
          System.out.println("Width: " + containerBounds.getWidth() + ", Height: " + containerBounds.getHeight());
       }
+
+      //layoutTiles(); //TODO: 28/02/2012
 
    }
 

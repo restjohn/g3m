@@ -4,7 +4,6 @@ package org.glob3.mobile.specific;
 
 import org.glob3.mobile.generated.URL;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.Log;
 import android.webkit.WebView;
@@ -35,7 +34,7 @@ public class Browser_Android {
    }
 
 
-   @SuppressLint("SetJavaScriptEnabled")
+   //@SuppressLint("SetJavaScriptEnabled")
    public void openInBrowser(final URL targetUrl) {
 
       _webView.getSettings().setAllowFileAccess(true);

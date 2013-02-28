@@ -2,7 +2,10 @@
 
 package planarviewer.client;
 
+import com.google.gwt.event.dom.client.DoubleClickEvent;
+import com.google.gwt.event.dom.client.DoubleClickHandler;
 import com.google.gwt.event.dom.client.HasAllTouchHandlers;
+import com.google.gwt.event.dom.client.HasDoubleClickHandlers;
 import com.google.gwt.event.dom.client.HasMouseDownHandlers;
 import com.google.gwt.event.dom.client.HasMouseMoveHandlers;
 import com.google.gwt.event.dom.client.HasMouseUpHandlers;
@@ -38,7 +41,8 @@ public class GContainer
             HasMouseWheelHandlers,
             HasMouseDownHandlers,
             HasMouseUpHandlers,
-            HasMouseMoveHandlers {
+            HasMouseMoveHandlers,
+            HasDoubleClickHandlers {
 
    private final AbsolutePanel _panel    = new AbsolutePanel();
    //private final AbsolutePanel _controlPanel = new AbsolutePanel();
@@ -50,6 +54,7 @@ public class GContainer
       initWidget(_panel);
       //DOM.setIntStyleAttribute(_controlPanel.getElement(), "zIndex", 49);
       DOM.setIntStyleAttribute(_panel.getElement(), "border", 0);
+      //DOM.setStyleAttribute(_panel.getElement(), "background", "black");
       DOM.setIntStyleAttribute(_topPanel.getElement(), "zIndex", 50);
       //setWidget(_topPanel, 0, 0);
       //_panel.add(_controlPanel, 0, 0);
@@ -102,6 +107,12 @@ public class GContainer
    @Override
    public HandlerRegistration addTouchCancelHandler(final TouchCancelHandler handler) {
       return _topPanel.addDomHandler(handler, TouchCancelEvent.getType());
+   }
+
+
+   @Override
+   public HandlerRegistration addDoubleClickHandler(final DoubleClickHandler handler) {
+      return _topPanel.addDomHandler(handler, DoubleClickEvent.getType());
    }
 
 
