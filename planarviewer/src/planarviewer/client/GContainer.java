@@ -116,23 +116,73 @@ public class GContainer
    }
 
 
+   public void addWidget(final Widget widget,
+                         final int left,
+                         final int top) {
+
+      _panel.add(widget, left, top);
+   }
+
+
    public void setWidget(final Widget widget,
                          final int left,
                          final int top) {
-      //_controlPanel.add(widget, left, top);
+
+      if (_panel == widget.getParent()) {
+         _panel.setWidgetPosition(widget, left, top);
+      }
+   }
+
+
+   public void addImage(final Widget widget,
+                        final int left,
+                        final int top) {
+
       _panel.add(widget, left, top);
-      //_topPanel.add(widget, left, top);
    }
 
 
    public void setImage(final Widget widget,
                         final int left,
                         final int top) {
-      _panel.add(widget, left, top);
+
+      if (_panel == widget.getParent()) {
+         _panel.setWidgetPosition(widget, left, top);
+      }
+   }
+
+
+   public void addTopWidget(final Widget widget,
+                            final int left,
+                            final int top) {
+
+      _topPanel.add(widget, left, top);
+   }
+
+
+   public void setTopWidget(final Widget widget,
+                            final int left,
+                            final int top) {
+
+      if (_topPanel == widget.getParent()) {
+         _topPanel.setWidgetPosition(widget, left, top);
+      }
+   }
+
+
+   public void updateImage(final Widget widget,
+                           final int left,
+                           final int top,
+                           final int width,
+                           final int height) {
+
+      widget.setSize(width + "px", height + "px");
+      _panel.setWidgetPosition(widget, left, top);
    }
 
 
    public void remove(final Widget widget) {
+
       _panel.remove(widget);
    }
 
