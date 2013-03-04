@@ -894,11 +894,11 @@ public class GPlanarPanoramicViewer
    private void createProgressIndicator() {
 
       _progressInd = new Image("IMG/loader1.gif");
-      _progressInd.setVisible(false);
       //DOM.setIntStyleAttribute(_progressInd.getElement(), "border", 0);
       final int posX = getContainerSize().getWidth() / 2;
       final int posY = getContainerSize().getHeight() / 2;
       super.addTopWidget(_progressInd, posX, posY);
+      _progressInd.setVisible(true);
    }
 
 
