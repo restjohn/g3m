@@ -266,7 +266,7 @@ public class GPlanarPanoramicViewer
             if (_image.getParent() == _container) {
                _container.remove(_image);
             }
-            else {
+            else { // to remove image ancestors
                _container.remove(_image.getParent());
                _image.removeFromParent();
             }
@@ -717,17 +717,17 @@ public class GPlanarPanoramicViewer
    //      }
    //   }
 
-   private void forceDownloadLevelOne() {
-
-      final GPlanarPanoramicZoomLevel levelOne = getZoomLevel(1);
-
-      if (_debug) {
-         System.out.println("forceDownloadLevelOne: " + levelOne.toString());
-      }
-
-      createTiles();
-      layoutTiles();
-   }
+   //   private void forceDownloadLevelOne() {
+   //
+   //      final GPlanarPanoramicZoomLevel levelOne = getZoomLevel(1);
+   //
+   //      if (_debug) {
+   //         System.out.println("forceDownloadLevelOne: " + levelOne.toString());
+   //      }
+   //
+   //      createTiles();
+   //      layoutTiles();
+   //   }
 
 
    private GPlanarPanoramicZoomLevel getCurrentZoomLevel() {
@@ -754,13 +754,14 @@ public class GPlanarPanoramicViewer
 
       final RequestBuilder rb = new RequestBuilder(RequestBuilder.GET, _url + "/info.txt");
       //rb.setHeader("Access-Control-Allow-Origin", "*");
+      //rb.setHeader("X-Requested-With", "XMLHttpRequest");
       rb.setCallback(new RequestCallback() {
          @Override
          public void onResponseReceived(final Request request,
                                         final Response response) {
             try {
-               final int responseCode = response.getStatusCode() / 100;
-               if (_url.startsWith("file:/") || (responseCode == 2)) {
+               //final int responseCode = response.getStatusCode() / 100;
+               if (_url.startsWith("file:/") || (response.getStatusCode() == 200)) {
                   //System.out.println("Response= " + response.getText());
                   final JSONValue values = JSONParser.parseLenient(response.getText());
                   if (values != null) {
@@ -795,20 +796,20 @@ public class GPlanarPanoramicViewer
                         _maxLevel = maxLevel;
                         _currentLevel = minLevel;
 
-                        forceDownloadLevelOne();
+                        //forceDownloadLevelOne();
                         fillContainer();
                         updateZoomLevelFromContainerSize(0);
                      }
                   }
                }
                else {
-                  _progressInd.setVisible(false);
-                  GWT.log("HttpError#" + response.getStatusCode() + " - " + response.getText());
+                  GWT.log("HttpError #" + response.getStatusCode() + " - " + response.getText());
+                  reportHttpError();
                }
             }
             catch (final Throwable e) {
-               _progressInd.setVisible(false);
                GWT.log("Exception: " + e.toString());
+               reportHttpError();
             }
          }
 
@@ -816,18 +817,26 @@ public class GPlanarPanoramicViewer
          @Override
          public void onError(final Request request,
                              final Throwable exception) {
+
             GWT.log("HttpError#" + request.toString() + "Exception: " + exception.toString());
-            _progressInd.setVisible(false);
+            reportHttpError();
          }
       });
+
 
       try {
          rb.send();
       }
       catch (final RequestException e) {
-         _progressInd.setVisible(false);
          GWT.log("RequestException: " + e.toString());
+         reportHttpError();
       }
+   }
+
+
+   private void reportHttpError() {
+      _progressInd.setVisible(false);
+      Window.alert("Panoramic temporarily unavailable");
    }
 
 
@@ -860,6 +869,7 @@ public class GPlanarPanoramicViewer
 
 
    private void createHUD() {
+
       if (!isMobileDevice()) {
          createNavigationButtons(BUTTONEXTEND, BUTTONMARGIN);
          createZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
@@ -869,10 +879,12 @@ public class GPlanarPanoramicViewer
 
 
    private boolean isMobileDevice() {
-      final String platform = Navigator.getPlatform().toLowerCase();
+      //final String platform = Navigator.getPlatform().toLowerCase();
+      final String platform = Navigator.getUserAgent().toLowerCase();
       if (_debug) {
          System.out.println("PLATFORM: " + platform);
       }
+      //Window.alert("platform: " + platform);
       //System.out.println("USER AGENT: " + Navigator.getUserAgent());
       return (
       //Detect android
@@ -1086,7 +1098,7 @@ public class GPlanarPanoramicViewer
       _offsetX = (int) (targetXForNewZoom - targetX) * -1;
       _offsetY = (int) (targetYForNewZoom - targetY) * -1;
 
-      updateZoomWidgets();
+      //updateZoomWidgets();
       updateTilesToNewZoom(_currentLevel);
       //recreateTiles(); //removed: 01/03/2013
    }
@@ -1176,11 +1188,11 @@ public class GPlanarPanoramicViewer
    }
 
 
-   private void updateZoomWidgets() {
-      _buttonZoomIn.setEnabled(_currentLevel < _maxLevel);
-      _buttonZoomOut.setEnabled(_currentLevel > _minLevel);
-      //_zoomSlider.setValue(_currentLevel);
-   }
+   //   private void updateZoomWidgets() {
+   //      _buttonZoomIn.setEnabled(_currentLevel < _maxLevel);
+   //      _buttonZoomOut.setEnabled(_currentLevel > _minLevel);
+   //      //_zoomSlider.setValue(_currentLevel);
+   //   }
 
 
    private void updateTilesToNewZoom(final int currentLevel) {
@@ -1326,7 +1338,7 @@ public class GPlanarPanoramicViewer
          System.out.println("_offsetX: " + _offsetX + " ,_offsetY: " + _offsetY);
       }
 
-      updateZoomWidgets();
+      //updateZoomWidgets();
       recreateTiles();
    }
 

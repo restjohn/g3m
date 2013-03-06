@@ -176,8 +176,10 @@ public class GContainer
                            final int width,
                            final int height) {
 
-      widget.setSize(width + "px", height + "px");
-      _panel.setWidgetPosition(widget, left, top);
+      if (_panel == widget.getParent()) {
+         widget.setSize(width + "px", height + "px");
+         _panel.setWidgetPosition(widget, left, top);
+      }
    }
 
 

@@ -4,11 +4,16 @@ package org.glob3.mobile.specific;
 
 import org.glob3.mobile.generated.URL;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.Log;
+import android.webkit.JsResult;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 
+@SuppressLint("SetJavaScriptEnabled")
 public class Browser_Android {
 
    private Activity      _activity;
@@ -50,16 +55,16 @@ public class Browser_Android {
       //_webView.getSettings().setBuiltInZoomControls(true);
       //_webView.getSettings().setUseWideViewPort(true);
 
-      //      _webView.setWebViewClient(new WebViewClient());
-      //      _webView.setWebChromeClient(new WebChromeClient() {
-      //         @Override
-      //         public boolean onJsAlert(final WebView view,
-      //                                  final String url,
-      //                                  final String message,
-      //                                  final JsResult result) {
-      //            return super.onJsAlert(view, url, message, result);
-      //         }
-      //      });
+      _webView.setWebViewClient(new WebViewClient());
+      _webView.setWebChromeClient(new WebChromeClient() {
+         @Override
+         public boolean onJsAlert(final WebView view,
+                                  final String url,
+                                  final String message,
+                                  final JsResult result) {
+            return super.onJsAlert(view, url, message, result);
+         }
+      });
 
       //      _webView.setWebViewClient(new WebViewClient() {
       //
