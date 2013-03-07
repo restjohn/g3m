@@ -369,6 +369,7 @@ public class GPlanarPanoramicViewer
                      }
                   }
                   _tilesToRemove.clear();
+                  Window.moveBy(1, 0);
                }
 
                if (_debug) {
@@ -717,17 +718,17 @@ public class GPlanarPanoramicViewer
    //      }
    //   }
 
-   //   private void forceDownloadLevelOne() {
-   //
-   //      final GPlanarPanoramicZoomLevel levelOne = getZoomLevel(1);
-   //
-   //      if (_debug) {
-   //         System.out.println("forceDownloadLevelOne: " + levelOne.toString());
-   //      }
-   //
-   //      createTiles();
-   //      layoutTiles();
-   //   }
+   private void forceDownloadLevelOne() {
+
+      final GPlanarPanoramicZoomLevel levelOne = getZoomLevel(1);
+
+      if (_debug) {
+         System.out.println("forceDownloadLevelOne: " + levelOne.toString());
+      }
+
+      createTiles();
+      layoutTiles();
+   }
 
 
    private GPlanarPanoramicZoomLevel getCurrentZoomLevel() {
@@ -1126,7 +1127,8 @@ public class GPlanarPanoramicViewer
       final List<Tile> tilesToCreate = new ArrayList<Tile>();
 
       final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
-      final GRectangle containerBounds = getContainerBound();
+      //final GRectangle containerBounds = getContainerBound();
+      final GRectangle containerBounds = getExtendedContainerBound();
 
       for (int x = 0; x < currentZoomLevel.getWidthInTiles(); x++) {
          for (int y = 0; y < currentZoomLevel.getHeightInTiles(); y++) {
@@ -1159,7 +1161,8 @@ public class GPlanarPanoramicViewer
    private void removeNotVisibleTiles() {
 
       final List<Tile> tilesToRemove = new ArrayList<Tile>();
-      final GRectangle containerBounds = getContainerBound();
+      //final GRectangle containerBounds = getContainerBound();
+      final GRectangle containerBounds = getExtendedContainerBound();
 
       for (final Tile tile : _tiles) {
          if (!tile.touches(containerBounds)) {
@@ -1181,6 +1184,16 @@ public class GPlanarPanoramicViewer
    private GRectangle getContainerBound() {
       final int containerWidth = Window.getClientWidth();
       final int containerHeight = Window.getClientHeight();
+
+      final GRectangle containerBounds = new GRectangle(containerWidth, containerHeight);
+
+      return containerBounds;
+   }
+
+
+   private GRectangle getExtendedContainerBound() {
+      final int containerWidth = Window.getClientWidth() + (4 * GPlanarPanoramicZoomLevel.TILE_WIDTH);
+      final int containerHeight = Window.getClientHeight() + (4 * GPlanarPanoramicZoomLevel.TILE_HEIGHT);
 
       final GRectangle containerBounds = new GRectangle(containerWidth, containerHeight);
 
@@ -1252,7 +1265,8 @@ public class GPlanarPanoramicViewer
    private void createTiles() {
 
       final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
-      final GRectangle containerBounds = getContainerBound();
+      //final GRectangle containerBounds = getContainerBound();
+      final GRectangle containerBounds = getExtendedContainerBound();
 
       for (int x = 0; x < currentZoomLevel.getWidthInTiles(); x++) {
          for (int y = 0; y < currentZoomLevel.getHeightInTiles(); y++) {
