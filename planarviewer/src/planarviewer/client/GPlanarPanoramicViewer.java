@@ -359,7 +359,7 @@ public class GPlanarPanoramicViewer
                }
 
                if (_numTilesToDownload == 0) {
-                  _progressInd.setVisible(false);
+                  //_progressInd.setVisible(false);
                   if (_debug) {
                      System.out.println("Deleting previous tiles: " + _tilesToRemove.size());
                   }
@@ -440,7 +440,7 @@ public class GPlanarPanoramicViewer
       Window.enableScrolling(false);
 
       System.out.println("Starting up .. ");
-      createProgressIndicator();
+      //createProgressIndicator();
       readZoomLevelsAndGo();
 
       //forceDownloadLevelOne();
@@ -835,7 +835,7 @@ public class GPlanarPanoramicViewer
 
 
    private void reportHttpError() {
-      _progressInd.setVisible(false);
+      //_progressInd.setVisible(false); // removed
       Window.alert("Panoramic temporarily unavailable");
    }
 
@@ -859,7 +859,7 @@ public class GPlanarPanoramicViewer
 
       for (int i = _minLevel + 1; i < _maxLevel; i++) {
          final GPlanarPanoramicZoomLevel currentLevel = getZoomLevel(i);
-         if ((currentLevel.getWidth() <= currentWidth) || (currentLevel.getHeight() <= currentHeight)) {
+         if ((currentLevel.getWidth() <= currentWidth) && (currentLevel.getHeight() <= currentHeight)) {
             result = i;
          }
       }
@@ -903,15 +903,15 @@ public class GPlanarPanoramicViewer
    //      recreateZoomWidgets(BUTTONEXTEND, BUTTONMARGIN);
    //   }
 
-   private void createProgressIndicator() {
-
-      _progressInd = new Image("IMG/loader1.gif");
-      //DOM.setIntStyleAttribute(_progressInd.getElement(), "border", 0);
-      final int posX = getContainerSize().getWidth() / 2;
-      final int posY = getContainerSize().getHeight() / 2;
-      super.addTopWidget(_progressInd, posX, posY);
-      _progressInd.setVisible(true);
-   }
+   //   private void createProgressIndicator() {
+   //
+   //      _progressInd = new Image("IMG/loader1.gif");
+   //      //DOM.setIntStyleAttribute(_progressInd.getElement(), "border", 0);
+   //      final int posX = getContainerSize().getWidth() / 2;
+   //      final int posY = getContainerSize().getHeight() / 2;
+   //      super.addTopWidget(_progressInd, posX, posY);
+   //      _progressInd.setVisible(true);
+   //   }
 
 
    private void createNavigationButtons(final int buttonExtent,
@@ -1240,11 +1240,9 @@ public class GPlanarPanoramicViewer
 
    private void layoutTiles() {
 
-      //clearTiles(); //removed 03/03/2012
-      //createHUD();
-      if (_numTilesToDownload > 0) {
-         _progressInd.setVisible(true);
-      }
+      //      if (_numTilesToDownload > 0) {
+      //         _progressInd.setVisible(true);
+      //      }
       for (final Tile tile : _tiles) {
          tile.positionate();
       }
