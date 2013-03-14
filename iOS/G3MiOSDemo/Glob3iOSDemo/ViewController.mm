@@ -299,8 +299,8 @@ id _thisInstance;
               
               PlanarViewerController *vc = [_thisInstance getPlanarViewerController];
               [_thisInstance presentModalViewController:vc animated:NO];
-              [vc loadPlanarViewerWebView:url];
-
+              [vc loadPlanarViewerWebView:url]; 
+ 
               //[_thisInstance loadUIWebView: urlString];
               return true;
           }
@@ -345,16 +345,173 @@ id _thisInstance;
     //-- add markers for planar panoramics --------------------
      
     //URL* pano1Url = new URL("http://glob3m.glob3mobile.com/planar/esmeralda2", false);
-    Mark* pano1 = new Mark("esmeralda2",
-                           URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
-                           Geodetic3D(Angle::fromDegrees(39.4348), Angle::fromDegrees(-6.3938), 0), new URL("http://glob3m.glob3mobile.com/planar/esmeralda2", false));
-    panoMarksRenderer->addMark(pano1);
-      
+//    Mark* pano1 = new Mark("esmeralda2",
+//                           URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+//                           Geodetic3D(Angle::fromDegrees(39.4348), Angle::fromDegrees(-6.3938), 0), new URL("http://glob3m.glob3mobile.com/planar/esmeralda2", false));
+
     //URL* pano2Url = new URL("http://glob3m.glob3mobile.com/planar/lospinos2", false);
-    Mark* pano2 = new Mark("lospinos2",
+//    Mark* pano2 = new Mark("lospinos2",
+//                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+//                             Geodetic3D(Angle::fromDegrees(39.4569), Angle::fromDegrees(-6.3892), 0), new URL("http://glob3m.glob3mobile.com/planar/lospinos2", false));
+
+    
+      Mark* pano1 = new Mark("arcoestrella",
                              URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
-                             Geodetic3D(Angle::fromDegrees(39.4569), Angle::fromDegrees(-6.3892), 0), new URL("http://glob3m.glob3mobile.com/planar/lospinos2", false));
+                             Geodetic3D(Angle::fromDegrees(39.4348), Angle::fromDegrees(-6.3938), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/arcoestrella", false));
+    panoMarksRenderer->addMark(pano1);
+    
+      Mark* pano2 = new Mark("arcoestrella360",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4569), Angle::fromDegrees(-6.3892), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/arcoestrella360", false));
     panoMarksRenderer->addMark(pano2);
+
+	Mark* pano3 = new Mark("caminomontana",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4349), Angle::fromDegrees(-6.3938), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/caminomontana", false));
+    panoMarksRenderer->addMark(pano3);
+    
+      Mark* pano4 = new Mark("esmeralda1",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4570), Angle::fromDegrees(-6.3892), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/esmeralda1", false));
+    panoMarksRenderer->addMark(pano4);
+
+//--
+
+Mark* pano5 = new Mark("esmeralda2",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4348), Angle::fromDegrees(-6.3939), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/esmeralda2", false));
+    panoMarksRenderer->addMark(pano5);
+    
+      Mark* pano6 = new Mark("esmeralda3",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4569), Angle::fromDegrees(-6.3893), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/esmeralda3", false));
+    panoMarksRenderer->addMark(pano6);
+
+	Mark* pano7 = new Mark("esmeralda4",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4349), Angle::fromDegrees(-6.3940), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/esmeralda4", false));
+    panoMarksRenderer->addMark(pano7);
+    
+      Mark* pano8 = new Mark("ferial",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4570), Angle::fromDegrees(-6.3894), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/ferial", false));
+    panoMarksRenderer->addMark(pano8);
+
+//--
+
+Mark* pano9 = new Mark("fuenteluminosa360",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4350), Angle::fromDegrees(-6.3939), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/fuenteluminosa360", false));
+    panoMarksRenderer->addMark(pano9);
+    
+      Mark* pano10 = new Mark("infantaisabelnorte",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4571), Angle::fromDegrees(-6.3893), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/infantaisabelnorte", false));
+    panoMarksRenderer->addMark(pano10);
+
+	Mark* pano11 = new Mark("infantaisabelsur",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4351), Angle::fromDegrees(-6.3940), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/infantaisabelnorte", false));
+    panoMarksRenderer->addMark(pano11);
+    
+      Mark* pano12 = new Mark("lamontana",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4572), Angle::fromDegrees(-6.3894), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/lamontana", false));
+    panoMarksRenderer->addMark(pano12);
+
+//--
+
+Mark* pano13 = new Mark("losgolfines",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4350), Angle::fromDegrees(-6.3941), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/losgolfines", false));
+    panoMarksRenderer->addMark(pano13);
+    
+      Mark* pano14 = new Mark("lospinos1",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4571), Angle::fromDegrees(-6.3895), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/lospinos1", false));
+    panoMarksRenderer->addMark(pano14);
+
+	Mark* pano15 = new Mark("lospinos2",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4351), Angle::fromDegrees(-6.3942), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/lospinos2", false));
+    panoMarksRenderer->addMark(pano15);
+    
+      Mark* pano16 = new Mark("paseoaltonorte",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4572), Angle::fromDegrees(-6.3896), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/paseoaltonorte", false));
+    panoMarksRenderer->addMark(pano16);
+
+//--
+
+Mark* pano17 = new Mark("paseoaltosur",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4352), Angle::fromDegrees(-6.3941), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/paseoaltosur", false));
+    panoMarksRenderer->addMark(pano17);
+    
+      Mark* pano18 = new Mark("plazaitalia1",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4573), Angle::fromDegrees(-6.3895), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/plazaitalia1", false));
+    panoMarksRenderer->addMark(pano18); 
+
+	Mark* pano19 = new Mark("plazaitalia2",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4353), Angle::fromDegrees(-6.3942), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/plazaitalia2", false));
+    panoMarksRenderer->addMark(pano19);
+    
+      Mark* pano20 = new Mark("plazaitalia3",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4574), Angle::fromDegrees(-6.3896), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/plazaitalia3", false));
+    panoMarksRenderer->addMark(pano20);
+
+//--
+
+Mark* pano21 = new Mark("plazamayor",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4352), Angle::fromDegrees(-6.3943), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/plazamayor", false));
+    panoMarksRenderer->addMark(pano21);
+    
+      Mark* pano22 = new Mark("sanfranciscojavier",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4573), Angle::fromDegrees(-6.3897), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/sanfranciscojavier", false));
+    panoMarksRenderer->addMark(pano22);
+
+	Mark* pano23 = new Mark("sanfranciscojavier360",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4353), Angle::fromDegrees(-6.3944), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/sanfranciscojavier360", false));
+    panoMarksRenderer->addMark(pano23);
+    
+      Mark* pano24 = new Mark("sanjorge360",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4574), Angle::fromDegrees(-6.3898), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/sanjorge360", false));
+    panoMarksRenderer->addMark(pano24);
+
+//--
+
+Mark* pano25 = new Mark("sanmarquino1",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4354), Angle::fromDegrees(-6.3943), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/sanmarquino1", false));
+    panoMarksRenderer->addMark(pano25);
+    
+      Mark* pano26 = new Mark("sanmarquino2",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4575), Angle::fromDegrees(-6.3897), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/sanmarquino2", false));
+    panoMarksRenderer->addMark(pano26);
+
+	Mark* pano27 = new Mark("sanmateo1",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4355), Angle::fromDegrees(-6.3944), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/sanmateo1", false));
+    panoMarksRenderer->addMark(pano27);
+    
+      Mark* pano28 = new Mark("sanmateo2",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4576), Angle::fromDegrees(-6.3898), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/sanmateo2", false));
+    panoMarksRenderer->addMark(pano28);
+
+Mark* pano29 = new Mark("santamaria360",
+                             URL("http://glob3m.glob3mobile.com/icons/markers/g3m.png", false),
+                             Geodetic3D(Angle::fromDegrees(39.4577), Angle::fromDegrees(-6.3899), 0), new URL("http://sig.ayto-caceres.es/caceresview/planar/santamaria360", false));
+    panoMarksRenderer->addMark(pano29);
+
     //---------------------------------------------------------
     
     
@@ -469,10 +626,10 @@ id _thisInstance;
     void run() {
       printf("Running initialization Task\n");
 
-      [_iosWidget widget]->setAnimatedCameraPosition(Geodetic3D(Angle::fromDegreesMinutes(37, 47),
-                                                                Angle::fromDegreesMinutes(-122, 25),
-                                                                1000000),
-                                                     TimeInterval::fromSeconds(10));
+      [_iosWidget widget]->setAnimatedCameraPosition(Geodetic3D(Angle::fromDegreesMinutes(39, 29),
+                                                                Angle::fromDegreesMinutes(-6, 19),
+                                                                100000),
+                                                     TimeInterval::fromSeconds(5));
 
       NSString *filePath = [[NSBundle mainBundle] pathForResource:@"seymour-plane" ofType:@"json"];
       if (filePath) {

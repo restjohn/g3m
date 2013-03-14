@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface PlanarViewerController : UIViewController
+@interface PlanarViewerController : UIViewController <UIWebViewDelegate>{
+    IBOutlet UIWebView *planarWebView; 
+}
 
 @property (strong, nonatomic) IBOutlet UIWebView *planarWebView;
 
