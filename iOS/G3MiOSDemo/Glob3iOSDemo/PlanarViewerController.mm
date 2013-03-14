@@ -25,15 +25,17 @@
     //NSLog(@"URL DESCRIPTION: %@",url.debugDescription);
     self.navigationItem.backBarButtonItem = backButton;
     backButton.target=self;
-    backButton.action=@selector(close);
+    backButton.action=@selector(close); 
+
     //CGRect webFrame = self.planarWebView.bounds;
     //CGRect webFrame = [[UIScreen mainScreen] applicationFrame];
-    CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
-    CGRect webFrame = CGRectMake(0, 44, appFrame.size.width, appFrame.size.height-44);
-    planarWebView = [[UIWebView alloc] initWithFrame:webFrame];
+    //CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+    //CGRect webFrame = CGRectMake(0, 44, appFrame.size.width, appFrame.size.height-44);
+    //planarWebView = [[UIWebView alloc] initWithFrame:webFrame];
+
+    self.planarWebView.delegate = self;
+    [self.view addSubview:self.planarWebView];
     [self.planarWebView loadRequest:[NSURLRequest requestWithURL:url]];
-    [self.view addSubview:planarWebView];
-    
 }
 
 - (void) close {
