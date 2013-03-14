@@ -46,6 +46,7 @@ public class GContainer
 
    private final AbsolutePanel _panel    = new AbsolutePanel();
    //private final AbsolutePanel _controlPanel = new AbsolutePanel();
+   //private final AbsolutePanel _debugPanel = new AbsolutePanel();
    private final AbsolutePanel _topPanel = new AbsolutePanel();
 
 
@@ -58,7 +59,10 @@ public class GContainer
       DOM.setIntStyleAttribute(_topPanel.getElement(), "zIndex", 50);
       //setWidget(_topPanel, 0, 0);
       //_panel.add(_controlPanel, 0, 0);
+      //DOM.setIntStyleAttribute(_debugPanel.getElement(), "zIndex", 101);
       _panel.add(_topPanel, 0, 0);
+      //_panel.add(_debugPanel, 0, 0);
+
    }
 
 
@@ -191,17 +195,37 @@ public class GContainer
 
    public void setSize(final int width,
                        final int height) {
-      super.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
-      _topPanel.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
-      //_controlPanel.setSize(Integer.toString(width) + "px", Integer.toString(height) + "px");
+
+      final String widthS = Integer.toString(width) + "px";
+      final String heightS = Integer.toString(height) + "px";
+      super.setSize(widthS, heightS);
+      _panel.setSize(widthS, heightS);
+      _topPanel.setSize(widthS, heightS);
    }
 
 
    public void clear() {
+
       _panel.clear();
       //_panel.add(_controlPanel, 0, 0);
       _panel.add(_topPanel, 0, 0);
    }
 
+   //   public void addDebugLabel(final Widget widget,
+   //                             final int left,
+   //                             final int top) {
+   //      //_debugPanel.add(widget, left, top);
+   //      _topPanel.add(widget, left, top);
+   //   }
+
+
+   //   public void forceReloadOnIos() {
+   //      if (_counterIos == 0) {
+   //         //DOM.setIntStyleAttribute(_panel.getElement(), "left", 1);
+   //         //DOM.setIntStyleAttribute(_panel.getElement(), "left", 0);
+   //         DOM.setIntStyleAttribute(_topPanel.getElement(), "left", 1);
+   //         _counterIos++;
+   //      }
+   //   }
 
 }
