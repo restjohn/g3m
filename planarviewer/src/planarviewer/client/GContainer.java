@@ -124,7 +124,9 @@ public class GContainer
                          final int left,
                          final int top) {
 
-      _panel.add(widget, left, top);
+      if (widget != null) {
+         _panel.add(widget, left, top);
+      }
    }
 
 
@@ -132,7 +134,7 @@ public class GContainer
                          final int left,
                          final int top) {
 
-      if (_panel == widget.getParent()) {
+      if ((widget != null) && (_panel == widget.getParent())) {
          _panel.setWidgetPosition(widget, left, top);
       }
    }
@@ -142,7 +144,9 @@ public class GContainer
                         final int left,
                         final int top) {
 
-      _panel.add(widget, left, top);
+      if (widget != null) {
+         _panel.add(widget, left, top);
+      }
    }
 
 
@@ -150,7 +154,7 @@ public class GContainer
                         final int left,
                         final int top) {
 
-      if (_panel == widget.getParent()) {
+      if ((widget != null) && (_panel == widget.getParent())) {
          _panel.setWidgetPosition(widget, left, top);
       }
    }
@@ -160,7 +164,9 @@ public class GContainer
                             final int left,
                             final int top) {
 
-      _topPanel.add(widget, left, top);
+      if (widget != null) {
+         _topPanel.add(widget, left, top);
+      }
    }
 
 
@@ -168,7 +174,7 @@ public class GContainer
                             final int left,
                             final int top) {
 
-      if (_topPanel == widget.getParent()) {
+      if ((widget != null) && (_topPanel == widget.getParent())) {
          _topPanel.setWidgetPosition(widget, left, top);
       }
    }
@@ -180,7 +186,7 @@ public class GContainer
                            final int width,
                            final int height) {
 
-      if (_panel == widget.getParent()) {
+      if ((widget != null) && (_panel == widget.getParent())) {
          widget.setSize(width + "px", height + "px");
          _panel.setWidgetPosition(widget, left, top);
       }
@@ -189,7 +195,9 @@ public class GContainer
 
    public void remove(final Widget widget) {
 
-      _panel.remove(widget);
+      if (widget != null) {
+         _panel.remove(widget);
+      }
    }
 
 
