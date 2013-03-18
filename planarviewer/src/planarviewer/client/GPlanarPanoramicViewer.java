@@ -438,6 +438,7 @@ public class GPlanarPanoramicViewer
    List<List<Tile>>                              _tilesToRemove;
    private int                                   _numTilesToDownload  = 0;
    private final Logger_WebGL                    _logger;
+   private GDimension                            _containerSize;
 
 
    public GPlanarPanoramicViewer(final String url,
@@ -458,10 +459,11 @@ public class GPlanarPanoramicViewer
       _zoomLevels = new ArrayList<GPlanarPanoramicZoomLevel>();
       _tiles = new ArrayList<Tile>();
       _tilesToRemove = new ArrayList<List<Tile>>();
+      _containerSize = getContainerSize();
 
       super.setTitle(name);
       super.setVisible(true);
-      super.setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
+      super.setSize(_containerSize.getWidth(), _containerSize.getHeight());
       Window.enableScrolling(false);
 
       //System.out.println("Starting up .. ");
@@ -493,8 +495,13 @@ public class GPlanarPanoramicViewer
          @Override
          public void onResize(final ResizeEvent event) {
 
+            if (getContainerSize().equals(_containerSize)) {
+               return;
+            }
             _logger.logInfo("Resizing view..");
-            setSize(getContainerSize().getWidth(), getContainerSize().getHeight());
+            //clear();
+            _containerSize = getContainerSize();
+            setSize(_containerSize.getWidth(), _containerSize.getHeight());
             updateZoomLevelFromContainerSize(_currentLevel);
             //recreateTiles();
             recreateWidgets(BUTTONEXTEND, BUTTONMARGIN);
@@ -1364,7 +1371,7 @@ public class GPlanarPanoramicViewer
          _currentLevel = clamp(initialZoomLevelIncrement, _minLevel, _maxLevel);
       }
       else {
-         _currentLevel = calculateInitialLevel(containerSize);
+         _currentLevel = calculateInitialLevel(getContainerSize());
       }
 
       final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
@@ -1389,7 +1396,7 @@ public class GPlanarPanoramicViewer
 
       final GDimension containerSize = getExtendedContainerBound().getSize();
 
-      _currentLevel = calculateInitialLevel(containerSize);
+      _currentLevel = calculateInitialLevel(getContainerSize());
 
       final GPlanarPanoramicZoomLevel currentZoomLevel = getCurrentZoomLevel();
       _offsetX = ((containerSize.getWidth() - currentZoomLevel.getWidth()) / 2)

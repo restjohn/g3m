@@ -27,6 +27,12 @@ public class GDimension {
    }
 
 
+   public boolean equals(final GDimension dim) {
+      //return super.equals(obj);
+      return (this._width == dim._width) && (this._height == dim._height);
+   }
+
+
    @Override
    public String toString() {
       return _width + ", " + _height;
