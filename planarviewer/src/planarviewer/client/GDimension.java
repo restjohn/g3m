@@ -29,6 +29,9 @@ public class GDimension {
 
    public boolean equals(final GDimension dim) {
       //return super.equals(obj);
+      if (dim == null) {
+         return false;
+      }
       return (this._width == dim._width) && (this._height == dim._height);
    }
 
