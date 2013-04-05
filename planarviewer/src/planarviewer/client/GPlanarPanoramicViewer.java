@@ -38,6 +38,7 @@ import com.google.gwt.json.client.JSONParser;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.Window.Navigator;
 import com.google.gwt.user.client.ui.AbsolutePanel;
@@ -61,6 +62,7 @@ public class GPlanarPanoramicViewer
    private static final int    ZOOM_SCALE_DELTA      = 10;
    private static final int    MIN_OFFSET_DISTANCE   = 6;
    private static final double NEIGHBORN_FACTOR      = 0.5;
+   private static final int    DEFERRED_TIME         = 100;
 
 
    private class Tile {
@@ -195,6 +197,7 @@ public class GPlanarPanoramicViewer
             _yPos = _offsetY + (int) (_y * GPlanarPanoramicZoomLevel.TILE_HEIGHT * scale);
             final int width = (int) (_image.getOriginalWidth() * scale);
             final int height = (int) (_image.getOriginalHeight() * scale);
+            _image.setMaxSize(width + 1, height + 1);
             _container.updateImage(_image, _xPos, _yPos, width, height);
          }
       }
@@ -344,24 +347,13 @@ public class GPlanarPanoramicViewer
             }
             else {
                _numTilesToDownload--;
-               //               if (_removeWhileLoading) {
-               //                  if (_debug) {
-               //                     System.out.println("Delete while downloading");
-               //                  }
-               //                  _removeWhileLoading = false;
-               //                  return;
-               //               }
 
-               if (_zoomLevel.getLevel() != _currentLevel) {
+               if ((_zoomLevel.getLevel() != _currentLevel) || !hasTileInTheSamePosition(_thisTile)) {
                   if (_debug) {
-                     _logger.logInfo("Different level tile..");
+                     _logger.logInfo("Discarded invalid tile..");
                   }
-                  return;
-               }
-
-               if (!hasTileInTheSamePosition(_thisTile)) { // == if (!_tiles.contains(_thisTile)) 
-                  if (_debug) {
-                     _logger.logInfo("Not contained tile ..");
+                  if (_numTilesToDownload == 0) {
+                     removeBackgroundTiles();
                   }
                   return;
                }
@@ -376,20 +368,17 @@ public class GPlanarPanoramicViewer
                }
                else {
                   _container.addImage(_image, _xPos, _yPos);
+                  //                  final Timer t = new Timer() {
+                  //                     @Override
+                  //                     public void run() {
+                  //                        _container.addImage(_image, _xPos, _yPos);
+                  //                     }
+                  //                  };
+                  //                  t.schedule(250);
                }
 
                if (_numTilesToDownload == 0) {
-                  //_progressInd.setVisible(false);
-                  if (_debug) {
-                     _logger.logInfo("Deleting previous tiles: " + _tilesToRemove.size());
-                  }
-                  for (final List<Tile> tileList : _tilesToRemove) {
-                     for (final Tile tile : tileList) {
-                        tile.remove();
-                     }
-                     tileList.clear();
-                  }
-                  _tilesToRemove.clear();
+                  removeBackgroundTiles();
                }
 
                if (_debug) {
@@ -397,7 +386,29 @@ public class GPlanarPanoramicViewer
                }
             }
          }
-      }
+
+
+         private void removeBackgroundTiles() {
+
+            final Timer deferredCleanT = new Timer() {
+               @Override
+               public void run() {
+                  //_progressInd.setVisible(false);
+                  if (_debug) {
+                     _logger.logInfo("Deleting previous tiles: " + _backgroundTiles.size());
+                  }
+
+                  for (final Tile tile : _backgroundTiles) {
+                     tile.remove();;
+                  }
+                  _backgroundTiles.clear();
+                  _isBackgroundDirty = false;
+               }
+            };
+            deferredCleanT.schedule(DEFERRED_TIME);
+         }
+
+      }// end class OnLoadImageHandler
 
    } // end class Tile
 
@@ -435,11 +446,12 @@ public class GPlanarPanoramicViewer
    private PushButton                            _buttonRight;
 
    //private Image                                 _progressInd;
-   List<List<Tile>>                              _tilesToRemove;
+   private final List<Tile>                      _backgroundTiles;
    private int                                   _numTilesToDownload  = 0;
    private final Logger_WebGL                    _logger;
    private GDimension                            _containerSize;
    private final boolean                         _isMobileDevice;
+   private boolean                               _isBackgroundDirty   = false;
 
 
    public GPlanarPanoramicViewer(final String url,
@@ -459,7 +471,7 @@ public class GPlanarPanoramicViewer
       _logger = new Logger_WebGL(LogLevel.InfoLevel);
       _zoomLevels = new ArrayList<GPlanarPanoramicZoomLevel>();
       _tiles = new ArrayList<Tile>();
-      _tilesToRemove = new ArrayList<List<Tile>>();
+      _backgroundTiles = new ArrayList<Tile>();
       _containerSize = getContainerSize();
       _isMobileDevice = isMobileDevice();
 
@@ -1025,6 +1037,10 @@ public class GPlanarPanoramicViewer
             event.preventDefault();
             _isDragging = false;
             moveLeft();
+            _logger.logInfo("BACKGROUND TILES: " + _backgroundTiles.size());;
+            _logger.logInfo("TILES TO DOWNLOAD: " + _numTilesToDownload);
+            _logger.logInfo("_isBackgroundDirty: " + Boolean.toString(_isBackgroundDirty));
+            _logger.logInfo("NUM TILES: " + _tiles.size());
          }
       });
       _buttonLeft.setSize(buttonSize, buttonSize);
@@ -1144,7 +1160,12 @@ public class GPlanarPanoramicViewer
          return;
       }
 
-      if (_numTilesToDownload > 0) {
+      //      if (_numTilesToDownload > 0) {
+      //         ;
+      //         return;
+      //      }
+
+      if (_isBackgroundDirty) {
          return;
       }
 
@@ -1161,7 +1182,6 @@ public class GPlanarPanoramicViewer
 
       //updateZoomWidgets();
       updateTilesToNewZoom(_currentLevel);
-      //recreateTiles(); //removed: 01/03/2013
    }
 
 
@@ -1172,7 +1192,7 @@ public class GPlanarPanoramicViewer
          return;
       }
 
-      //      if (_numTilesToDownload > 0) {
+      //      if (_isBackgroundDirty) {
       //         return;
       //      }
 
@@ -1181,6 +1201,7 @@ public class GPlanarPanoramicViewer
 
       updateTilesGrid();
       layoutTiles();
+      layoutBackgroundTiles();
    }
 
 
@@ -1276,14 +1297,11 @@ public class GPlanarPanoramicViewer
 
    private void updateTilesToNewZoom(final int currentLevel) {
 
-      final List<Tile> oldTilesToRemove = new ArrayList<Tile>();
-      oldTilesToRemove.addAll(_tiles);
-
-      for (final Tile tile : oldTilesToRemove) {
+      _backgroundTiles.addAll(_tiles);
+      for (final Tile tile : _backgroundTiles) {
          tile.resizeWhileDownloading(currentLevel);
       }
-      _tilesToRemove.add(oldTilesToRemove);
-
+      _isBackgroundDirty = true;
       _tiles.clear();
 
       createTiles();
@@ -1324,6 +1342,16 @@ public class GPlanarPanoramicViewer
       //      }
       for (final Tile tile : _tiles) {
          tile.positionate();
+      }
+   }
+
+
+   private void layoutBackgroundTiles() {
+
+      if (_backgroundTiles.size() > 0) {
+         for (final Tile tile : _backgroundTiles) {
+            tile.positionate();
+         }
       }
    }
 
