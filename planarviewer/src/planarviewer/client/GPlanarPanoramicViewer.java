@@ -352,9 +352,8 @@ public class GPlanarPanoramicViewer
                   if (_debug) {
                      _logger.logInfo("Discarded invalid tile..");
                   }
-                  if (_numTilesToDownload == 0) {
-                     removeBackgroundTiles();
-                  }
+                  removeBackgroundTiles();
+
                   return;
                }
 
@@ -374,12 +373,10 @@ public class GPlanarPanoramicViewer
                   //                        _container.addImage(_image, _xPos, _yPos);
                   //                     }
                   //                  };
-                  //                  t.schedule(250);
+                  //                  t.schedule(2500);
                }
 
-               if (_numTilesToDownload == 0) {
-                  removeBackgroundTiles();
-               }
+               removeBackgroundTiles();
 
                if (_debug) {
                   _logger.logInfo("Loaded: " + tileToString());
@@ -390,22 +387,24 @@ public class GPlanarPanoramicViewer
 
          private void removeBackgroundTiles() {
 
-            final Timer deferredCleanT = new Timer() {
-               @Override
-               public void run() {
-                  //_progressInd.setVisible(false);
-                  if (_debug) {
-                     _logger.logInfo("Deleting previous tiles: " + _backgroundTiles.size());
-                  }
+            if ((_numTilesToDownload == 0) && (_backgroundTiles.size() > 0)) {
+               final Timer t = new Timer() {
+                  @Override
+                  public void run() {
+                     //_progressInd.setVisible(false);
+                     if (_debug) {
+                        _logger.logInfo("Deleting previous tiles: " + _backgroundTiles.size());
+                     }
 
-                  for (final Tile tile : _backgroundTiles) {
-                     tile.remove();;
+                     for (final Tile tile : _backgroundTiles) {
+                        tile.remove();;
+                     }
+                     _backgroundTiles.clear();
+                     _isBackgroundDirty = false;
                   }
-                  _backgroundTiles.clear();
-                  _isBackgroundDirty = false;
-               }
-            };
-            deferredCleanT.schedule(DEFERRED_TIME);
+               };
+               t.schedule(DEFERRED_TIME);
+            }
          }
 
       }// end class OnLoadImageHandler
