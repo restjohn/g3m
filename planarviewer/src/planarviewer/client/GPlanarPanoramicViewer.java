@@ -62,7 +62,7 @@ public class GPlanarPanoramicViewer
    private static final int    ZOOM_SCALE_DELTA      = 10;
    private static final int    MIN_OFFSET_DISTANCE   = 6;
    private static final double NEIGHBORN_FACTOR      = 0.5;
-   private static final int    DEFERRED_TIME         = 100;
+   private static final int    DEFERRED_TIME         = 400;
 
 
    private class Tile {
@@ -353,7 +353,6 @@ public class GPlanarPanoramicViewer
                      _logger.logInfo("Discarded invalid tile..");
                   }
                   removeBackgroundTiles();
-
                   return;
                }
 
@@ -373,7 +372,7 @@ public class GPlanarPanoramicViewer
                   //                        _container.addImage(_image, _xPos, _yPos);
                   //                     }
                   //                  };
-                  //                  t.schedule(2500);
+                  //                  t.schedule(3000);
                }
 
                removeBackgroundTiles();
@@ -388,6 +387,18 @@ public class GPlanarPanoramicViewer
          private void removeBackgroundTiles() {
 
             if ((_numTilesToDownload == 0) && (_backgroundTiles.size() > 0)) {
+
+               //               _backgroundTiles.get(0).remove();//borro el primero pa forzar el render
+               //               _backgroundTiles.remove(0);
+
+               doRender(); //to force rendering of downloaded tiles (unfortunately doesn't work!)
+               //               _logger.logInfo("endRender");
+               //               for (final Tile tile : _backgroundTiles) {
+               //                  tile.remove();;
+               //               }
+               //               _backgroundTiles.clear();
+               //               _isBackgroundDirty = false;
+
                final Timer t = new Timer() {
                   @Override
                   public void run() {
@@ -406,6 +417,7 @@ public class GPlanarPanoramicViewer
                t.schedule(DEFERRED_TIME);
             }
          }
+
 
       }// end class OnLoadImageHandler
 
@@ -1036,10 +1048,10 @@ public class GPlanarPanoramicViewer
             event.preventDefault();
             _isDragging = false;
             moveLeft();
-            _logger.logInfo("BACKGROUND TILES: " + _backgroundTiles.size());;
-            _logger.logInfo("TILES TO DOWNLOAD: " + _numTilesToDownload);
-            _logger.logInfo("_isBackgroundDirty: " + Boolean.toString(_isBackgroundDirty));
-            _logger.logInfo("NUM TILES: " + _tiles.size());
+            //            _logger.logInfo("BACKGROUND TILES: " + _backgroundTiles.size());;
+            //            _logger.logInfo("TILES TO DOWNLOAD: " + _numTilesToDownload);
+            //            _logger.logInfo("_isBackgroundDirty: " + Boolean.toString(_isBackgroundDirty));
+            //            _logger.logInfo("NUM TILES: " + _tiles.size());
          }
       });
       _buttonLeft.setSize(buttonSize, buttonSize);

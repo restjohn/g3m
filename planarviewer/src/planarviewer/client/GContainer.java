@@ -62,7 +62,7 @@ public class GContainer
       //DOM.setIntStyleAttribute(_debugPanel.getElement(), "zIndex", 101);
       _panel.add(_topPanel, 0, 0);
       //_panel.add(_debugPanel, 0, 0);
-
+      DOM.setElementAttribute(_panel.getElement(), "id", "planarviewer");
    }
 
 
@@ -218,6 +218,22 @@ public class GContainer
       //_panel.add(_controlPanel, 0, 0);
       _panel.add(_topPanel, 0, 0);
    }
+
+
+   public void doRender() {
+      //render("planarviewer.planarviewer");;
+      render("planarviewer");
+      //Event.trigger(_panel.getElement(), "resize");
+      //ResizeEvent.fire(this, _panel.getOffsetWidth(), _panel.getOffsetHeight());
+   }
+
+
+   //   @Override
+   //   public HandlerRegistration addResizeHandler(final ResizeHandler handler) {
+   //      //return this.addDomHandler(handler, ResizeEvent.getType());
+   //      return Window.addResizeHandler(handler);
+   //      //return null;
+   //   }
 
    //   public void addDebugLabel(final Widget widget,
    //                             final int left,
