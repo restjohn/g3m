@@ -103,6 +103,8 @@ private:
   Extent* getTileExtent(const G3MRenderContext *rc);
 
   void cancelElevationDataRequest(ElevationDataProvider* elevationDataProvider);
+  
+  int _elevationDataLevel;
 
 public:
   Tile(TileTexturizer* texturizer,
@@ -201,6 +203,12 @@ public:
   inline std::vector<Tile*>* createSubTiles(const Angle& splitLatitude,
                                             const Angle& splitLongitude,
                                             bool setParent);
+  
+  void setElevationData(ElevationData* ed, int level, ElevationDataProvider* edp);
+  
+  void getElevationDataFromAncestor(ElevationDataProvider* elevationDataProvider);
+  
+  void ancestorChangedElevationData(Tile* ancestor, ElevationDataProvider* edp);
 
 };
 
