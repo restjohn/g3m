@@ -131,7 +131,8 @@ public:
   _halfFrustum((that._halfFrustum == NULL) ? NULL : new Frustum(*that._halfFrustum)),
   _halfFrustumInModelCoordinates((that._halfFrustumInModelCoordinates == NULL) ? NULL : new Frustum(*that._halfFrustumInModelCoordinates)),
   _camEffectTarget(new CameraEffectTarget()),
-  _geodeticPosition((that._geodeticPosition == NULL) ? NULL: new Geodetic3D(*that._geodeticPosition))
+  _geodeticPosition((that._geodeticPosition == NULL) ? NULL: new Geodetic3D(*that._geodeticPosition)),
+  _timeStamp(0)
   {
   }
 
@@ -226,6 +227,7 @@ public:
       _position = MutableVector3D(v);
       _geodeticPosition = NULL;
       _dirtyFlags.setAll(true);
+      increaseTimeStamp();
     }
   }
 
@@ -279,6 +281,10 @@ public:
     getProjectionMatrix();
     getModelMatrix();
   }
+  
+  int getTimeStamp() const{
+    return _timeStamp;
+  }
 
 private:
   const Angle getHeading(const Vector3D& normal) const;
@@ -306,6 +312,8 @@ private:
   mutable Frustum*         _frustumInModelCoordinates;
   mutable Frustum*         _halfFrustum;                    // ONLY FOR DEBUG
   mutable Frustum*         _halfFrustumInModelCoordinates;  // ONLY FOR DEBUG
+  
+  int                      _timeStamp;
 
   //The Camera Effect Target
   class CameraEffectTarget: public EffectTarget {
@@ -325,6 +333,7 @@ private:
     if (!v.equalTo(_center)){
       _center = MutableVector3D(v);
       _dirtyFlags.setAll(true);
+      increaseTimeStamp();
     }
   }
 
@@ -332,6 +341,7 @@ private:
     if (!v.equalTo(_up)){
       _up = MutableVector3D(v);
       _dirtyFlags.setAll(true);
+      increaseTimeStamp();
     }
   }
 
@@ -425,6 +435,10 @@ private:
   FrustumData calculateFrustumData() const;
 
   void _setGeodeticPosition(const Vector3D& pos);
+  
+  inline void increaseTimeStamp(){
+    _timeStamp++;
+  }
 
 };
 
