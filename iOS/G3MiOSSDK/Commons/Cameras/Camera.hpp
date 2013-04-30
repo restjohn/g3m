@@ -95,7 +95,7 @@ public:
   void setAll(bool value) {
     _frustumDataDirty           = value;
     _projectionMatrixDirty      = value;
-    _modelMatrixDirty          = value;
+    _modelMatrixDirty           = value;
     _modelViewMatrixDirty       = value;
     _cartesianCenterOfViewDirty = value;
     _geodeticCenterOfViewDirty  = value;
@@ -145,6 +145,7 @@ public:
     delete _halfFrustum;
     delete _halfFrustumInModelCoordinates;
     delete _geodeticCenterOfView;
+    delete _geodeticPosition;
   }
 
   void copyFrom(const Camera &c);
@@ -225,6 +226,7 @@ public:
   void setCartesianPosition(const MutableVector3D& v){
     if (!v.equalTo(_position)){
       _position = MutableVector3D(v);
+      delete _geodeticPosition;
       _geodeticPosition = NULL;
       _dirtyFlags.setAll(true);
       increaseTimeStamp();
@@ -241,8 +243,8 @@ public:
   void setPitch(const Angle& angle);
 
   const Geodetic3D getGeodeticPosition() const {
-    if (_geodeticPosition == NULL){
-      _geodeticPosition = new Geodetic3D(_planet->toGeodetic3D( getCartesianPosition() ));
+    if (_geodeticPosition == NULL) {
+      _geodeticPosition = new Geodetic3D( _planet->toGeodetic3D(getCartesianPosition()) );
     }
     return *_geodeticPosition;
   }
