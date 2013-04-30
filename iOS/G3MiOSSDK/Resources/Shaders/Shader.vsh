@@ -12,8 +12,9 @@ attribute vec4 Color;
 uniform mediump vec2 TranslationTexCoord;
 uniform mediump vec2 ScaleTexCoord;
 
-uniform mat4 Projection;
-uniform mat4 Modelview;
+//uniform mat4 Projection;
+//uniform mat4 Modelview;
+uniform mat4 ProjectionModelview;
 
 uniform bool BillBoard;
 uniform vec2 TextureExtent;
@@ -26,7 +27,8 @@ varying vec2 TextureCoordOut;
 
 
 void main() {
-  gl_Position = Projection * Modelview * Position;
+  //gl_Position = Projection * Modelview * Position;
+  gl_Position = ProjectionModelview * Position;
 
   if (BillBoard) {
     gl_Position.x += ((TextureCoord.x - 0.5) * 2.0 * TextureExtent.x / ViewPortExtent.x) * gl_Position.w;

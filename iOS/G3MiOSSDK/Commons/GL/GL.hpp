@@ -30,7 +30,7 @@ class GL {
 private:
   INativeGL* const _nativeGL;
 
-  MutableMatrix44D            _modelView;
+  MutableMatrix44D            _projectionModelview;
 
   // stack of ModelView matrices
   std::list<MutableMatrix44D> _matrixStack;
@@ -81,7 +81,7 @@ private:
 //  private IGLTextureId _boundTextureId;
 //#endif
 
-  inline void loadModelView();
+//  inline void loadModelView();
 
   const IGLTextureId* getGLTextureId();
 
@@ -163,7 +163,7 @@ public:
 
   void popMatrix();
 
-  void loadMatrixf(const MutableMatrix44D &m);
+//  void loadMatrixf(const MutableMatrix44D &m);
 
   void multMatrixf(const MutableMatrix44D &m);
 
@@ -180,7 +180,8 @@ public:
                   int first,
                   int count);
 
-  void setProjection(const MutableMatrix44D &projection);
+//  void setProjection(const MutableMatrix44D &projection);
+  void loadProjectionModelview(const MutableMatrix44D &projectionModelview);
 
   bool useProgram(ShaderProgram* program);
 

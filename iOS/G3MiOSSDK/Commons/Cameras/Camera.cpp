@@ -196,8 +196,7 @@ void Camera::_setGeodeticPosition(const Vector3D& pos) {
 void Camera::render(const G3MRenderContext* rc,
                     const GLState& parentState) const {
   GL* gl = rc->getGL();
-  gl->setProjection(getProjectionMatrix());
-  gl->loadMatrixf(getModelMatrix());
+  gl->loadProjectionModelview(getProjectionMatrix().multiply(getModelMatrix() ));
 }
 
 

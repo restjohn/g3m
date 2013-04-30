@@ -23,72 +23,69 @@
 
 class UniformsStruct {
 public:
-
-  IGLUniformID* Projection;
-  IGLUniformID* Modelview;
+  IGLUniformID* ProjectionModelview;
+  
   IGLUniformID* Sampler;
   IGLUniformID* EnableTexture;
   IGLUniformID* FlatColor;
   IGLUniformID* TranslationTexCoord;
   IGLUniformID* ScaleTexCoord;
   IGLUniformID* PointSize;
-
+  
   //FOR BILLBOARDING
   IGLUniformID* BillBoard;
   IGLUniformID* ViewPortExtent;
   IGLUniformID* TextureExtent;
-
-
+  
+  
   //FOR COLOR MIXING
   IGLUniformID* FlatColorIntensity;
   IGLUniformID* EnableColorPerVertex;
   IGLUniformID* EnableFlatColor;
   IGLUniformID* ColorPerVertexIntensity;
-
+  
   UniformsStruct() {
-    Projection = NULL;
-    Modelview = NULL;
+    ProjectionModelview = NULL;
     Sampler = NULL;
     EnableTexture = NULL;
     FlatColor = NULL;
     TranslationTexCoord = NULL;
     ScaleTexCoord = NULL;
     PointSize = NULL;
-
+    
     //FOR BILLBOARDING
     BillBoard = NULL;
     ViewPortExtent = NULL;
     TextureExtent = NULL;
-
+    
     //FOR COLOR MIXING
     FlatColorIntensity = NULL;
     EnableColorPerVertex = NULL;
     EnableFlatColor = NULL;
     ColorPerVertexIntensity = NULL;
   }
-
+  
   void deleteUniformsIDs(){
-    delete Projection;
-    delete Modelview;
+    delete ProjectionModelview;
     delete Sampler;
     delete EnableTexture;
     delete FlatColor;
     delete TranslationTexCoord;
     delete ScaleTexCoord;
     delete PointSize;
-
+    
     //FOR BILLBOARDING
     delete BillBoard;
     delete ViewPortExtent;
     delete TextureExtent;
-
+    
     //FOR COLOR MIXING
     delete FlatColorIntensity;
     delete EnableColorPerVertex;
     delete EnableFlatColor;
     delete ColorPerVertexIntensity;
   }
-
+  
   ~UniformsStruct(){
     deleteUniformsIDs();
   }
@@ -135,7 +132,7 @@ bool GL::useProgram(ShaderProgram* program) {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::useProgram()");
   }
-
+  
   if (_program == program) {
     return true;
   }
@@ -143,114 +140,92 @@ bool GL::useProgram(ShaderProgram* program) {
   
   // set shaders
   _nativeGL->useProgram(program);
-
+  
   //Methods checkedGetAttribLocation and checkedGetUniformLocation
   //will turn _errorGettingLocationOcurred to true is that happens
   _errorGettingLocationOcurred = false;
-
+  
   // Extract the handles to attributes
   Attributes.Position     = checkedGetAttribLocation(program, "Position");
   Attributes.TextureCoord = checkedGetAttribLocation(program, "TextureCoord");
   Attributes.Color        = checkedGetAttribLocation(program, "Color");
-
+  
   Uniforms.deleteUniformsIDs(); //DELETING
-
+  
   // Extract the handles to uniforms
-  Uniforms.Projection          = checkedGetUniformLocation(program, "Projection");
-  Uniforms.Modelview           = checkedGetUniformLocation(program, "Modelview");
+  Uniforms.ProjectionModelview = checkedGetUniformLocation(program, "ProjectionModelview");
+  
   Uniforms.Sampler             = checkedGetUniformLocation(program, "Sampler");
   Uniforms.EnableTexture       = checkedGetUniformLocation(program, "EnableTexture");
   Uniforms.FlatColor           = checkedGetUniformLocation(program, "FlatColor");
   Uniforms.TranslationTexCoord = checkedGetUniformLocation(program, "TranslationTexCoord");
   Uniforms.ScaleTexCoord       = checkedGetUniformLocation(program, "ScaleTexCoord");
   Uniforms.PointSize           = checkedGetUniformLocation(program, "PointSize");
-
+  
   // default values
   _nativeGL->uniform2f(Uniforms.ScaleTexCoord, _scaleX, _scaleY);
   _nativeGL->uniform2f(Uniforms.TranslationTexCoord, _translationX, _translationY);
   _nativeGL->uniform1f(Uniforms.PointSize, 1);
-
+  
   //BILLBOARDS
   Uniforms.BillBoard      = checkedGetUniformLocation(program, "BillBoard");
   Uniforms.ViewPortExtent = checkedGetUniformLocation(program, "ViewPortExtent");
   Uniforms.TextureExtent  = checkedGetUniformLocation(program, "TextureExtent");
   
   _nativeGL->uniform1i(Uniforms.BillBoard, 0); //NOT DRAWING BILLBOARD
-
+  
   //FOR FLAT COLOR MIXING
   Uniforms.FlatColorIntensity      = checkedGetUniformLocation(program, "FlatColorIntensity");
   Uniforms.ColorPerVertexIntensity = checkedGetUniformLocation(program, "ColorPerVertexIntensity");
   Uniforms.EnableColorPerVertex    = checkedGetUniformLocation(program, "EnableColorPerVertex");
   Uniforms.EnableFlatColor         = checkedGetUniformLocation(program, "EnableFlatColor");
-
+  
   //Return
   return !_errorGettingLocationOcurred;
 }
 
-void GL::loadModelView() {
+void GL::loadProjectionModelview(const MutableMatrix44D &projectionModelview) {
   if (_verbose) {
-    ILogger::instance()->logInfo("GL::loadModelView()");
+    ILogger::instance()->logInfo("GL::setProjectionModelview()");
   }
-
-  _nativeGL->uniformMatrix4fv(Uniforms.Modelview,
+  
+  _projectionModelview = projectionModelview;
+  
+  _nativeGL->uniformMatrix4fv(Uniforms.ProjectionModelview,
                               false,
-                              &_modelView);
-}
-
-void GL::setProjection(const MutableMatrix44D &projection) {
-  if (_verbose) {
-    ILogger::instance()->logInfo("GL::setProjection()");
-  }
-
-  _nativeGL->uniformMatrix4fv(Uniforms.Projection,
-                              false,
-                              &projection);
-}
-
-void GL::loadMatrixf(const MutableMatrix44D &modelView) {
-  if (_verbose) {
-    ILogger::instance()->logInfo("GL::loadMatrixf()");
-  }
-
-  _modelView = modelView;
-
-  loadModelView();
+                              &projectionModelview);
 }
 
 void GL::multMatrixf(const MutableMatrix44D &m) {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::multMatrixf()");
   }
-
-  _modelView = _modelView.multiply(m);
-
-  loadModelView();
+  
+  loadProjectionModelview(_projectionModelview.multiply(m));
 }
 
 void GL::popMatrix() {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::popMatrix()");
   }
-
-  _modelView = _matrixStack.back();
+  
+  loadProjectionModelview(_matrixStack.back());
   _matrixStack.pop_back();
-
-  loadModelView();
 }
 
 void GL::pushMatrix() {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::pushMatrix()");
   }
-
-  _matrixStack.push_back(_modelView);
+  
+  _matrixStack.push_back(_projectionModelview);
 }
 
 void GL::clearScreen(float r, float g, float b, float a) {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::clearScreen()");
   }
-
+  
   _nativeGL->clearColor(r, g, b, a);
   _nativeGL->clear(GLBufferType::colorBuffer() | GLBufferType::depthBuffer());
 }
@@ -259,7 +234,7 @@ void GL::color(float r, float g, float b, float a) {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::color()");
   }
-
+  
   if (
       (_flatColorR != r) ||
       (_flatColorG != g) ||
@@ -267,7 +242,7 @@ void GL::color(float r, float g, float b, float a) {
       (_flatColorA != a)
       ) {
     _nativeGL->uniform4f(Uniforms.FlatColor, r, g, b, a);
-
+    
     _flatColorR = r;
     _flatColorG = g;
     _flatColorB = b;
@@ -282,7 +257,7 @@ void GL::transformTexCoords(float scaleX,
   if (_verbose) {
     ILogger::instance()->logInfo("GL::transformTexCoords()");
   }
-
+  
   if ((_scaleX != scaleX) || (_scaleY != scaleY)) {
     _nativeGL->uniform2f(Uniforms.ScaleTexCoord,
                          scaleX,
@@ -290,7 +265,7 @@ void GL::transformTexCoords(float scaleX,
     _scaleX = scaleX;
     _scaleY = scaleY;
   }
-
+  
   if ((_translationX != translationX) || (_translationY != translationY)) {
     _nativeGL->uniform2f(Uniforms.TranslationTexCoord,
                          translationX,
@@ -304,7 +279,7 @@ void GL::enablePolygonOffset(float factor, float units) {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::enablePolygonOffset()");
   }
-
+  
   _nativeGL->enable(GLFeature::polygonOffsetFill());
   _nativeGL->polygonOffset(factor, units);
 }
@@ -313,7 +288,7 @@ void GL::disablePolygonOffset() {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::disablePolygonOffset()");
   }
-
+  
   _nativeGL->disable(GLFeature::polygonOffsetFill());
 }
 
@@ -326,7 +301,7 @@ void GL::vertexPointer(int size,
                                  stride,
                                  vertices->description().c_str());
   }
-
+  
   if ((_vertices != vertices) ||
       (_verticesTimestamp != vertices->timestamp()) ) {
     _nativeGL->vertexAttribPointer(Attributes.Position, size, false, stride, vertices);
@@ -354,7 +329,7 @@ void GL::drawElements(int mode,
                                  mode,
                                  indices->description().c_str());
   }
-
+  
   _nativeGL->drawElements(mode,
                           indices->size(),
                           indices);
@@ -369,7 +344,7 @@ void GL::drawArrays(int mode,
                                  first,
                                  count);
   }
-
+  
   _nativeGL->drawArrays(mode,
                         first,
                         count);
@@ -379,7 +354,7 @@ int GL::getError() {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::getError()");
   }
-
+  
   return _nativeGL->getError();
 }
 
@@ -389,12 +364,12 @@ const IGLTextureId* GL::uploadTexture(const IImage* image,
   if (_verbose) {
     ILogger::instance()->logInfo("GL::uploadTexture()");
   }
-
+  
   const IGLTextureId* texId = getGLTextureId();
   if (texId != NULL) {
     //_nativeGL->blendFunc(GLBlendFactor::srcAlpha(), GLBlendFactor::oneMinusSrcAlpha());
     _nativeGL->pixelStorei(GLAlignment::unpack(), 1);
-
+    
     _nativeGL->bindTexture(GLTextureType::texture2D(), texId);
     _nativeGL->texParameteri(GLTextureType::texture2D(),
                              GLTextureParameter::minFilter(),
@@ -409,7 +384,7 @@ const IGLTextureId* GL::uploadTexture(const IImage* image,
                              GLTextureParameter::wrapT(),
                              GLTextureParameterValue::clampToEdge());
     _nativeGL->texImage2D(image, format);
-
+    
     if (generateMipmap) {
       _nativeGL->generateMipmap(GLTextureType::texture2D());
     }
@@ -418,7 +393,7 @@ const IGLTextureId* GL::uploadTexture(const IImage* image,
     ILogger::instance()->logError("can't get a valid texture id\n");
     return NULL;
   }
-
+  
   return texId;
 }
 
@@ -431,7 +406,7 @@ void GL::setTextureCoordinates(int size,
                                  stride,
                                  textureCoordinates->description().c_str());
   }
-
+  
   if ((_textureCoordinates != textureCoordinates) ||
       (_textureCoordinatesTimestamp != textureCoordinates->timestamp()) ) {
     _nativeGL->vertexAttribPointer(Attributes.TextureCoord, size, false, stride, textureCoordinates);
@@ -444,18 +419,18 @@ void GL::bindTexture(const IGLTextureId* textureId) {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::bindTexture()");
   }
-
+  
   if (textureId == NULL) {
     ILogger::instance()->logError("Can't bind a NULL texture");
   }
   else {
-//    if ((_boundTextureId == NULL) || !_boundTextureId->isEqualsTo(textureId)) {
-      _nativeGL->bindTexture(GLTextureType::texture2D(), textureId);
-//      _boundTextureId = textureId;
-//    }
-//    else {
-//      ILogger::instance()->logInfo("TextureId %s already bound", textureId->description().c_str());
-//    }
+    //    if ((_boundTextureId == NULL) || !_boundTextureId->isEqualsTo(textureId)) {
+    _nativeGL->bindTexture(GLTextureType::texture2D(), textureId);
+    //      _boundTextureId = textureId;
+    //    }
+    //    else {
+    //      ILogger::instance()->logInfo("TextureId %s already bound", textureId->description().c_str());
+    //    }
   }
 }
 
@@ -463,7 +438,7 @@ IFloatBuffer* GL::getBillboardTexCoord() {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::getBillboardTexCoord()");
   }
-
+  
   if (_billboardTexCoord == NULL) {
     FloatBufferBuilderFromCartesian2D texCoor;
     texCoor.add(1,1);
@@ -472,7 +447,7 @@ IFloatBuffer* GL::getBillboardTexCoord() {
     texCoor.add(0,0);
     _billboardTexCoord = texCoor.create();
   }
-
+  
   return _billboardTexCoord;
 }
 
@@ -480,9 +455,9 @@ void GL::startBillBoardDrawing(int viewPortWidth,
                                int viewPortHeight) {
   _nativeGL->uniform1i(Uniforms.BillBoard, 1);
   _nativeGL->uniform2f(Uniforms.ViewPortExtent, viewPortWidth, viewPortHeight);
-
+  
   color(1, 1, 1, 1);
-
+  
   setTextureCoordinates(2, 0, getBillboardTexCoord());
 }
 
@@ -498,15 +473,15 @@ void GL::drawBillBoard(const IGLTextureId* textureId,
   if (_verbose) {
     ILogger::instance()->logInfo("GL::drawBillBoard()");
   }
-
+  
   int TODO_refactor_billboard;
-
+  
   _nativeGL->uniform2f(Uniforms.TextureExtent, textureWidth, textureHeight);
-
+  
   bindTexture(textureId);
-
+  
   vertexPointer(3, 0, vertices);
-
+  
   _nativeGL->drawArrays(GLPrimitive::triangleStrip(), 0, vertices->size() / 3);
 }
 
@@ -514,7 +489,7 @@ void GL::setBlendFuncSrcAlpha() {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::setBlendFuncSrcAlpha()");
   }
-
+  
   _nativeGL->blendFunc(GLBlendFactor::srcAlpha(), GLBlendFactor::oneMinusSrcAlpha());
 }
 
@@ -522,43 +497,43 @@ const IGLTextureId* GL::getGLTextureId() {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::getGLTextureId()");
   }
-
+  
   if (_texturesIdBag.size() == 0) {
     //const int bugdetSize = 256;
     const int bugdetSize = 1024;
     //const int bugdetSize = 10240;
-
+    
     const std::vector<IGLTextureId*> ids = _nativeGL->genTextures(bugdetSize);
     const int idsCount = ids.size();
     for (int i = 0; i < idsCount; i++) {
       // ILogger::instance()->logInfo("  = Created textureId=%s", ids[i]->description().c_str());
       _texturesIdBag.push_front(ids[i]);
     }
-
+    
     _texturesIdAllocationCounter += idsCount;
-
+    
     ILogger::instance()->logInfo("= Created %d texturesIds (accumulated %d).",
                                  idsCount,
                                  _texturesIdAllocationCounter);
   }
-
+  
   //  _texturesIdGetCounter++;
-
+  
   if (_texturesIdBag.size() == 0) {
     ILogger::instance()->logError("TextureIds bag exhausted");
     return NULL;
   }
-
+  
   const IGLTextureId* result = _texturesIdBag.back();
   _texturesIdBag.pop_back();
-
+  
   //  printf("   - Assigning 1 texturesId (#%d) from bag (bag size=%ld). Gets:%ld, Takes:%ld, Delta:%ld.\n",
   //         result.getGLTextureId(),
   //         _texturesIdBag.size(),
   //         _texturesIdGetCounter,
   //         _texturesIdTakeCounter,
   //         _texturesIdGetCounter - _texturesIdTakeCounter);
-
+  
   return result;
 }
 
@@ -566,7 +541,7 @@ void GL::deleteTexture(const IGLTextureId* textureId) {
   if (_verbose) {
     ILogger::instance()->logInfo("GL::deleteTexture()");
   }
-
+  
   if (textureId != NULL) {
     if ( _nativeGL->deleteTexture(textureId) ) {
       _texturesIdBag.push_back(textureId);
@@ -574,19 +549,19 @@ void GL::deleteTexture(const IGLTextureId* textureId) {
     else {
       delete textureId;
     }
-
-//    if (_boundTextureId != NULL) {
-//      if (_boundTextureId->isEqualsTo(textureId)) {
-//        _boundTextureId = NULL;
-//      }
-//    }
-
+    
+    //    if (_boundTextureId != NULL) {
+    //      if (_boundTextureId->isEqualsTo(textureId)) {
+    //        _boundTextureId = NULL;
+    //      }
+    //    }
+    
     //ILogger::instance()->logInfo("  = delete textureId=%s", texture->description().c_str());
   }
 }
 
 void GL::setState(const GLState& state) {
-
+  
   // Depth Testh
   if (_enableDepthTest != state.isEnabledDepthTest()) {
     _enableDepthTest = state.isEnabledDepthTest();
@@ -597,7 +572,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->disable(GLFeature::depthTest());
     }
   }
-
+  
   // Blending
   if (_enableBlend != state.isEnabledBlend()) {
     _enableBlend = state.isEnabledBlend();
@@ -608,7 +583,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->disable(GLFeature::blend());
     }
   }
-
+  
   // Textures
   if (_enableTextures != state.isEnabledTextures()) {
     _enableTextures = state.isEnabledTextures();
@@ -619,7 +594,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->disableVertexAttribArray(Attributes.TextureCoord);
     }
   }
-
+  
   // Texture2D
   if (_enableTexture2D != state.isEnabledTexture2D()) {
     _enableTexture2D = state.isEnabledTexture2D();
@@ -630,7 +605,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->uniform1i(Uniforms.EnableTexture, 0);
     }
   }
-
+  
   // VertexColor
   if (_enableVertexColor != state.isEnabledVertexColor()) {
     _enableVertexColor = state.isEnabledVertexColor();
@@ -650,7 +625,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->uniform1i(Uniforms.EnableColorPerVertex, 0);
     }
   }
-
+  
   // Vertices Position
   if (_enableVerticesPosition != state.isEnabledVerticesPosition()) {
     _enableVerticesPosition = state.isEnabledVerticesPosition();
@@ -661,7 +636,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->disableVertexAttribArray(Attributes.Position);
     }
   }
-
+  
   // Flat Color
   if (_enableFlatColor != state.isEnabledFlatColor()) {
     _enableFlatColor = state.isEnabledFlatColor();
@@ -672,7 +647,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->uniform1i(Uniforms.EnableFlatColor, 0);
     }
   }
-
+  
   if (_enableFlatColor) {
     color(state.getFlatColor());
     const float intensity = state.getIntensity();
@@ -681,7 +656,7 @@ void GL::setState(const GLState& state) {
       _flatColorIntensity = intensity;
     }
   }
-
+  
   // Cull Face
   if (_enableCullFace != state.isEnabledCullFace()) {
     _enableCullFace = state.isEnabledCullFace();
@@ -697,7 +672,7 @@ void GL::setState(const GLState& state) {
       _nativeGL->disable(GLFeature::cullFace());
     }
   }
-
+  
   const float lineWidth = state.lineWidth();
   if (_lineWidth != lineWidth) {
     _nativeGL->lineWidth(lineWidth);
