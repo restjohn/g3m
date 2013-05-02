@@ -36,6 +36,8 @@ private:
   mutable Sector_Geodetic2DCachedData* _neData;
   mutable Sector_Geodetic2DCachedData* _swData;
   mutable Sector_Geodetic2DCachedData* _seData;
+  mutable int _lastBackOrientedCameraTimeStamp;
+  mutable bool _lastBackOrientedResult;
 
 public:
 
@@ -52,7 +54,9 @@ public:
   _nwData(NULL),
   _neData(NULL),
   _swData(NULL),
-  _seData(NULL)
+  _seData(NULL),
+  _lastBackOrientedCameraTimeStamp(-1),
+  _lastBackOrientedResult(true)
   {
   }
 
@@ -66,7 +70,9 @@ public:
   _nwData(NULL),
   _neData(NULL),
   _swData(NULL),
-  _seData(NULL)
+  _seData(NULL),
+  _lastBackOrientedCameraTimeStamp(sector._lastBackOrientedCameraTimeStamp),
+  _lastBackOrientedResult(sector._lastBackOrientedResult)
   {
   }
 

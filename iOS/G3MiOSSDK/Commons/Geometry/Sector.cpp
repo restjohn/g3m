@@ -85,23 +85,31 @@ Sector::~Sector() {
 
 bool Sector::isBackOriented(const G3MRenderContext *rc,
                             double minHeight) const {
+  
   const Camera* camera = rc->getCurrentCamera();
+  
+  if (camera->getTimeStamp() == _lastBackOrientedCameraTimeStamp){
+    return _lastBackOrientedResult;
+  } else{
+    _lastBackOrientedCameraTimeStamp = camera->getTimeStamp();
+  }
+  
   const Planet* planet = rc->getPlanet();
 
   // compute angle with normals in the four corners
   const Vector3D eye = camera->getCartesianPosition();
 
   if (_nwData == NULL)    { _nwData = new Sector_Geodetic2DCachedData(planet, getNW()); }
-  if (_nwData->test(eye)) { return false; }
+  if (_nwData->test(eye)) { _lastBackOrientedResult = false; return false; }
 
   if (_neData == NULL)    { _neData = new Sector_Geodetic2DCachedData(planet, getNE()); }
-  if (_neData->test(eye)) { return false; }
+  if (_neData->test(eye)) { _lastBackOrientedResult = false; return false; }
 
   if (_swData == NULL)    { _swData = new Sector_Geodetic2DCachedData(planet, getSW()); }
-  if (_swData->test(eye)) { return false; }
+  if (_swData->test(eye)) { _lastBackOrientedResult = false; return false; }
 
   if (_seData == NULL)    { _seData = new Sector_Geodetic2DCachedData(planet, getSE()); }
-  if (_seData->test(eye)) { return false; }
+  if (_seData->test(eye)) { _lastBackOrientedResult = false; return false; }
 
   /*
   const Vector3D cartesianNW = planet->toCartesian(getNW());
@@ -123,7 +131,8 @@ bool Sector::isBackOriented(const G3MRenderContext *rc,
   const Vector3D cartesianCenter = planet->toCartesian(getClosestPoint(center), minHeight);
 
   // if all the angles are higher than 90, sector is back oriented
-  return (planet->geodeticSurfaceNormal(cartesianCenter).dot(eye.sub(cartesianCenter)) <= 0);
+  _lastBackOrientedResult = (planet->geodeticSurfaceNormal(cartesianCenter).dot(eye.sub(cartesianCenter)) <= 0);
+  return _lastBackOrientedResult;
 }
 
 /*
