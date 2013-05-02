@@ -25,6 +25,7 @@ public class Camera
      _halfFrustumInModelCoordinates = (that._halfFrustumInModelCoordinates == null) ? null : new Frustum(that._halfFrustumInModelCoordinates);
      _camEffectTarget = new CameraEffectTarget();
      _geodeticPosition = (that._geodeticPosition == null) ? null: new Geodetic3D(that._geodeticPosition);
+     _timeStamp = 0;
   }
 
   public Camera(int width, int height)
@@ -48,6 +49,7 @@ public class Camera
      _halfFrustum = null;
      _camEffectTarget = new CameraEffectTarget();
      _geodeticPosition = null;
+     _timeStamp = 0;
     resizeViewport(width, height);
     _dirtyFlags.setAll(true);
   }
@@ -114,6 +116,8 @@ public class Camera
     if (_geodeticPosition != null)
        _geodeticPosition.dispose();
     _geodeticPosition = ((that._geodeticPosition == null) ? null : new Geodetic3D(that._geodeticPosition));
+  
+    _timeStamp = that._timeStamp;
   }
 
 
@@ -161,8 +165,7 @@ public class Camera
   public final void render(G3MRenderContext rc, GLState parentState)
   {
     GL gl = rc.getGL();
-    gl.setProjection(getProjectionMatrix());
-    gl.loadMatrixf(getModelMatrix());
+    gl.loadProjectionModelview(getProjectionMatrix().multiply(getModelMatrix()));
   }
 
   public final Vector3D pixel2Ray(Vector2I pixel)
@@ -363,6 +366,7 @@ public class Camera
          _geodeticPosition.dispose();
       _geodeticPosition = null;
       _dirtyFlags.setAll(true);
+      increaseTimeStamp();
     }
   }
 
@@ -455,6 +459,11 @@ public class Camera
     getModelMatrix();
   }
 
+  public final int getTimeStamp()
+  {
+    return _timeStamp;
+  }
+
   private Angle getHeading(Vector3D normal)
   {
     final Vector3D north2D = Vector3D.upZ().projectionInPlane(normal);
@@ -485,6 +494,8 @@ public class Camera
   private Frustum _frustumInModelCoordinates;
   private Frustum _halfFrustum; // ONLY FOR DEBUG
   private Frustum _halfFrustumInModelCoordinates; // ONLY FOR DEBUG
+
+  private int _timeStamp;
 
   //The Camera Effect Target
   private static class CameraEffectTarget implements EffectTarget
@@ -524,6 +535,7 @@ public class Camera
     {
       _center = new MutableVector3D(v);
       _dirtyFlags.setAll(true);
+      increaseTimeStamp();
     }
   }
 
@@ -533,6 +545,7 @@ public class Camera
     {
       _up = new MutableVector3D(v);
       _dirtyFlags.setAll(true);
+      increaseTimeStamp();
     }
   }
 
@@ -742,6 +755,13 @@ public class Camera
   
     setHeading(heading);
     setPitch(pitch);
+  
+    increaseTimeStamp();
+  }
+
+  private void increaseTimeStamp()
+  {
+    _timeStamp++;
   }
 
 }

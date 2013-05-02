@@ -3,9 +3,8 @@ package org.glob3.mobile.generated;
 
 public class UniformsStruct
 {
+  public IGLUniformID ProjectionModelview;
 
-  public IGLUniformID Projection;
-  public IGLUniformID Modelview;
   public IGLUniformID Sampler;
   public IGLUniformID EnableTexture;
   public IGLUniformID FlatColor;
@@ -27,8 +26,7 @@ public class UniformsStruct
 
   public UniformsStruct()
   {
-    Projection = null;
-    Modelview = null;
+    ProjectionModelview = null;
     Sampler = null;
     EnableTexture = null;
     FlatColor = null;
@@ -50,10 +48,8 @@ public class UniformsStruct
 
   public final void deleteUniformsIDs()
   {
-    if (Projection != null)
-       Projection.dispose();
-    if (Modelview != null)
-       Modelview.dispose();
+    if (ProjectionModelview != null)
+       ProjectionModelview.dispose();
     if (Sampler != null)
        Sampler.dispose();
     if (EnableTexture != null)

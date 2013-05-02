@@ -117,8 +117,8 @@ public class BusyQuadRenderer extends LeafRenderer implements EffectTarget
     final int halfWidth = currentViewport[2] / 2;
     final int halfHeight = currentViewport[3] / 2;
     MutableMatrix44D M = MutableMatrix44D.createOrthographicProjectionMatrix(-halfWidth, halfWidth, -halfHeight, halfHeight, -halfWidth, halfWidth);
-    gl.setProjection(M);
-    gl.loadMatrixf(MutableMatrix44D.identity());
+  
+    gl.loadProjectionModelview(M);
   
     // clear screen
     gl.clearScreen(_backgroundColor.getRed(), _backgroundColor.getGreen(), _backgroundColor.getBlue(), _backgroundColor.getAlpha());

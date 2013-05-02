@@ -28,7 +28,7 @@ public class GL
 {
   private final INativeGL _nativeGL;
 
-  private MutableMatrix44D _modelView = new MutableMatrix44D();
+  private MutableMatrix44D _projectionModelview = new MutableMatrix44D();
 
   // stack of ModelView matrices
   private java.util.LinkedList<MutableMatrix44D> _matrixStack = new java.util.LinkedList<MutableMatrix44D>();
@@ -79,15 +79,7 @@ public class GL
 //  private IGLTextureId _boundTextureId;
 ///#endif
 
-  private void loadModelView()
-  {
-    if (_verbose)
-    {
-      ILogger.instance().logInfo("GL::loadModelView()");
-    }
-  
-    _nativeGL.uniformMatrix4fv(GlobalMembersGL.Uniforms.Modelview, false, _modelView);
-  }
+//  inline void loadModelView();
 
   private IGLTextureId getGLTextureId()
   {
@@ -283,7 +275,7 @@ public class GL
       ILogger.instance().logInfo("GL::pushMatrix()");
     }
   
-    _matrixStack.addLast(_modelView);
+    _matrixStack.addLast(_projectionModelview);
   }
 
   public final void popMatrix()
@@ -293,23 +285,11 @@ public class GL
       ILogger.instance().logInfo("GL::popMatrix()");
     }
   
-    _modelView = _matrixStack.getLast();
+    loadProjectionModelview(_matrixStack.getLast());
     _matrixStack.removeLast();
-  
-    loadModelView();
   }
 
-  public final void loadMatrixf(MutableMatrix44D modelView)
-  {
-    if (_verbose)
-    {
-      ILogger.instance().logInfo("GL::loadMatrixf()");
-    }
-  
-    _modelView = modelView;
-  
-    loadModelView();
-  }
+//  void loadMatrixf(const MutableMatrix44D &m);
 
   public final void multMatrixf(MutableMatrix44D m)
   {
@@ -318,9 +298,7 @@ public class GL
       ILogger.instance().logInfo("GL::multMatrixf()");
     }
   
-    _modelView = _modelView.multiply(m);
-  
-    loadModelView();
+    loadProjectionModelview(_projectionModelview.multiply(m));
   }
 
   public final void vertexPointer(int size, int stride, IFloatBuffer vertices)
@@ -373,14 +351,17 @@ public class GL
     _nativeGL.drawArrays(mode, first, count);
   }
 
-  public final void setProjection(MutableMatrix44D projection)
+//  void setProjection(const MutableMatrix44D &projection);
+  public final void loadProjectionModelview(MutableMatrix44D projectionModelview)
   {
     if (_verbose)
     {
-      ILogger.instance().logInfo("GL::setProjection()");
+      ILogger.instance().logInfo("GL::setProjectionModelview()");
     }
   
-    _nativeGL.uniformMatrix4fv(GlobalMembersGL.Uniforms.Projection, false, projection);
+    _projectionModelview = projectionModelview;
+  
+    _nativeGL.uniformMatrix4fv(GlobalMembersGL.Uniforms.ProjectionModelview, false, projectionModelview);
   }
 
   public final boolean useProgram(ShaderProgram program)
@@ -411,8 +392,8 @@ public class GL
     GlobalMembersGL.Uniforms.deleteUniformsIDs(); //DELETING
   
     // Extract the handles to uniforms
-    GlobalMembersGL.Uniforms.Projection = checkedGetUniformLocation(program, "Projection");
-    GlobalMembersGL.Uniforms.Modelview = checkedGetUniformLocation(program, "Modelview");
+    GlobalMembersGL.Uniforms.ProjectionModelview = checkedGetUniformLocation(program, "ProjectionModelview");
+  
     GlobalMembersGL.Uniforms.Sampler = checkedGetUniformLocation(program, "Sampler");
     GlobalMembersGL.Uniforms.EnableTexture = checkedGetUniformLocation(program, "EnableTexture");
     GlobalMembersGL.Uniforms.FlatColor = checkedGetUniformLocation(program, "FlatColor");
@@ -539,13 +520,13 @@ public class GL
     }
     else
     {
-  //    if ((_boundTextureId == NULL) || !_boundTextureId->isEqualsTo(textureId)) {
-        _nativeGL.bindTexture(GLTextureType.texture2D(), textureId);
-  //      _boundTextureId = textureId;
-  //    }
-  //    else {
-  //      ILogger::instance()->logInfo("TextureId %s already bound", textureId->description().c_str());
-  //    }
+      //    if ((_boundTextureId == NULL) || !_boundTextureId->isEqualsTo(textureId)) {
+      _nativeGL.bindTexture(GLTextureType.texture2D(), textureId);
+      //      _boundTextureId = textureId;
+      //    }
+      //    else {
+      //      ILogger::instance()->logInfo("TextureId %s already bound", textureId->description().c_str());
+      //    }
     }
   }
 
@@ -600,11 +581,11 @@ public class GL
            textureId.dispose();
       }
   
-  //    if (_boundTextureId != NULL) {
-  //      if (_boundTextureId->isEqualsTo(textureId)) {
-  //        _boundTextureId = NULL;
-  //      }
-  //    }
+      //    if (_boundTextureId != NULL) {
+      //      if (_boundTextureId->isEqualsTo(textureId)) {
+      //        _boundTextureId = NULL;
+      //      }
+      //    }
   
       //ILogger::instance()->logInfo("  = delete textureId=%s", texture->description().c_str());
     }
