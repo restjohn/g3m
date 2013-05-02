@@ -13,6 +13,7 @@ class Color;
 class IImageListener;
 class GFont;
 class IImage;
+class Vector2I;
 #include <string>
 
 #include "Vector2F.hpp"
@@ -89,6 +90,8 @@ protected:
   virtual void _drawImage(const IImage* image,
                           float srcLeft, float srcTop, float srcWidth, float srcHeight,
                           float destLeft, float destTop, float destWidth, float destHeight) = 0;
+  
+  virtual void _drawLine(float leftStart, float topStart, float leftEnd, float topEnd) = 0;
   
 public:
   ICanvas() :
@@ -180,6 +183,8 @@ public:
   int getHeight() const {
     return _canvasHeight;
   }
+  
+  void drawLine(float leftStart, float topStart, float leftEnd, float topEnd);
   
 };
 

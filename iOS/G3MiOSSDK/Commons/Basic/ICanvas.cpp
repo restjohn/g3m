@@ -11,6 +11,7 @@
 #include "GFont.hpp"
 #include "RectangleF.hpp"
 #include "IImage.hpp"
+#include "Vector2I.hpp"
 
 ICanvas::~ICanvas() {
   delete _currentFont;
@@ -170,4 +171,9 @@ void ICanvas::drawImage(const IImage* image,
   _drawImage(image,
              srcLeft, srcTop, srcWidth, srcHeight,
              destLeft, destTop, destWidth, destHeight);
+}
+
+void ICanvas::drawLine(float leftStart, float topStart, float leftEnd, float topEnd){
+  checkInitialized();
+  _drawLine(leftStart, topStart, leftEnd, topEnd);
 }

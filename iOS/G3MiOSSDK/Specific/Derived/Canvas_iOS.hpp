@@ -91,6 +91,7 @@ protected:
                   float srcLeft, float srcTop, float srcWidth, float srcHeight,
                   float destLeft, float destTop, float destWidth, float destHeight);
   
+  void _drawLine(float leftStart, float topStart, float leftEnd, float topEnd);
   
 public:
   Canvas_iOS() :

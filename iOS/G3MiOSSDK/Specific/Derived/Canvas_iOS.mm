@@ -357,3 +357,13 @@ void Canvas_iOS::_drawImage(const IImage* image,
     CGImageRelease(cgCropImage);
   }
 }
+
+void Canvas_iOS::_drawLine(float leftStart, float topStart, float leftEnd, float topEnd){
+  
+  CGContextBeginPath(_context);
+  CGContextMoveToPoint(_context, leftStart, topStart);
+  CGContextAddLineToPoint(_context, leftEnd, topEnd);
+  CGContextDrawPath(_context, kCGPathStroke);
+  //TODO: UNCHECKED
+  
+}
