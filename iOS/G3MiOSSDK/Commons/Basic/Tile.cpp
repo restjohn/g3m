@@ -52,7 +52,6 @@ _subtiles(NULL),
 _justCreatedSubtiles(false),
 _isVisible(false),
 _texturizerData(NULL),
-//_tileBoundingVolume(NULL),
 _elevationData(NULL),
 _elevationDataLevel(-1),
 _elevationDataRequest(NULL),
@@ -66,13 +65,8 @@ _planetRenderer(planetRenderer),
 _tessellatorData(NULL),
 _renderedVStileSectorRatio(getRenderedVSTileSectorsRatio(planetRenderer)),
 _cornerNE(NULL),
-_cornerNW(NULL),
-_cornerSE(NULL),
 _cornerSW(NULL),
-_northArcSegmentRatioSquared(0),
-_eastArcSegmentRatioSquared(0),
-_westArcSegmentRatioSquared(0),
-_southArcSegmentRatioSquared(0)
+_diagonalArcDistSquared(0)
 {
   //  int __remove_tile_print;
   //  printf("Created tile=%s\n deltaLat=%s deltaLon=%s\n",
@@ -101,9 +95,6 @@ Tile::~Tile() {
 
   delete _texturizedMesh;
   _texturizedMesh = NULL;
-
-//  delete _tileBoundingVolume;
-//  _tileBoundingVolume = NULL;
 
   delete _elevationData;
   _elevationData = NULL;
@@ -408,41 +399,16 @@ bool Tile::meetsRenderCriteria(const G3MRenderContext* rc,
 
   const Planet* planet = rc->getPlanet();
 
-  if ((_northArcSegmentRatioSquared == 0) ||
-      (_eastArcSegmentRatioSquared  == 0) ||
-      (_southArcSegmentRatioSquared == 0) ||
-      (_westArcSegmentRatioSquared  == 0)) {
+  if (_diagonalArcDistSquared == 0) {
     prepareTestLODData(planet);
   }
 
   const Camera* camera = rc->getCurrentCamera();
-  const Vector2F pnw = camera->point2Pixel(*_cornerNW);
   const Vector2F pne = camera->point2Pixel(*_cornerNE);
   const Vector2F psw = camera->point2Pixel(*_cornerSW);
-  const Vector2F pse = camera->point2Pixel(*_cornerSE);
+  const double textureDiagonalSquared = texWidthSquared + texHeightSquared;
 
-  const double southLinearDistSquared = psw.squaredDistanceTo(pse);
-  const double eastLinearDistSquared  = pse.squaredDistanceTo(pne);
-  const double northLinearDistSquared = pnw.squaredDistanceTo(pne);
-  const double westLinearDistSquared  = psw.squaredDistanceTo(pnw);
-
-  const double southArcDistSquared = southLinearDistSquared * _southArcSegmentRatioSquared;
-  const double eastArcDistSquared  = eastLinearDistSquared  * _eastArcSegmentRatioSquared;
-  const double northArcDistSquared = northLinearDistSquared * _northArcSegmentRatioSquared;
-  const double westArcDistSquared  = westLinearDistSquared  * _westArcSegmentRatioSquared;
-
-  const double longestWidthSquared  = (northArcDistSquared > southArcDistSquared) ? northArcDistSquared : southArcDistSquared;
-  const double longestHeightSquared = (westArcDistSquared  > eastArcDistSquared)  ? westArcDistSquared  : eastArcDistSquared;
-
-  _lastLodTest = ((longestWidthSquared  <= texWidthSquared) &&
-                  (longestHeightSquared <= texHeightSquared));
-
-//  if (_lastLodTest){
-//    printf("LD: %f, %f, %f, %f\n", sqrt(southLinearDistSquared),
-//           sqrt(eastLinearDistSquared),
-//           sqrt(northLinearDistSquared),
-//           sqrt(westLinearDistSquared));
-//  }
+  _lastLodTest = _diagonalArcDistSquared <= textureDiagonalSquared;
 
   return _lastLodTest;
 }
@@ -891,14 +857,6 @@ const std::string Tile::description() const {
   return s;
 }
 
-//double Tile::getMinHeight() const {
-//  return _minHeight;
-//}
-//
-//double Tile::getMaxHeight() const {
-//  return _maxHeight;
-//}
-
 #pragma mark ElevationData methods
 
 void Tile::setElevationData(ElevationData* ed, int level) {
@@ -1044,37 +1002,22 @@ const Vector2D Tile::getRenderedVSTileSectorsRatio(const PlanetRenderer* pr) con
 
 void Tile::prepareTestLODData(const Planet* planet){
 
-  if (_cornerNW == NULL){
+  if (_cornerNE == NULL){
     ILogger::instance()->logError("Error in Tile::prepareTestLODData");
     return;
   }
 
-  Vector3D nNW = planet->centricSurfaceNormal(*_cornerNW);
-  Vector3D nNE = planet->centricSurfaceNormal(*_cornerNE);
-  Vector3D nSE = planet->centricSurfaceNormal(*_cornerSE);
-  Vector3D nSW = planet->centricSurfaceNormal(*_cornerSW);
 
   /*
    Arco = ang * Cuerda / (2 * sen(ang/2))
    */
 
-  Angle northAngle = nNW.angleBetween(nNE);
-  double northArcSegmentRatio = northAngle.isZero()? 1 : northAngle._radians / (2 * SIN(northAngle._radians/2));
+  Vector3D nNE = planet->centricSurfaceNormal(*_cornerNE);
+  Vector3D nSW = planet->centricSurfaceNormal(*_cornerSW);
 
-  Angle eastAngle = nNE.angleBetween(nSE);
-  double eastArcSegmentRatio = eastAngle.isZero()? 1 : eastAngle._radians / (2 * SIN(eastAngle._radians/2));
-
-  Angle southAngle = nSW.angleBetween(nSE);
-  double southArcSegmentRatio = southAngle.isZero()? 1: southAngle._radians / (2 * SIN(southAngle._radians/2));
-
-  Angle westAngle = nNW.angleBetween(nSW);
-  double westArcSegmentRatio = westAngle.isZero()? 1 : westAngle._radians / (2 * SIN(westAngle._radians/2));
-
-  _southArcSegmentRatioSquared = (southArcSegmentRatio * southArcSegmentRatio);
-  _eastArcSegmentRatioSquared = (eastArcSegmentRatio * eastArcSegmentRatio);
-  _northArcSegmentRatioSquared = (northArcSegmentRatio * northArcSegmentRatio);
-  _westArcSegmentRatioSquared = (westArcSegmentRatio * westArcSegmentRatio);
-
+  Angle diagonalAngle = nNE.angleBetween(nSW);
+  double diagonalArcSegmentRatio = diagonalAngle.isZero()? 1 : diagonalAngle._radians / (2 * SIN(diagonalAngle._radians/2));
+  _diagonalArcSegmentRatioSquared = diagonalArcSegmentRatio * diagonalArcSegmentRatio;
 }
 
 void Tile::computeTileCorners(const Planet* planet){
@@ -1085,20 +1028,12 @@ void Tile::computeTileCorners(const Planet* planet){
   }
 
   delete _cornerSW;
-  delete _cornerSE;
-  delete _cornerNW;
   delete _cornerNE;
 
-//  double mediumHeight = (_minHeight + _maxHeight) / 2.0;
   double mediumHeight = _tileTessellatorMeshData._averageHeight;
 
-  Geodetic3D gNW( _sector.getNW(), mediumHeight);
   Geodetic3D gNE( _sector.getNE(), mediumHeight);
   Geodetic3D gSW( _sector.getSW(), mediumHeight);
-  Geodetic3D gSE( _sector.getSE(), mediumHeight);
-
-  _cornerNW = new Vector3D(planet->toCartesian( gNW ));
   _cornerNE = new Vector3D(planet->toCartesian( gNE ));
   _cornerSW = new Vector3D(planet->toCartesian( gSW ));
-  _cornerSE = new Vector3D(planet->toCartesian( gSE ));
 }

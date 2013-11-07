@@ -70,15 +70,10 @@ private:
   const Vector2D _renderedVStileSectorRatio;
 
   Vector3D* _cornerNE;
-  Vector3D* _cornerNW;
-  Vector3D* _cornerSE;
   Vector3D* _cornerSW;
   void computeTileCorners(const Planet* planet);
 
-  double _northArcSegmentRatioSquared;
-  double _eastArcSegmentRatioSquared;
-  double _westArcSegmentRatioSquared;
-  double _southArcSegmentRatioSquared;
+  double _diagonalArcSegmentRatioSquared;
 
   void prepareTestLODData(const Planet* planet);
   //////////////////////////////////////////
