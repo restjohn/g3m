@@ -66,7 +66,7 @@ _tessellatorData(NULL),
 _renderedVStileSectorRatio(getRenderedVSTileSectorsRatio(planetRenderer)),
 _cornerNE(NULL),
 _cornerSW(NULL),
-_diagonalArcDistSquared(0)
+_diagonalArcSegmentRatioSquared(0)
 {
   //  int __remove_tile_print;
   //  printf("Created tile=%s\n deltaLat=%s deltaLon=%s\n",
@@ -78,8 +78,6 @@ _diagonalArcDistSquared(0)
 
 Tile::~Tile() {
   prune(NULL, NULL);
-
-  //  delete _boundingVolume;
 
   delete _debugMesh;
   _debugMesh = NULL;
@@ -399,7 +397,7 @@ bool Tile::meetsRenderCriteria(const G3MRenderContext* rc,
 
   const Planet* planet = rc->getPlanet();
 
-  if (_diagonalArcDistSquared == 0) {
+  if (_diagonalArcSegmentRatioSquared < 1) {
     prepareTestLODData(planet);
   }
 
@@ -408,7 +406,16 @@ bool Tile::meetsRenderCriteria(const G3MRenderContext* rc,
   const Vector2F psw = camera->point2Pixel(*_cornerSW);
   const double textureDiagonalSquared = texWidthSquared + texHeightSquared;
 
-  _lastLodTest = _diagonalArcDistSquared <= textureDiagonalSquared;
+  double diagonalLinearDistSquared = psw.squaredDistanceTo(pne);
+  const double diagonalArcDistSquared = diagonalLinearDistSquared * _diagonalArcSegmentRatioSquared;
+
+  _lastLodTest = diagonalArcDistSquared <= textureDiagonalSquared;
+
+  if (_lastLodTest){
+    double d = sqrt(diagonalLinearDistSquared);
+    double s = d / sqrt(2);
+    printf("TILE SHOWN WITH DIAGONAL LENGTH %f PIXELS. [%f SIDE LENGTH]\n", d, s);
+  }
 
   return _lastLodTest;
 }
