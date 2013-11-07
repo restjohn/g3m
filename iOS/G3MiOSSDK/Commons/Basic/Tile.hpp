@@ -67,8 +67,6 @@ private:
   BoundingVolume* _boundingVolume;
 
   //LOD TEST DATA
-  const Vector2D _renderedVStileSectorRatio;
-
   Vector3D* _cornerNE;
   Vector3D* _cornerSW;
   void computeTileCorners(const Planet* planet);
@@ -107,8 +105,7 @@ private:
                                   const TilesRenderParameters* tilesRenderParameters,
                                   const TilesStatistics* tilesStatistics,
                                   const ITimer* lastSplitTimer,
-                                  double texWidthSquared,
-                                  double texHeightSquared);
+                                  double textureDiagonalSquared);
 
   inline void rawRender(const G3MRenderContext* rc,
                         const GLState* glState,
@@ -165,8 +162,6 @@ private:
                                           const TileTessellator* tessellator,
                                           const LayerTilesRenderParameters* layerTilesRenderParameters,
                                           const TilesRenderParameters* tilesRenderParameters);
-
-  const Vector2D getRenderedVSTileSectorsRatio(const PlanetRenderer* pr) const;
 
 public:
   const Sector    _sector;
@@ -243,8 +238,7 @@ public:
               const Sector* renderedSector,
               bool isForcedFullRender,
               long long texturePriority,
-              double texWidth,
-              double texHeight);
+              double textureDiagonalSquared);
 
   const TileKey getKey() const;
 

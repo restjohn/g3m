@@ -63,7 +63,6 @@ _boundingVolume(NULL),
 _lodTimer(NULL),
 _planetRenderer(planetRenderer),
 _tessellatorData(NULL),
-_renderedVStileSectorRatio(getRenderedVSTileSectorsRatio(planetRenderer)),
 _cornerNE(NULL),
 _cornerSW(NULL),
 _diagonalArcSegmentRatioSquared(0)
@@ -351,8 +350,7 @@ bool Tile::meetsRenderCriteria(const G3MRenderContext* rc,
                                const TilesRenderParameters* tilesRenderParameters,
                                const TilesStatistics* tilesStatistics,
                                const ITimer* lastSplitTimer,
-                               double texWidthSquared,
-                               double texHeightSquared) {
+                               double textureDiagonalSquared) {
 
   if ((_level >= layerTilesRenderParameters->_maxLevelForPoles) &&
       (_sector.touchesPoles())) {
@@ -404,18 +402,17 @@ bool Tile::meetsRenderCriteria(const G3MRenderContext* rc,
   const Camera* camera = rc->getCurrentCamera();
   const Vector2F pne = camera->point2Pixel(*_cornerNE);
   const Vector2F psw = camera->point2Pixel(*_cornerSW);
-  const double textureDiagonalSquared = texWidthSquared + texHeightSquared;
 
   double diagonalLinearDistSquared = psw.squaredDistanceTo(pne);
   const double diagonalArcDistSquared = diagonalLinearDistSquared * _diagonalArcSegmentRatioSquared;
 
   _lastLodTest = diagonalArcDistSquared <= textureDiagonalSquared;
 
-  if (_lastLodTest){
-    double d = sqrt(diagonalLinearDistSquared);
-    double s = d / sqrt(2);
-    printf("TILE SHOWN WITH DIAGONAL LENGTH %f PIXELS. [%f SIDE LENGTH]\n", d, s);
-  }
+//  if (_lastLodTest){
+//    double d = sqrt(diagonalLinearDistSquared);
+//    double s = d / sqrt(2);
+//    printf("TILE SHOWN WITH DIAGONAL LENGTH %f PIXELS. [%f SIDE LENGTH]\n", d, s);
+//  }
 
   return _lastLodTest;
 }
@@ -659,8 +656,7 @@ void Tile::render(const G3MRenderContext* rc,
                   const Sector* renderedSector,
                   bool isForcedFullRender,
                   long long texturePriority,
-                  double texWidthSquared,
-                  double texHeightSquared) {
+                  double textureDiagonalSquared) {
 
   tilesStatistics->computeTileProcessed(this);
 
@@ -692,8 +688,7 @@ void Tile::render(const G3MRenderContext* rc,
                                                   tilesRenderParameters,
                                                   tilesStatistics,
                                                   lastSplitTimer,
-                                                  texWidthSquared,
-                                                  texHeightSquared) ||
+                                                  textureDiagonalSquared) ||
                               (tilesRenderParameters->_incrementalTileQuality && !_textureSolved)
                               );
 
@@ -992,19 +987,6 @@ void Tile::setTessellatorData(PlanetTileTessellatorData* tessellatorData) {
     delete _tessellatorData;
     _tessellatorData = tessellatorData;
   }
-}
-
-const Vector2D Tile::getRenderedVSTileSectorsRatio(const PlanetRenderer* pr) const{
-  const Sector* renderedSector = pr->getRenderedSector();
-  if (renderedSector != NULL){
-    if (!renderedSector->fullContains(_sector)) {
-      Sector meshSector = renderedSector->intersection(_sector);
-      const double rx = meshSector._deltaLongitude._degrees / _sector._deltaLongitude._degrees;
-      const double ry = meshSector._deltaLatitude._degrees / _sector._deltaLatitude._degrees;
-      return Vector2D(rx,ry);
-    }
-  }
-  return Vector2D(1.0,1.0);
 }
 
 void Tile::prepareTestLODData(const Planet* planet){
