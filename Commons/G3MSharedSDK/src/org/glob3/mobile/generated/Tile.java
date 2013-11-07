@@ -70,11 +70,7 @@ public class Tile
   private BoundingVolume _boundingVolume;
 
   //LOD TEST DATA
-  private final Vector2D _renderedVStileSectorRatio ;
-
   private Vector3D _cornerNE;
-  private Vector3D _cornerNW;
-  private Vector3D _cornerSE;
   private Vector3D _cornerSW;
   private void computeTileCorners(Planet planet)
   {
@@ -87,67 +83,39 @@ public class Tile
   
     if (_cornerSW != null)
        _cornerSW.dispose();
-    if (_cornerSE != null)
-       _cornerSE.dispose();
-    if (_cornerNW != null)
-       _cornerNW.dispose();
     if (_cornerNE != null)
        _cornerNE.dispose();
   
-  //  double mediumHeight = (_minHeight + _maxHeight) / 2.0;
     double mediumHeight = _tileTessellatorMeshData._averageHeight;
   
-    Geodetic3D gNW = new Geodetic3D(_sector.getNW(), mediumHeight);
     Geodetic3D gNE = new Geodetic3D(_sector.getNE(), mediumHeight);
     Geodetic3D gSW = new Geodetic3D(_sector.getSW(), mediumHeight);
-    Geodetic3D gSE = new Geodetic3D(_sector.getSE(), mediumHeight);
-  
-    _cornerNW = new Vector3D(planet.toCartesian(gNW));
     _cornerNE = new Vector3D(planet.toCartesian(gNE));
     _cornerSW = new Vector3D(planet.toCartesian(gSW));
-    _cornerSE = new Vector3D(planet.toCartesian(gSE));
   }
 
-  private double _northArcSegmentRatioSquared;
-  private double _eastArcSegmentRatioSquared;
-  private double _westArcSegmentRatioSquared;
-  private double _southArcSegmentRatioSquared;
+  private double _diagonalArcSegmentRatioSquared;
 
   private void prepareTestLODData(Planet planet)
   {
   
-    if (_cornerNW == null)
+    if (_cornerNE == null)
     {
       ILogger.instance().logError("Error in Tile::prepareTestLODData");
       return;
     }
   
-    Vector3D nNW = planet.centricSurfaceNormal(_cornerNW);
-    Vector3D nNE = planet.centricSurfaceNormal(_cornerNE);
-    Vector3D nSE = planet.centricSurfaceNormal(_cornerSE);
-    Vector3D nSW = planet.centricSurfaceNormal(_cornerSW);
   
     /*
      Arco = ang * Cuerda / (2 * sen(ang/2))
      */
   
-    Angle northAngle = nNW.angleBetween(nNE);
-    double northArcSegmentRatio = northAngle.isZero()? 1 : northAngle._radians / (2 * java.lang.Math.sin(northAngle._radians/2));
+    Vector3D nNE = planet.centricSurfaceNormal(_cornerNE);
+    Vector3D nSW = planet.centricSurfaceNormal(_cornerSW);
   
-    Angle eastAngle = nNE.angleBetween(nSE);
-    double eastArcSegmentRatio = eastAngle.isZero()? 1 : eastAngle._radians / (2 * java.lang.Math.sin(eastAngle._radians/2));
-  
-    Angle southAngle = nSW.angleBetween(nSE);
-    double southArcSegmentRatio = southAngle.isZero()? 1: southAngle._radians / (2 * java.lang.Math.sin(southAngle._radians/2));
-  
-    Angle westAngle = nNW.angleBetween(nSW);
-    double westArcSegmentRatio = westAngle.isZero()? 1 : westAngle._radians / (2 * java.lang.Math.sin(westAngle._radians/2));
-  
-    _southArcSegmentRatioSquared = (southArcSegmentRatio * southArcSegmentRatio);
-    _eastArcSegmentRatioSquared = (eastArcSegmentRatio * eastArcSegmentRatio);
-    _northArcSegmentRatioSquared = (northArcSegmentRatio * northArcSegmentRatio);
-    _westArcSegmentRatioSquared = (westArcSegmentRatio * westArcSegmentRatio);
-  
+    Angle diagonalAngle = nNE.angleBetween(nSW);
+    double diagonalArcSegmentRatio = diagonalAngle.isZero()? 1 : diagonalAngle._radians / (2 * java.lang.Math.sin(diagonalAngle._radians/2));
+    _diagonalArcSegmentRatioSquared = diagonalArcSegmentRatio * diagonalArcSegmentRatio;
   }
   //////////////////////////////////////////
 
@@ -252,7 +220,7 @@ public class Tile
 
   private ITimer _lodTimer;
   private boolean _lastLodTest;
-  private boolean meetsRenderCriteria(G3MRenderContext rc, LayerTilesRenderParameters layerTilesRenderParameters, TileTexturizer texturizer, TilesRenderParameters tilesRenderParameters, TilesStatistics tilesStatistics, ITimer lastSplitTimer, double texWidthSquared, double texHeightSquared)
+  private boolean meetsRenderCriteria(G3MRenderContext rc, LayerTilesRenderParameters layerTilesRenderParameters, TileTexturizer texturizer, TilesRenderParameters tilesRenderParameters, TilesStatistics tilesStatistics, ITimer lastSplitTimer, double textureDiagonalSquared)
   {
   
     if ((_level >= layerTilesRenderParameters._maxLevelForPoles) && (_sector.touchesPoles()))
@@ -307,37 +275,24 @@ public class Tile
   
     final Planet planet = rc.getPlanet();
   
-    if ((_northArcSegmentRatioSquared == 0) || (_eastArcSegmentRatioSquared == 0) || (_southArcSegmentRatioSquared == 0) || (_westArcSegmentRatioSquared == 0))
+    if (_diagonalArcSegmentRatioSquared < 1)
     {
       prepareTestLODData(planet);
     }
   
     final Camera camera = rc.getCurrentCamera();
-    final Vector2F pnw = camera.point2Pixel(_cornerNW);
     final Vector2F pne = camera.point2Pixel(_cornerNE);
     final Vector2F psw = camera.point2Pixel(_cornerSW);
-    final Vector2F pse = camera.point2Pixel(_cornerSE);
   
-    final double southLinearDistSquared = psw.squaredDistanceTo(pse);
-    final double eastLinearDistSquared = pse.squaredDistanceTo(pne);
-    final double northLinearDistSquared = pnw.squaredDistanceTo(pne);
-    final double westLinearDistSquared = psw.squaredDistanceTo(pnw);
+    double diagonalLinearDistSquared = psw.squaredDistanceTo(pne);
+    final double diagonalArcDistSquared = diagonalLinearDistSquared * _diagonalArcSegmentRatioSquared;
   
-    final double southArcDistSquared = southLinearDistSquared * _southArcSegmentRatioSquared;
-    final double eastArcDistSquared = eastLinearDistSquared * _eastArcSegmentRatioSquared;
-    final double northArcDistSquared = northLinearDistSquared * _northArcSegmentRatioSquared;
-    final double westArcDistSquared = westLinearDistSquared * _westArcSegmentRatioSquared;
-  
-    final double longestWidthSquared = (northArcDistSquared > southArcDistSquared) ? northArcDistSquared : southArcDistSquared;
-    final double longestHeightSquared = (westArcDistSquared > eastArcDistSquared) ? westArcDistSquared : eastArcDistSquared;
-  
-    _lastLodTest = ((longestWidthSquared <= texWidthSquared) && (longestHeightSquared <= texHeightSquared));
+    _lastLodTest = diagonalArcDistSquared <= textureDiagonalSquared;
   
   //  if (_lastLodTest){
-  //    printf("LD: %f, %f, %f, %f\n", sqrt(southLinearDistSquared),
-  //           sqrt(eastLinearDistSquared),
-  //           sqrt(northLinearDistSquared),
-  //           sqrt(westLinearDistSquared));
+  //    double d = sqrt(diagonalLinearDistSquared);
+  //    double s = d / sqrt(2);
+  //    printf("TILE SHOWN WITH DIAGONAL LENGTH %f PIXELS. [%f SIDE LENGTH]\n", d, s);
   //  }
   
     return _lastLodTest;
@@ -566,29 +521,12 @@ public class Tile
     return _boundingVolume;
   }
 
-  private Vector2D getRenderedVSTileSectorsRatio(PlanetRenderer pr)
-  {
-    final Sector renderedSector = pr.getRenderedSector();
-    if (renderedSector != null)
-    {
-      if (!renderedSector.fullContains(_sector))
-      {
-        Sector meshSector = renderedSector.intersection(_sector);
-        final double rx = meshSector._deltaLongitude._degrees / _sector._deltaLongitude._degrees;
-        final double ry = meshSector._deltaLatitude._degrees / _sector._deltaLatitude._degrees;
-        return new Vector2D(rx,ry);
-      }
-    }
-    return new Vector2D(1.0,1.0);
-  }
-
   public final Sector _sector ;
   public final int _level;
   public final int _row;
   public final int _column;
 
   public Tile(TileTexturizer texturizer, Tile parent, Sector sector, int level, int row, int column, PlanetRenderer planetRenderer)
-  //_tileBoundingVolume(NULL),
   {
      _texturizer = texturizer;
      _parent = parent;
@@ -617,15 +555,9 @@ public class Tile
      _lodTimer = null;
      _planetRenderer = planetRenderer;
      _tessellatorData = null;
-     _renderedVStileSectorRatio = new Vector2D(getRenderedVSTileSectorsRatio(planetRenderer));
      _cornerNE = null;
-     _cornerNW = null;
-     _cornerSE = null;
      _cornerSW = null;
-     _northArcSegmentRatioSquared = 0;
-     _eastArcSegmentRatioSquared = 0;
-     _westArcSegmentRatioSquared = 0;
-     _southArcSegmentRatioSquared = 0;
+     _diagonalArcSegmentRatioSquared = 0;
     //  int __remove_tile_print;
     //  printf("Created tile=%s\n deltaLat=%s deltaLon=%s\n",
     //         getKey().description().c_str(),
@@ -637,8 +569,6 @@ public class Tile
   public void dispose()
   {
     prune(null, null);
-  
-    //  delete _boundingVolume;
   
     if (_debugMesh != null)
        _debugMesh.dispose();
@@ -659,9 +589,6 @@ public class Tile
     if (_texturizedMesh != null)
        _texturizedMesh.dispose();
     _texturizedMesh = null;
-  
-  //  delete _tileBoundingVolume;
-  //  _tileBoundingVolume = NULL;
   
     if (_elevationData != null)
        _elevationData.dispose();
@@ -753,7 +680,7 @@ public class Tile
     }
   }
 
-  public final void render(G3MRenderContext rc, GLState parentState, java.util.LinkedList<Tile> toVisitInNextIteration, Planet planet, Vector3D cameraNormalizedPosition, double cameraAngle2HorizonInRadians, Frustum cameraFrustumInModelCoordinates, TilesStatistics tilesStatistics, float verticalExaggeration, LayerTilesRenderParameters layerTilesRenderParameters, TileTexturizer texturizer, TilesRenderParameters tilesRenderParameters, ITimer lastSplitTimer, ElevationDataProvider elevationDataProvider, TileTessellator tessellator, TileRasterizer tileRasterizer, LayerSet layerSet, Sector renderedSector, boolean isForcedFullRender, long texturePriority, double texWidthSquared, double texHeightSquared)
+  public final void render(G3MRenderContext rc, GLState parentState, java.util.LinkedList<Tile> toVisitInNextIteration, Planet planet, Vector3D cameraNormalizedPosition, double cameraAngle2HorizonInRadians, Frustum cameraFrustumInModelCoordinates, TilesStatistics tilesStatistics, float verticalExaggeration, LayerTilesRenderParameters layerTilesRenderParameters, TileTexturizer texturizer, TilesRenderParameters tilesRenderParameters, ITimer lastSplitTimer, ElevationDataProvider elevationDataProvider, TileTessellator tessellator, TileRasterizer tileRasterizer, LayerSet layerSet, Sector renderedSector, boolean isForcedFullRender, long texturePriority, double textureDiagonalSquared)
   {
   
     tilesStatistics.computeTileProcessed(this);
@@ -771,7 +698,7 @@ public class Tile
   
       tilesStatistics.computeVisibleTile(this);
   
-      final boolean isRawRender = ((toVisitInNextIteration == null) || meetsRenderCriteria(rc, layerTilesRenderParameters, texturizer, tilesRenderParameters, tilesStatistics, lastSplitTimer, texWidthSquared, texHeightSquared) || (tilesRenderParameters._incrementalTileQuality && !_textureSolved));
+      final boolean isRawRender = ((toVisitInNextIteration == null) || meetsRenderCriteria(rc, layerTilesRenderParameters, texturizer, tilesRenderParameters, tilesStatistics, lastSplitTimer, textureDiagonalSquared) || (tilesRenderParameters._incrementalTileQuality && !_textureSolved));
   
       if (isRawRender)
       {
@@ -1174,13 +1101,5 @@ public class Tile
   }
 
 }
-//double Tile::getMinHeight() const {
-//  return _minHeight;
-//}
-//
-//double Tile::getMaxHeight() const {
-//  return _maxHeight;
-//}
-
 //C++ TO JAVA CONVERTER TODO TASK: There is no preprocessor in Java:
 //#pragma mark ElevationData methods
