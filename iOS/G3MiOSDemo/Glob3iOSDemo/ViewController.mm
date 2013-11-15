@@ -1077,7 +1077,7 @@ public:
     layerSet->addLayer( MapQuestLayer::newOpenAerial(TimeInterval::fromDays(30)) );
   }
 
-  const bool useMapBox = false;
+  const bool useMapBox = true;
   if (useMapBox) {
     //const std::string mapKey = "dgd.map-v93trj8v";
     //const std::string mapKey = "examples.map-cnkhv76j";
@@ -1131,7 +1131,7 @@ public:
     layerSet->addLayer(osmEditMapLayer);
   }
 
-  const bool blueMarble = true;
+  const bool blueMarble = false;
   if (blueMarble) {
     WMSLayer* blueMarble = new WMSLayer("bmng200405",
                                         URL("http://www.nasa.network.com/wms?", false),
