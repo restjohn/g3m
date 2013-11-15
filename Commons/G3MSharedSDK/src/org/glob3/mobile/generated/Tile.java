@@ -241,6 +241,8 @@ public class Tile
       }
     }
   
+    int TODO_DIEGO_CHECK_IF_NECESSARY;
+  
     if ((_lodTimer != null) && (_lodTimer.elapsedTimeInMilliseconds() < 500))
     {
       return _lastLodTest;
