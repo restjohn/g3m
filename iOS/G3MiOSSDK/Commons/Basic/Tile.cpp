@@ -367,6 +367,8 @@ bool Tile::meetsRenderCriteria(const G3MRenderContext* rc,
     }
   }
 
+  int TODO_DIEGO_CHECK_IF_NECESSARY;
+
   if ((_lodTimer != NULL) &&
       (_lodTimer->elapsedTimeInMilliseconds() < 500)) {
     return _lastLodTest;
