@@ -385,11 +385,8 @@ void Camera::setRoll(const Angle& angle) {
     rotateWithAxisAndPoint(getViewDirection(), _position.asVector3D(), delta);
   }
 
-
 //  ILogger::instance()->logInfo("FROM ROLL %f to %f DELTA: %f-> NEW ROLL: %f",
 //                               roll._degrees, angle._degrees, delta._degrees, getRoll()._degrees);
-
-
 }
 
 Angle Camera::getRoll() const{
@@ -404,9 +401,9 @@ Angle Camera::getRoll() const{
   //    return Angle::nan();
   //  }
   
-  Angle pitch = normal.angleBetween(viewDir);
-  if (pitch._degrees > 175){
-    ILogger::instance()->logInfo("No Roll available for this camera position");
+  double pitch = normal.angleBetween(viewDir)._degrees;
+  if (pitch > 179){
+    ILogger::instance()->logInfo("No Roll available for camera with pitch %f.", pitch);
     return Angle::nan();
   }
 
