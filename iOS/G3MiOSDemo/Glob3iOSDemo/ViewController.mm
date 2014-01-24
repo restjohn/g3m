@@ -445,6 +445,16 @@ public:
                       const Camera*          camera,
                       const Geodetic3D&      position,
                       const Tile*            tile) { }
+
+  void onSceneChanged(const G3MContext* context,
+                      MapBoo_Scene* scene){}
+
+  void onCurrentSceneChanged(const G3MContext* context,
+                             const std::string& sceneId){}
+
+  void onCurrentSceneChanged(const G3MContext* context,
+                             const std::string& sceneId,
+                             const MapBoo_Scene* scene){}
 };
 
 
@@ -887,7 +897,7 @@ public:
                                                                            labelBuilder,
                                                                            altimeterCanvasImageBuilder)));
 
-    if (true){ //Changing FOV
+    if (false){ //Changing FOV
 
 
       class AnimatedFOVCameraConstrainer: public ICameraConstrainer {
@@ -924,15 +934,15 @@ public:
       builder.addCameraConstraint(new AnimatedFOVCameraConstrainer());
     }
 
-    if (false){ //Changing ROLL
-      
+    if (true){ //Changing ROLL
+
       class AnimatedRollCameraConstrainer: public ICameraConstrainer {
       private:
         mutable double _angle;
         mutable double _step;
       public:
 
-        AnimatedRollCameraConstrainer() : _angle(0), _step(2)
+        AnimatedRollCameraConstrainer() : _angle(0), _step(0.01)
         {
         }
 
@@ -941,7 +951,15 @@ public:
                             Camera* nextCamera) const {
           _angle += _step;
 
-          nextCamera->setRoll(Angle::fromDegrees(_angle));
+
+          Camera aux(*nextCamera);
+          aux.getRoll();
+
+
+          //nextCamera->setRoll(Angle::fromDegrees(_angle));
+
+
+          //nextCamera->getRoll();
 
           return true;
 
@@ -956,64 +974,64 @@ public:
 
 
 
-}
+  }
 
 
-//  [self createInterpolationTest: meshRenderer];
+  //  [self createInterpolationTest: meshRenderer];
 
-//  meshRenderer->addMesh([self createPointsMesh: builder.getPlanet() ]);
+  //  meshRenderer->addMesh([self createPointsMesh: builder.getPlanet() ]);
 
-//Draw light direction
-if (false) {
+  //Draw light direction
+  if (false) {
 
-  Vector3D lightDir = Vector3D(100000, 0,0);
-  //    FloatBufferBuilderFromCartesian3D vertex(CenterStrategy::noCenter(), Vector3D::zero);
-  FloatBufferBuilderFromCartesian3D* vertex = FloatBufferBuilderFromCartesian3D::builderWithoutCenter();
+    Vector3D lightDir = Vector3D(100000, 0,0);
+    //    FloatBufferBuilderFromCartesian3D vertex(CenterStrategy::noCenter(), Vector3D::zero);
+    FloatBufferBuilderFromCartesian3D* vertex = FloatBufferBuilderFromCartesian3D::builderWithoutCenter();
 
-  Vector3D v = planet->toCartesian(Geodetic3D(Angle::fromDegrees(28.127222),
-                                              Angle::fromDegrees(-15.431389),
-                                              10000));
+    Vector3D v = planet->toCartesian(Geodetic3D(Angle::fromDegrees(28.127222),
+                                                Angle::fromDegrees(-15.431389),
+                                                10000));
 
-  vertex->add(v);
-  vertex->add(v.add(lightDir));
-  //lightDir.normalized().times(planet->getRadii().maxAxis() *1.5));
+    vertex->add(v);
+    vertex->add(v.add(lightDir));
+    //lightDir.normalized().times(planet->getRadii().maxAxis() *1.5));
 
-  meshRenderer->addMesh( new DirectMesh(GLPrimitive::lines(),
-                                        true,
-                                        vertex->getCenter(),
-                                        vertex->create(),
-                                        3.0,
-                                        1.0,
-                                        Color::newFromRGBA(1.0, 0.0, 0.0, 1.0)));
+    meshRenderer->addMesh( new DirectMesh(GLPrimitive::lines(),
+                                          true,
+                                          vertex->getCenter(),
+                                          vertex->create(),
+                                          3.0,
+                                          1.0,
+                                          Color::newFromRGBA(1.0, 0.0, 0.0, 1.0)));
 
-  delete vertex;
+    delete vertex;
 
-}
+  }
 
-GInitializationTask* initializationTask = [self createSampleInitializationTask: shapesRenderer
-                                                                   geoRenderer: geoRenderer
-                                                                  meshRenderer: meshRenderer
-                                                                 marksRenderer: marksRenderer
-                                                                        planet: planet];
-builder.setInitializationTask(initializationTask, true);
+  GInitializationTask* initializationTask = [self createSampleInitializationTask: shapesRenderer
+                                                                     geoRenderer: geoRenderer
+                                                                    meshRenderer: meshRenderer
+                                                                   marksRenderer: marksRenderer
+                                                                          planet: planet];
+  builder.setInitializationTask(initializationTask, true);
 
-PeriodicalTask* periodicalTask = [self createSamplePeriodicalTask: &builder];
-builder.addPeriodicalTask(periodicalTask);
+  PeriodicalTask* periodicalTask = [self createSamplePeriodicalTask: &builder];
+  builder.addPeriodicalTask(periodicalTask);
 
-const bool logFPS = false;
-builder.setLogFPS(logFPS);
+  const bool logFPS = false;
+  builder.setLogFPS(logFPS);
 
-const bool logDownloaderStatistics = false;
-builder.setLogDownloaderStatistics(logDownloaderStatistics);
+  const bool logDownloaderStatistics = false;
+  builder.setLogDownloaderStatistics(logDownloaderStatistics);
 
-//builder.getPlanetRendererBuilder()->setRenderDebug(true);
+  //builder.getPlanetRendererBuilder()->setRenderDebug(true);
 
-//  WidgetUserData* userData = NULL;
-//  builder.setUserData(userData);
+  //  WidgetUserData* userData = NULL;
+  //  builder.setUserData(userData);
 
-// initialization
-builder.initializeWidget();
-//  [self testGenericQuadTree:geoTileRasterizer];
+  // initialization
+  builder.initializeWidget();
+  //  [self testGenericQuadTree:geoTileRasterizer];
 
 }
 
@@ -3356,7 +3374,9 @@ public:
                                       const Geodetic3D&      position,
                                       const Tile*            tile){
 
-            [_iosWidget widget]->getNextCamera()->setRoll(Angle::fromDegrees(45));
+            Angle roll = [_iosWidget widget]->getNextCamera()->getRoll();
+
+            [_iosWidget widget]->getNextCamera()->setRoll(roll.add(Angle::fromDegrees(10)));
 
             return true;
 

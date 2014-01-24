@@ -463,13 +463,46 @@ void Camera::setFOV(const Angle& vertical, const Angle& horizontal) {
 }
 
 void Camera::setRoll(const Angle& angle) {
-  Angle delta = angle.sub(Angle::fromRadians(_rollInRadians));
-  if (delta._radians > 0) {
-    _rollInRadians = angle._radians;
+
+  Angle roll = getRoll();
+  if (roll.isNan()){
+    return;
+  }
+
+  ILogger::instance()->logInfo("FROM ROLL %f to %f", roll._degrees, angle._degrees);
+
+  Angle delta = angle.sub(getRoll());
+  if (!delta.isZero()){
     rotateWithAxisAndPoint(getViewDirection(), _position.asVector3D(), delta);
   }
+
+
+//  //Angle delta = angle.sub(Angle::fromRadians(_rollInRadians));
+//  if (delta._radians > 0) {
+//    _rollInRadians = angle._radians;
+//    rotateWithAxisAndPoint(getViewDirection(), _position.asVector3D(), delta);
+//  }
 }
 
 Angle Camera::getRoll() const{
-  return Angle::fromRadians(_rollInRadians);
+
+  const Vector3D viewDir = getViewDirection();
+
+  const Vector3D normal = _planet->geodeticSurfaceNormal( _position );
+  const Vector3D normal2D = normal.projectionInPlane(viewDir);
+
+  double length = normal2D.squaredLength();
+  if (length < 0.1){
+    ILogger::instance()->logInfo("No Roll available for this camera position");
+    return Angle::nan();
+  }
+
+  const Vector3D up2D     = getUp().projectionInPlane(viewDir);
+  Angle a = up2D.signedAngleBetween(normal2D, viewDir);
+
+  ILogger::instance()->logInfo("Roll angle = %f", a._degrees);
+  return a;
+
+
+  //return Angle::fromRadians(_rollInRadians);
 }
