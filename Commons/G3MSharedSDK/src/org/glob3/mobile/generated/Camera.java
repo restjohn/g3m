@@ -24,7 +24,6 @@ public class Camera
      _normalizedPosition = new MutableVector3D(that._normalizedPosition);
      _tanHalfVerticalFieldOfView = java.lang.Double.NaN;
      _tanHalfHorizontalFieldOfView = java.lang.Double.NaN;
-     _rollInRadians = that._rollInRadians;
   }
 
   public Camera(int width, int height)
@@ -50,7 +49,6 @@ public class Camera
      _normalizedPosition = new MutableVector3D(0, 0, 0);
      _tanHalfVerticalFieldOfView = java.lang.Double.NaN;
      _tanHalfHorizontalFieldOfView = java.lang.Double.NaN;
-     _rollInRadians = 0;
     resizeViewport(width, height);
     _dirtyFlags.setAll(true);
   }
@@ -497,16 +495,49 @@ public class Camera
 
   public final Angle getRoll()
   {
-    return Angle.fromRadians(_rollInRadians);
+  
+    final Vector3D viewDir = getViewDirection();
+  
+    final Vector3D normal = _planet.geodeticSurfaceNormal(_position);
+  
+     //Current calculus of pitch crashes in roll = 90
+    //  if (getPitch().isZero()){
+    //    ILogger::instance()->logInfo("No Roll available for this camera position");
+    //    return Angle::nan();
+    //  }
+  
+    double pitch = normal.angleBetween(viewDir)._degrees;
+    if (pitch > 179)
+    {
+      ILogger.instance().logInfo("No Roll available for camera with pitch %f.", pitch);
+      return Angle.nan();
+    }
+  
+    final Vector3D normal2D = normal.projectionInPlane(viewDir);
+    final Vector3D up2D = getUp().projectionInPlane(viewDir);
+  
+    Angle a = up2D.signedAngleBetween(normal2D, viewDir);
+  
+  //  ILogger::instance()->logInfo("Roll angle = %f", a._degrees);
+    return a;
   }
   public final void setRoll(Angle angle)
   {
-    final Angle delta = angle.sub(Angle.fromRadians(_rollInRadians));
-    if (delta._radians != 0)
+  
+    Angle roll = getRoll();
+    if (roll.isNan())
     {
-      _rollInRadians = angle._radians;
+      return;
+    }
+  
+    Angle delta = roll.sub(angle);
+    if (!delta.isZero())
+    {
       rotateWithAxisAndPoint(getViewDirection(), _position.asVector3D(), delta);
     }
+  
+  //  ILogger::instance()->logInfo("FROM ROLL %f to %f DELTA: %f-> NEW ROLL: %f",
+  //                               roll._degrees, angle._degrees, delta._degrees, getRoll()._degrees);
   }
 
   private Angle getHeading(Vector3D normal)
@@ -551,7 +582,6 @@ public class Camera
   private Frustum _frustumInModelCoordinates;
   private double _tanHalfVerticalFieldOfView;
   private double _tanHalfHorizontalFieldOfView;
-  private double _rollInRadians;
 
   //The Camera Effect Target
   private static class CameraEffectTarget implements EffectTarget
