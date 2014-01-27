@@ -799,6 +799,13 @@ public class Tile
     {
       _textureSolved = textureSolved;
   
+      if (_textureSolved)
+      {
+        if (_texturizerData != null)
+           _texturizerData.dispose();
+        _texturizerData = null;
+      }
+  
       if (_subtiles != null)
       {
         final int subtilesSize = _subtiles.size();
@@ -949,6 +956,10 @@ public class Tile
     if (isb != null)
        isb.dispose();
     return s;
+  }
+  @Override
+  public String toString() {
+    return description();
   }
 
   public final java.util.ArrayList<Tile> createSubTiles(Angle splitLatitude, Angle splitLongitude, boolean setParent)
