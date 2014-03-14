@@ -718,8 +718,8 @@ public:
 
 - (void) initWidgetForTestingElevationData
 {
-  double scaleFactor = 0.0005;
-  int meshResolution = 64;
+  double scaleFactor = 0.5;
+  int meshResolution = 12;
 
   G3MBuilder_iOS builder([self G3MWidget]);
 
@@ -758,7 +758,7 @@ public:
 
   layerSet->addLayer(grafcan);
   builder.getPlanetRendererBuilder()->setLayerSet(layerSet);
-  builder.getPlanetRendererBuilder()->setRenderDebug(false);
+  builder.getPlanetRendererBuilder()->setRenderDebug(true);
 
 
   std::string name;
@@ -775,7 +775,7 @@ public:
                                                                                     0);
 
   builder.getPlanetRendererBuilder()->setElevationDataProvider(elevationDataProvider);
-  builder.getPlanetRendererBuilder()->setVerticalExaggeration(scaleFactor);
+  //builder.getPlanetRendererBuilder()->setVerticalExaggeration(scaleFactor);
 
   builder.setShownSector(gcSector);
 
