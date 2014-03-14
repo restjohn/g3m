@@ -273,7 +273,9 @@ Mesh* createSectorMesh(const Planet* planet,
   //[[self G3MWidget] initSingletons];
   // [self initWithoutBuilder];
 
-  [self initCustomizedWithBuilder];
+  //[self initCustomizedWithBuilder];
+
+  [self initWidgetForTestingElevationData];
 
   //  [self initWithMapBooBuilder];
 
@@ -588,6 +590,202 @@ public:
 
 };
 
+- (Mesh*) circleMeshWithCenter: (Vector3D) center
+                        radius: (double) radius
+                        normal: (Vector3D) normal
+                      segments: (int) nSegments
+                         color: (Color)color{
+
+  FloatBufferBuilderFromCartesian3D* vertices = FloatBufferBuilderFromCartesian3D::builderWithoutCenter();
+
+  // first is the center
+  vertices->add(center);
+
+  const Vector3D radii = normal.cross(Vector3D::upX()).normalized().times(radius);
+
+  for (int deg = 0; deg <= 360; deg += 360 / nSegments) {
+    Vector3D rad = radii.rotateAroundAxis(normal, Angle::fromDegrees(deg));
+    Vector3D vertex = rad.add(center);
+    vertices->add(vertex);
+  }
+
+  Color* diskColor = new Color(color);
+
+  Mesh* result = new DirectMesh(GLPrimitive::triangleFan(),
+                                true,
+                                vertices->getCenter(),
+                                vertices->create(),
+                                1,
+                                1,
+                                diskColor,
+                                NULL,
+                                1.0f,
+                                false);
+
+  delete vertices;
+
+  return result;
+}
+
+
+- (void) testMeshAnimationForBuilder: (G3MBuilder_iOS*) builder{
+
+  int nFrames = 200;
+
+  MeshRenderer** mr = new MeshRenderer*[nFrames];
+
+  for(int i = 0; i < nFrames; i++){
+    mr[i] = new MeshRenderer();
+
+    if (bool russia = true)
+    {
+      Geodetic3D moscow = Geodetic3D::fromDegrees(55.755825999412004, 37.61730000085663, 0);
+      Vector3D center = builder->getPlanet()->toCartesian(moscow);
+      Vector3D normal = builder->getPlanet()->geodeticSurfaceNormal(moscow);
+
+      mr[i]->addMesh([self circleMeshWithCenter:center
+                                         radius:1e6 * (i/ (float)nFrames)
+                                         normal:normal
+                                       segments:100
+                                          color:Color::fromRGBA(1.0, 0.0, 0.0, 0.5)]);
+    }
+
+    if (bool deutschland = true)
+    {
+      Geodetic3D munchen = Geodetic3D::fromDegrees(48.23685704229997, 11.579850238049403, 0);
+      Vector3D center = builder->getPlanet()->toCartesian(munchen);
+      Vector3D normal = builder->getPlanet()->geodeticSurfaceNormal(munchen);
+
+      mr[i]->addMesh([self circleMeshWithCenter:center
+                                         radius:0.6e6 * (i/ (float)nFrames)
+                                         normal:normal
+                                       segments:100
+                                          color:Color::black()]);
+    }
+
+    if (bool britain = true)
+    {
+      Geodetic3D london = Geodetic3D::fromDegrees(51.52012542691352, -0.24143882445059717, 0);
+      Vector3D center = builder->getPlanet()->toCartesian(london);
+      Vector3D normal = builder->getPlanet()->geodeticSurfaceNormal(london);
+
+      mr[i]->addMesh([self circleMeshWithCenter:center
+                                         radius:0.4e6 * (i/ (float)nFrames)
+                                         normal:normal
+                                       segments:100
+                                          color:Color::blue()]);
+    }
+
+
+    builder->addRenderer(mr[i]);
+  }
+
+  class ChangeMeshTask : public GTask {
+  private:
+
+    MeshRenderer** _mr;
+    int _nMeshs;
+    int _activeMesh;
+
+  public:
+    ChangeMeshTask(MeshRenderer** mr, int nMeshes) :
+    _mr(mr),
+    _nMeshs(nMeshes),
+    _activeMesh(0)
+    {
+      for(int i = 0; i < _nMeshs; i++){
+        mr[i]->setEnable(false);
+      }
+      mr[_activeMesh]->setEnable(true);
+    }
+
+    void run(const G3MContext* context) {
+      _mr[_activeMesh]->setEnable(false);
+
+      _activeMesh = (_activeMesh+1) % _nMeshs;
+
+      _mr[_activeMesh]->setEnable(true);
+
+    }
+
+  };
+
+  builder->addPeriodicalTask(new PeriodicalTask(TimeInterval::fromMilliseconds(50),
+                                                new ChangeMeshTask(mr, nFrames)));
+
+}
+
+
+- (void) initWidgetForTestingElevationData
+{
+  double scaleFactor = 0.0005;
+  int meshResolution = 64;
+
+  G3MBuilder_iOS builder([self G3MWidget]);
+
+  Sector gcSector = Sector::fromDegrees(27.7116484957735, -15.90589160041418,
+                                        28.225913322423995, -15.32910937385168 ).shrinkedByPercent(1.0 - scaleFactor);
+
+  LayerSet* layerSet = new LayerSet();
+
+//  LayerTilesRenderParameters(const Sector&   topSector,
+//                             const int       topSectorSplitsByLatitude,
+//                             const int       topSectorSplitsByLongitude,
+//                             const int       firstLevel,
+//                             const int       maxLevel,
+//                             const Vector2I& tileTextureResolution,
+//                             const Vector2I& tileMeshResolution,
+//                             const bool      mercator) :
+
+  WMSLayer* grafcan = new WMSLayer("WMS_OrtoExpress",
+                                   URL("http://idecan1.grafcan.es/ServicioWMS/OrtoExpress?", false),
+                                   WMS_1_1_0,
+                                   gcSector,
+                                   "image/jpeg",
+                                   "EPSG:4326",
+                                   "",
+                                   false,
+                                   new LevelTileCondition(0, 50),
+                                   TimeInterval::fromDays(30),
+                                   true,
+                                   new LayerTilesRenderParameters(Sector::fullSphere(),
+                                                                  2,2,
+                                                                  1,50,
+                                                                  Vector2I(256,256),
+                                                                  Vector2I(meshResolution,meshResolution),
+                                                                  false)
+                                   );
+
+  layerSet->addLayer(grafcan);
+  builder.getPlanetRendererBuilder()->setLayerSet(layerSet);
+  builder.getPlanetRendererBuilder()->setRenderDebug(false);
+
+
+  std::string name;
+  if (true){ //HILL
+    name = "file:///gaussian_ED_100x100_height=10000.bil";
+  } else{ //HOLE
+    name = "file:///gaussian_ED_100x100_height=-10000.bil";
+  }
+
+
+  ElevationDataProvider* elevationDataProvider = new SingleBilElevationDataProvider(URL(name, false),
+                                                                                    gcSector,
+                                                                                    Vector2I(100, 100),
+                                                                                    0);
+
+  builder.getPlanetRendererBuilder()->setElevationDataProvider(elevationDataProvider);
+  builder.getPlanetRendererBuilder()->setVerticalExaggeration(scaleFactor);
+
+  builder.setShownSector(gcSector);
+
+  
+  // initialization
+  builder.initializeWidget();
+  
+}
+
+
 - (void) initCustomizedWithBuilder
 {
 
@@ -604,6 +802,8 @@ public:
   //  builder.addCameraConstraint(scc);
 
   builder.setCameraRenderer([self createCameraRenderer]);
+
+  [self testMeshAnimationForBuilder:&builder];
 
   const Planet* planet = Planet::createEarth();
   //const Planet* planet = Planet::createSphericalEarth();
@@ -1872,7 +2072,7 @@ public:
 
 - (TilesRenderParameters*) createPlanetRendererParameters
 {
-  const bool renderDebug = false;
+  const bool renderDebug = true;
   const bool useTilesSplitBudget = true;
   const bool forceFirstLevelTilesRenderOnStart = true;
   const bool incrementalTileQuality = false;
@@ -2841,17 +3041,17 @@ public:
     void run(const G3MContext* context) {
       printf("Running initialization Task\n");
 
-//      [_iosWidget widget]->setAnimatedCameraPosition(TimeInterval::fromSeconds(10.0),
-//                                                     Geodetic3D::fromDegrees(28.624949838863251728, -13.898810737833036555, 18290),
-//                                                     Angle::fromDegrees(180),
-//                                                     Angle::fromDegrees(-45),
-//                                                     false,
-//                                                     false);
+      //      [_iosWidget widget]->setAnimatedCameraPosition(TimeInterval::fromSeconds(10.0),
+      //                                                     Geodetic3D::fromDegrees(28.624949838863251728, -13.898810737833036555, 18290),
+      //                                                     Angle::fromDegrees(180),
+      //                                                     Angle::fromDegrees(-45),
+      //                                                     false,
+      //                                                     false);
 
-//      [_iosWidget widget]->setAnimatedCameraPosition(TimeInterval::fromSeconds(5),
-//                                                     Geodetic3D::fromDegrees(28.624949838863251728,
-//                                                                             -13.898810737833036555,
-//                                                                             5));
+      //      [_iosWidget widget]->setAnimatedCameraPosition(TimeInterval::fromSeconds(5),
+      //                                                     Geodetic3D::fromDegrees(28.624949838863251728,
+      //                                                                             -13.898810737833036555,
+      //                                                                             5));
 
 
       //      [_iosWidget widget]->setAnimatedCameraPosition(Geodetic3D::fromDegrees(36.518803097704875427,
@@ -3073,7 +3273,7 @@ public:
         }
       }
 
-      if (true) {
+      if (false) {
         //      NSString* geojsonName = @"geojson/countries";
         //        NSString* geojsonName = @"geojson/countries-50m";
         //      NSString* geojsonName = @"geojson/boundary_lines_land";
@@ -3185,47 +3385,47 @@ public:
                                       const Tile*            tile){
 
             //            [_iosWidget widget]->getNextCamera()->setRoll(Angle::fromDegrees(45));
-//            Camera* cam = [_iosWidget widget]->getNextCamera();
-/*
+            //            Camera* cam = [_iosWidget widget]->getNextCamera();
+            /*
 
-<<<<<<< HEAD
-            //TaitBryanAngles angles = cam->getTaitBryanAngles();
-=======
+             <<<<<<< HEAD
+             //TaitBryanAngles angles = cam->getTaitBryanAngles();
+             =======
 
-            TaitBryanAngles angles = cam->getHeadingPitchRoll();
->>>>>>> 10100b4c5f73c124779494d0ba45d11b9ed1ebc2
-            printf("A1: %s\n", angles.description().c_str() );
+             TaitBryanAngles angles = cam->getHeadingPitchRoll();
+             >>>>>>> 10100b4c5f73c124779494d0ba45d11b9ed1ebc2
+             printf("A1: %s\n", angles.description().c_str() );
 
-            Angle step = Angle::fromDegrees(10);
+             Angle step = Angle::fromDegrees(10);
 
-            switch ((pixel._x * 4) / cam->getWidth()) {
-              case 0:
-                [_iosWidget widget]->getNextCamera()->setHeading(angles._heading.add(step));
-                break;
+             switch ((pixel._x * 4) / cam->getWidth()) {
+             case 0:
+             [_iosWidget widget]->getNextCamera()->setHeading(angles._heading.add(step));
+             break;
 
-              case 1:
-                [_iosWidget widget]->getNextCamera()->setPitch(angles._pitch.add(step));
-                break;
+             case 1:
+             [_iosWidget widget]->getNextCamera()->setPitch(angles._pitch.add(step));
+             break;
 
-              case 2:
-                [_iosWidget widget]->getNextCamera()->setRoll(angles._roll.add(step));
-                break;
+             case 2:
+             [_iosWidget widget]->getNextCamera()->setRoll(angles._roll.add(step));
+             break;
 
-              default:
-                break;
-            }
+             default:
+             break;
+             }
 
-            TaitBryanAngles angles2 = cam->getHeadingPitchRoll();
-            printf("A2: %s\n", angles2.description().c_str() );
+             TaitBryanAngles angles2 = cam->getHeadingPitchRoll();
+             printf("A2: %s\n", angles2.description().c_str() );
 
-            Geodetic2D g(cam->getGeodeticPosition()._latitude, cam->getGeodeticPosition()._longitude);
-            Vector3D posInGround = ec->getPlanet()->toCartesian(cam->getGeodeticPosition()._latitude, cam->getGeodeticPosition()._longitude, 0);
+             Geodetic2D g(cam->getGeodeticPosition()._latitude, cam->getGeodeticPosition()._longitude);
+             Vector3D posInGround = ec->getPlanet()->toCartesian(cam->getGeodeticPosition()._latitude, cam->getGeodeticPosition()._longitude, 0);
 
 
-            _meshRenderer->addMesh(cam->getLocalCoordinateSystem().changeOrigin(posInGround).createMesh(1e3, Color::red(), Color::green(), Color::blue())  );
-            _meshRenderer->addMesh(cam->getCameraCoordinateSystem().createMesh(1e3, Color::red(), Color::green(), Color::blue())  );
+             _meshRenderer->addMesh(cam->getLocalCoordinateSystem().changeOrigin(posInGround).createMesh(1e3, Color::red(), Color::green(), Color::blue())  );
+             _meshRenderer->addMesh(cam->getCameraCoordinateSystem().createMesh(1e3, Color::red(), Color::green(), Color::blue())  );
 
-*/
+             */
             return true;
           }
 
@@ -3249,7 +3449,7 @@ public:
                                                                          meshRenderer,
                                                                          marksRenderer,
                                                                          planet);
-  
+
   return initializationTask;
 }
 
