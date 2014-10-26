@@ -21,8 +21,8 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 
 public final class Factory_WebGL
-         extends
-            IFactory {
+extends
+IFactory {
 
    boolean first = true;
 
@@ -100,8 +100,8 @@ public final class Factory_WebGL
 
 
    @Override
-   public ICanvas createCanvas() {
-      return new Canvas_WebGL();
+   public ICanvas createCanvas(final boolean scaleToDeviceResolution) {
+      return new Canvas_WebGL(scaleToDeviceResolution);
    }
 
 

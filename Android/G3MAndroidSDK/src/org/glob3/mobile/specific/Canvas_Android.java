@@ -23,8 +23,8 @@ import android.graphics.Typeface;
 
 
 public final class Canvas_Android
-         extends
-            ICanvas {
+extends
+ICanvas {
 
    private Bitmap      _bitmap          = null;
    private Canvas      _canvas          = null;
@@ -38,7 +38,9 @@ public final class Canvas_Android
    private final Rect  _rect            = new Rect(); // Rect instance for reuse (and avoid garbage)
 
 
-   Canvas_Android() {
+   Canvas_Android(final boolean scaleToDeviceResolution) {
+      super(scaleToDeviceResolution);
+
       _fillPaint = new Paint();
       _fillPaint.setAntiAlias(true);
       _fillPaint.setStyle(Paint.Style.FILL);
