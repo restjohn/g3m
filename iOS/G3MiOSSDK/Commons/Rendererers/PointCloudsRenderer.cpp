@@ -63,6 +63,7 @@ void PointCloudsRenderer::PointCloud::initialize(const G3MContext* context) {
                         _cloudName +
                         "?planet=" + planetType +
                         "&verticalExaggeration=" + IStringUtils::instance()->toString(_verticalExaggeration) +
+                        "&deltaHeight=" + IStringUtils::instance()->toString(_deltaHeight) +
                         "&format=binary");
 
   ILogger::instance()->logInfo("Downloading metadata for \"%s\"", _cloudName.c_str());
@@ -370,10 +371,11 @@ void PointCloudsRenderer::PointCloud::parsedMetadata(long long pointsCount,
   ILogger::instance()->logInfo("Parsed metadata for \"%s\"", _cloudName.c_str());
 
   if (_metadataListener != NULL) {
-    _metadataListener->onMetadata(pointsCount,
+    _metadataListener->onMetadata(_pointsCount,
                                   *sector,
-                                  minHeight,
-                                  maxHeight);
+                                  _minHeight,
+                                  _maxHeight,
+                                  _averageHeight);
     if (_deleteListener) {
       delete _metadataListener;
     }
@@ -404,7 +406,15 @@ void PointCloudsRenderer::PointCloud::render(const G3MRenderContext* rc,
                                              long long nowInMS) {
   if (_rootNode != NULL) {
 #warning TODO: make plugable the colorization of the cloud
-    const long long renderedCount = _rootNode->render(this, rc, glState, frustum, _minHeight, _averageHeight * 3, _pointSize, nowInMS);
+#ifdef C_CODE
+    const double maxHeight = (_colorPolicy == MIN_MAX_HEIGHT) ? _maxHeight : _averageHeight * 3;
+#endif
+#ifdef JAVA_CODE
+    final double maxHeight = (_colorPolicy == ColorPolicy.MIN_MAX_HEIGHT) ? _maxHeight : _averageHeight * 3;
+#endif
+
+    const long long renderedCount = _rootNode->render(this, rc, glState, frustum, _minHeight, maxHeight, _pointSize, nowInMS);
+    // const long long renderedCount = _rootNode->render(this, rc, glState, frustum, _minHeight, _averageHeight * 3, _pointSize, nowInMS);
     // const long long renderedCount = _rootNode->render(this, rc, glState, frustum, _minHeight, _maxHeight, _pointSize, nowInMS);
 
     if (_lastRenderedCount != renderedCount) {
@@ -510,7 +520,7 @@ long long PointCloudsRenderer::PointCloudInnerNode::rawRender(const PointCloud* 
                              Color::newFromRGBA(1, 1, 0, 1), // flatColor
                              NULL, // colors
                              1,    // colorsIntensity
-                             false);
+                             true);
     }
     _mesh->render(rc, glState);
     renderedCount = 1;
@@ -587,6 +597,7 @@ long long PointCloudsRenderer::PointCloud::requestBufferForLevel(const G3MRender
                 "/" + IStringUtils::instance()->toString(level) +
                 "?planet=" + planetType +
                 "&verticalExaggeration=" + IStringUtils::instance()->toString(_verticalExaggeration) +
+                "&deltaHeight=" + IStringUtils::instance()->toString(_deltaHeight) +
                 "&format=binary");
 
   //  ILogger::instance()->logInfo("Downloading metadata for \"%s\"", _cloudName.c_str());
@@ -742,7 +753,7 @@ DirectMesh* PointCloudsRenderer::PointCloudLeafNode::createMesh(double minHeight
                                       NULL,                     // flatColor
                                       _firstPointsColorsBuffer, // colors
                                       1,                        // colorsIntensity
-                                      false);
+                                      true);
     mesh->setRenderVerticesCount( mu->min(_neededPoints, firstPointsCount) );
 
     return mesh;
@@ -813,7 +824,7 @@ DirectMesh* PointCloudsRenderer::PointCloudLeafNode::createMesh(double minHeight
                                     NULL,   // flatColor
                                     colors, // colors
                                     1,      // colorsIntensity
-                                    false);
+                                    true);
   // mesh->setRenderVerticesCount( mu->min(_neededPoints, firstPointsCount) );
   mesh->setRenderVerticesCount( pointsCount );
 
@@ -1013,8 +1024,10 @@ RenderState PointCloudsRenderer::getRenderState(const G3MRenderContext* rc) {
 
 void PointCloudsRenderer::addPointCloud(const URL& serverURL,
                                         const std::string& cloudName,
+                                        ColorPolicy colorPolicy,
                                         float pointSize,
                                         float verticalExaggeration,
+                                        double deltaHeight,
                                         PointCloudMetadataListener* metadataListener,
                                         bool deleteListener,
                                         bool verbose) {
@@ -1023,8 +1036,10 @@ void PointCloudsRenderer::addPointCloud(const URL& serverURL,
                 DownloadPriority::MEDIUM,
                 TimeInterval::fromDays(30),
                 true,
+                colorPolicy,
                 pointSize,
                 verticalExaggeration,
+                deltaHeight,
                 metadataListener,
                 deleteListener,
                 verbose);
@@ -1035,14 +1050,18 @@ void PointCloudsRenderer::addPointCloud(const URL& serverURL,
                                         long long downloadPriority,
                                         const TimeInterval& timeToCache,
                                         bool readExpired,
+                                        ColorPolicy colorPolicy,
                                         float pointSize,
                                         float verticalExaggeration,
+                                        double deltaHeight,
                                         PointCloudMetadataListener* metadataListener,
                                         bool deleteListener,
                                         bool verbose) {
   PointCloud* pointCloud = new PointCloud(serverURL,
                                           cloudName,
                                           verticalExaggeration,
+                                          deltaHeight,
+                                          colorPolicy,
                                           pointSize,
                                           downloadPriority,
                                           timeToCache,

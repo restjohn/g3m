@@ -25,6 +25,11 @@ class ByteBufferIterator;
 
 class PointCloudsRenderer : public DefaultRenderer {
 public:
+  enum ColorPolicy {
+    MIN_MAX_HEIGHT,
+    MIN_AVERAGE3_HEIGHT
+  };
+
 
   class PointCloudMetadataListener {
   public:
@@ -34,7 +39,8 @@ public:
     virtual void onMetadata(long long pointsCount,
                             const Sector& sector,
                             double minHeight,
-                            double maxHeight) = 0;
+                            double maxHeight,
+                            double averageHeight) = 0;
   };
 
 
@@ -465,6 +471,7 @@ private:
   };
 
 
+
   class PointCloud {
   private:
 #ifdef C_CODE
@@ -475,6 +482,7 @@ private:
 #endif
     const std::string _cloudName;
     const float _verticalExaggeration;
+    const double _deltaHeight;
 
     const long long    _downloadPriority;
 #ifdef C_CODE
@@ -488,6 +496,7 @@ private:
     PointCloudMetadataListener* _metadataListener;
     bool _deleteListener;
 
+    const ColorPolicy _colorPolicy;
     const bool _verbose;
 
     bool _downloadingMetadata;
@@ -509,6 +518,8 @@ private:
     PointCloud(const URL& serverURL,
                const std::string& cloudName,
                float verticalExaggeration,
+               double deltaHeight,
+               ColorPolicy colorPolicy,
                float pointSize,
                long long downloadPriority,
                const TimeInterval& timeToCache,
@@ -519,6 +530,8 @@ private:
     _serverURL(serverURL),
     _cloudName(cloudName),
     _verticalExaggeration(verticalExaggeration),
+    _deltaHeight(deltaHeight),
+    _colorPolicy(colorPolicy),
     _pointSize(pointSize),
     _downloadPriority(downloadPriority),
     _timeToCache(timeToCache),
@@ -601,8 +614,10 @@ public:
 
   void addPointCloud(const URL& serverURL,
                      const std::string& cloudName,
+                     ColorPolicy colorPolicy,
                      float pointSize = 2.0f,
                      float verticalExaggeration = 1.0f,
+                     double deltaHeight = 0,
                      PointCloudMetadataListener* metadataListener = NULL,
                      bool deleteListener = true,
                      bool verbose = false);
@@ -612,8 +627,10 @@ public:
                      long long downloadPriority,
                      const TimeInterval& timeToCache,
                      bool readExpired,
+                     ColorPolicy colorPolicy,
                      float pointSize = 2.0f,
                      float verticalExaggeration = 1.0f,
+                     double deltaHeight = 0,
                      PointCloudMetadataListener* metadataListener = NULL,
                      bool deleteListener = true,
                      bool verbose = false);

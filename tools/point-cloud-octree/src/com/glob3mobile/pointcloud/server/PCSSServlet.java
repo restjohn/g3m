@@ -40,8 +40,8 @@ import es.igosoftware.util.XStringTokenizer;
 
 
 public class PCSSServlet
-extends
-HttpServlet {
+         extends
+            HttpServlet {
    private static final long serialVersionUID = 1L;
 
 
@@ -50,16 +50,19 @@ HttpServlet {
       private final String _cloudName;
       private final String _nodeID;
       private final float  _verticalExaggeration;
+      private final double _deltaHeight;
 
 
       private NodeAverageCacheKey(final Planet planet,
                                   final String cloudName,
                                   final String nodeID,
-                                  final float verticalExaggeration) {
+                                  final float verticalExaggeration,
+                                  final double deltaHeight) {
          _planet = planet;
          _cloudName = cloudName;
          _nodeID = nodeID;
          _verticalExaggeration = verticalExaggeration;
+         _deltaHeight = deltaHeight;
       }
 
 
@@ -68,6 +71,9 @@ HttpServlet {
          final int prime = 31;
          int result = 1;
          result = (prime * result) + ((_cloudName == null) ? 0 : _cloudName.hashCode());
+         long temp;
+         temp = Double.doubleToLongBits(_deltaHeight);
+         result = (prime * result) + (int) (temp ^ (temp >>> 32));
          result = (prime * result) + ((_nodeID == null) ? 0 : _nodeID.hashCode());
          result = (prime * result) + ((_planet == null) ? 0 : _planet.hashCode());
          result = (prime * result) + Float.floatToIntBits(_verticalExaggeration);
@@ -93,6 +99,9 @@ HttpServlet {
             }
          }
          else if (!_cloudName.equals(other._cloudName)) {
+            return false;
+         }
+         if (Double.doubleToLongBits(_deltaHeight) != Double.doubleToLongBits(other._deltaHeight)) {
             return false;
          }
          if (_nodeID == null) {
@@ -130,6 +139,7 @@ HttpServlet {
             final String nodeID = key._nodeID;
             final Planet planet = key._planet;
             final float verticalExaggeration = key._verticalExaggeration;
+            final double deltaHeight = key._deltaHeight;
             final PersistentLOD db = getDB(cloudName);
             final PersistentLOD.Node node = db.getNode(nodeID, true);
 
@@ -146,7 +156,9 @@ HttpServlet {
                for (final Geodetic3D point : points) {
                   pointsCount++;
 
-                  final GVector3D cartesian = planet.toCartesian(point, verticalExaggeration);
+                  final GVector3D cartesian = planet.toCartesian(point._latitude, point._longitude, point._height + deltaHeight,
+                           verticalExaggeration);
+
                   sumX += cartesian._x;
                   sumY += cartesian._y;
                   sumZ += cartesian._z;
@@ -187,7 +199,7 @@ HttpServlet {
       super.init(config);
 
       _cloudDirectory = new File(System.getProperty("user.dir"));
-      //_cloudDirectory = new File("/Volumes/My Passport/_LIDAR_COPY");
+      // _cloudDirectory = new File("/Volumes/My Passport/_minnesota_lidar_/db");
 
       log("initialization of " + getClass() + " at " + _cloudDirectory);
    }
@@ -262,8 +274,9 @@ HttpServlet {
 
 
    private static List<NodeMetadata> getNodesMetadata(final PersistentLOD db,
-                                                      final Planet planet,
-                                                      final float verticalExaggeration) {
+            final Planet planet,
+            final float verticalExaggeration,
+            final double deltaHeight) {
       final List<NodeMetadata> result = new ArrayList<PCSSServlet.NodeMetadata>(10000);
 
       db.acceptDepthFirstVisitor(null, new PersistentLOD.Visitor() {
@@ -291,7 +304,9 @@ HttpServlet {
             for (final PersistentLOD.NodeLevel level : levels) {
                final List<Geodetic3D> points = level.getPoints(transaction);
                for (final Geodetic3D point : points) {
-                  final GVector3D cartesian = planet.toCartesian(point, verticalExaggeration);
+                  final GVector3D cartesian = planet.toCartesian(point._latitude, point._longitude, point._height + deltaHeight,
+                           verticalExaggeration);
+
                   final double x = cartesian._x;
                   final double y = cartesian._y;
                   final double z = cartesian._z;
@@ -413,6 +428,7 @@ HttpServlet {
       private final PersistentLOD.Statistics _statistics;
       private final List<NodeMetadata>       _nodes;
       private final float                    _verticalExaggeration;
+      private final double                   _deltaHeight;
 
       private byte[]                         _buffer = null;
 
@@ -420,11 +436,13 @@ HttpServlet {
       private MetadataEntry(final Planet planet,
                             final PersistentLOD.Statistics statistics,
                             final List<NodeMetadata> nodes,
-                            final float verticalExaggeration) {
+                            final float verticalExaggeration,
+                            final double deltaHeight) {
          _planet = planet;
          _statistics = statistics;
          _nodes = nodes;
          _verticalExaggeration = verticalExaggeration;
+         _deltaHeight = deltaHeight;
       }
 
 
@@ -444,7 +462,7 @@ HttpServlet {
          os.write(toLittleEndian(_nodes.size()));
 
          for (final NodeMetadata node : _nodes) {
-            os.write(getNodeArray(_planet, node, _verticalExaggeration));
+            os.write(getNodeArray(_planet, node, _verticalExaggeration, _deltaHeight));
          }
 
          return os.toByteArray();
@@ -456,16 +474,18 @@ HttpServlet {
 
    private static MetadataEntry getMetadataEntry(final PersistentLOD db,
                                                  final Planet planet,
-                                                 final float verticalExaggeration) {
+                                                 final float verticalExaggeration,
+                                                 final double deltaHeight) {
       synchronized (_metadataCache) {
-         final String key = db.getCloudName() + "/" + planet + "/" + verticalExaggeration;
+         final String key = db.getCloudName() + "/" + planet + "/" + verticalExaggeration + "/" + deltaHeight;
          MetadataEntry entry = _metadataCache.get(key);
          if (entry == null) {
             entry = new MetadataEntry( //
                      planet, //
                      db.getStatistics(false), //
-                     getNodesMetadata(db, planet, verticalExaggeration), //
-                     verticalExaggeration);
+                     getNodesMetadata(db, planet, verticalExaggeration, deltaHeight), //
+                     verticalExaggeration, //
+                     deltaHeight);
             _metadataCache.put(key, entry);
          }
          return entry;
@@ -503,7 +523,8 @@ HttpServlet {
 
    private static byte[] getNodeArray(final Planet planet,
                                       final NodeMetadata node,
-                                      final float verticalExaggeration) {
+                                      final float verticalExaggeration,
+                                      final double deltaHeight) {
       final byte[] id = Utils.toBinaryID(node._id);
 
       final byte idLength = toByte(id.length);
@@ -544,7 +565,7 @@ HttpServlet {
       final byte intLevelsCount = toByte(intLevels.size());
 
       final int bufferSize = //
-               ByteBufferUtils.sizeOf(idLength) + //
+      ByteBufferUtils.sizeOf(idLength) + //
                idLength + //
                ByteBufferUtils.sizeOf(byteLevelsCount) + //
                ByteBufferUtils.sizeOf(shortLevelsCount) + //
@@ -579,7 +600,7 @@ HttpServlet {
 
       ByteBufferUtils.put(buffer, node._bounds, node._average);
 
-      ByteBufferUtils.put(buffer, planet, node._firstPoints, node._average, verticalExaggeration);
+      ByteBufferUtils.put(buffer, planet, node._firstPoints, node._average, verticalExaggeration, deltaHeight);
 
       for (final Geodetic3D point : node._firstPoints) {
          buffer.putFloat((float) point._height);
@@ -604,7 +625,7 @@ HttpServlet {
       final double averageHeight = statistics.getAverageHeight();
 
       final int bufferSize = //
-      ByteBufferUtils.sizeOf(pointsCount) + //
+               ByteBufferUtils.sizeOf(pointsCount) + //
                ByteBufferUtils.sizeOf(sector) + //
                ByteBufferUtils.sizeOf(minHeight) + //
                ByteBufferUtils.sizeOf(maxHeight) + //
@@ -626,16 +647,18 @@ HttpServlet {
                                     final Planet planet,
                                     final ResponseFormat format,
                                     final float verticalExaggeration,
+                                    final double deltaHeight,
                                     final HttpServletResponse response) throws IOException {
       switch (format) {
          case JSON: {
             response.addHeader("Access-Control-Allow-Origin", "*");
-            sendJSONMetadata(response, getMetadataEntry(db, planet, verticalExaggeration), planet, verticalExaggeration);
+            sendJSONMetadata(response, getMetadataEntry(db, planet, verticalExaggeration, deltaHeight), planet,
+                     verticalExaggeration);
             break;
          }
          case BINARY: {
             response.addHeader("Access-Control-Allow-Origin", "*");
-            sendBinaryMetadata(response, getMetadataEntry(db, planet, verticalExaggeration));
+            sendBinaryMetadata(response, getMetadataEntry(db, planet, verticalExaggeration, deltaHeight));
             break;
          }
          default: {
@@ -652,6 +675,7 @@ HttpServlet {
                                     final String nodeID,
                                     final int level,
                                     final float verticalExaggeration,
+                                    final double deltaHeight,
                                     final HttpServletResponse response) throws IOException {
       final PersistentLOD.NodeLevel nodeLevel = db.getNodeLevel(nodeID, level, false);
       if (nodeLevel == null) {
@@ -662,12 +686,12 @@ HttpServlet {
       switch (format) {
          case JSON: {
             response.addHeader("Access-Control-Allow-Origin", "*");
-            sendJSONNodeLevelPoints(response, db, planet, nodeID, verticalExaggeration, nodeLevel);
+            sendJSONNodeLevelPoints(response, db, planet, nodeID, verticalExaggeration, deltaHeight, nodeLevel);
             break;
          }
          case BINARY: {
             response.addHeader("Access-Control-Allow-Origin", "*");
-            sendBinaryNodeLevelPoints(response, db, planet, nodeID, verticalExaggeration, nodeLevel);
+            sendBinaryNodeLevelPoints(response, db, planet, nodeID, verticalExaggeration, deltaHeight, nodeLevel);
             break;
          }
          default: {
@@ -683,8 +707,9 @@ HttpServlet {
                                           final Planet planet,
                                           final String nodeID,
                                           final float verticalExaggeration,
+                                          final double deltaHeight,
                                           final PersistentLOD.NodeLevel nodeLevel) throws IOException {
-      final GVector3F average = getNodeAverage(db, planet, nodeID, verticalExaggeration);
+      final GVector3F average = getNodeAverage(db, planet, nodeID, verticalExaggeration, deltaHeight);
 
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("application/octet-stream");
@@ -694,7 +719,7 @@ HttpServlet {
       final int bufferSize = ByteBufferUtils.sizeOf(planet, points, average) + (points.size() * 4);
 
       final ByteBuffer buffer = ByteBuffer.allocate(bufferSize).order(ByteOrder.LITTLE_ENDIAN);
-      ByteBufferUtils.put(buffer, planet, points, average, verticalExaggeration);
+      ByteBufferUtils.put(buffer, planet, points, average, verticalExaggeration, deltaHeight);
 
       for (final Geodetic3D point : points) {
          buffer.putFloat((float) point._height);
@@ -710,8 +735,9 @@ HttpServlet {
                                         final Planet planet,
                                         final String nodeID,
                                         final float verticalExaggeration,
+                                        final double deltaHeight,
                                         final PersistentLOD.NodeLevel nodeLevel) throws IOException {
-      final GVector3F average = getNodeAverage(db, planet, nodeID, verticalExaggeration);
+      final GVector3F average = getNodeAverage(db, planet, nodeID, verticalExaggeration, deltaHeight);
 
       response.setStatus(HttpServletResponse.SC_OK);
       response.setContentType("application/json");
@@ -737,8 +763,10 @@ HttpServlet {
    private GVector3F getNodeAverage(final PersistentLOD db,
                                     final Planet planet,
                                     final String nodeID,
-                                    final float verticalExaggeration) {
-      final NodeAverageCacheKey key = new NodeAverageCacheKey(planet, db.getCloudName(), nodeID, verticalExaggeration);
+                                    final float verticalExaggeration,
+                                    final double deltaHeight) {
+      final NodeAverageCacheKey key = new NodeAverageCacheKey(planet, db.getCloudName(), nodeID, verticalExaggeration,
+               deltaHeight);
       return _nodeAverageCache.get(key);
    }
 
@@ -772,7 +800,9 @@ HttpServlet {
          final String planetName = request.getParameter("planet");
          final String formatName = request.getParameter("format");
          final String verticalExaggerationStr = request.getParameter("verticalExaggeration");
-         final float verticalExaggeration = getFloat(verticalExaggerationStr);
+         final float verticalExaggeration = getFloat(verticalExaggerationStr, 1);
+         final String deltaHeightStr = request.getParameter("deltaHeight");
+         final double deltaHeight = getDouble(deltaHeightStr, 0);
 
          final Planet planet = getPlanet(planetName);
          final ResponseFormat format = ResponseFormat.get(formatName);
@@ -785,8 +815,11 @@ HttpServlet {
          else if (Float.isNaN(verticalExaggeration)) {
             error(response, "verticalExaggeration parameter invalid or missing: " + verticalExaggerationStr);
          }
+         else if (Double.isNaN(deltaHeight)) {
+            error(response, "deltaHeight parameter invalid or missing: " + deltaHeightStr);
+         }
          else {
-            sendMetadata(db, planet, format, verticalExaggeration, response);
+            sendMetadata(db, planet, format, verticalExaggeration, deltaHeight, response);
          }
       }
       else if (path.length == 3) {
@@ -798,7 +831,9 @@ HttpServlet {
             final String planetName = request.getParameter("planet");
             final String formatName = request.getParameter("format");
             final String verticalExaggerationStr = request.getParameter("verticalExaggeration");
-            final float verticalExaggeration = getFloat(verticalExaggerationStr);
+            final float verticalExaggeration = getFloat(verticalExaggerationStr, 1);
+            final String deltaHeightStr = request.getParameter("deltaHeight");
+            final double deltaHeight = getDouble(deltaHeightStr, 0);
 
             final Planet planet = getPlanet(planetName);
             final ResponseFormat format = ResponseFormat.get(formatName);
@@ -811,8 +846,11 @@ HttpServlet {
             else if (Float.isNaN(verticalExaggeration)) {
                error(response, "verticalExaggeration parameter invalid or missing: " + verticalExaggerationStr);
             }
+            else if (Double.isNaN(deltaHeight)) {
+               error(response, "deltaHeight parameter invalid or missing: " + deltaHeightStr);
+            }
             else {
-               sendNodeLevelPoints(db, planet, format, nodeID, level, verticalExaggeration, response);
+               sendNodeLevelPoints(db, planet, format, nodeID, level, verticalExaggeration, deltaHeight, response);
             }
          }
          catch (final NumberFormatException e) {
@@ -825,16 +863,32 @@ HttpServlet {
    }
 
 
-   private float getFloat(final String str) {
+   private static float getFloat(final String str,
+                                 final float defaultValue) {
       if (str == null) {
-         return Float.NaN;
+         return defaultValue;
       }
 
       try {
          return Float.parseFloat(str);
       }
       catch (final NumberFormatException e) {
-         return Float.NaN;
+         return defaultValue;
+      }
+   }
+
+
+   private static double getDouble(final String str,
+                                   final double defaultValue) {
+      if (str == null) {
+         return defaultValue;
+      }
+
+      try {
+         return Double.parseDouble(str);
+      }
+      catch (final NumberFormatException e) {
+         return defaultValue;
       }
    }
 
