@@ -56,7 +56,7 @@
             priority: (long long) priority
            requestId: (long long) requestId;
 
-
+- (void) cancelAllListeners;
 - (bool) cancelListenerForRequestId: (long long) requestId;
 - (bool) removeListenerForRequestId: (long long) requestId;
 - (bool) hasListeners;

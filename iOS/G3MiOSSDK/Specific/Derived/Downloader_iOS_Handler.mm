@@ -111,13 +111,26 @@
   return result;
 }
 
+- (void) cancelAllListeners
+{
+    [_lock lock];
+    
+    const NSUInteger listenersCount = [_listeners count];
+    for (int i = 0; i < listenersCount; i++) {
+        ListenerEntry* entry = _listeners[i];
+        [entry cancel];
+    }
+    
+    [_lock unlock];
+}
+
 - (bool) cancelListenerForRequestId: (long long)requestId
 {
   bool canceled = false;
 
   [_lock lock];
 
-  const int listenersCount = [_listeners count];
+  const NSUInteger listenersCount = [_listeners count];
   for (int i = 0; i < listenersCount; i++) {
     ListenerEntry* entry = [_listeners objectAtIndex: i];
     if ([entry requestId] == requestId) {
