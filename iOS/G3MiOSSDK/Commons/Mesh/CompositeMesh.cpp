@@ -25,9 +25,46 @@ CompositeMesh::~CompositeMesh() {
 
 }
 
+/**
+ * Calculate the average of the centers of the child meshes.
+ * If there are no children, return the zero vector.
+ * If there is one child, return its center.
+ * Otherwise, calculate the minimum bounding box of all the 
+ * child centers, and return the center of that.
+ */
 const Vector3D CompositeMesh::getCenter() const {
-    // TODO: calc average of child mesh centers
-    return Vector3D(0.0, 0.0, 0.0);
+  if (_children.size() == 0) {
+    return Vector3D::zero;
+  }
+  
+  Vector3D center = _children[0]->getCenter();
+  if (_children.size() == 1) {
+    return center;
+  }
+    
+  double minX = center._x, minY = center._y, maxX = minX, maxY = minY, maxZ = center._z;
+
+  const size_t childrenCount = _children.size();
+  for (size_t i = 1; i < childrenCount; i++) {
+    Vector3D center = _children[i]->getCenter();
+    if (center._x < minX) {
+      minX = center._x;
+    }
+    else if (center._x > maxX) {
+      maxX = center._x;
+    }
+    if (center._y < minY) {
+      minY = center._y;
+    }
+    else if (center._y > maxY) {
+      maxY = center._y;
+    }
+    if (center._z > maxZ) {
+      maxZ = center._z;
+    }
+  }
+    
+  return Vector3D((minX + maxX) / 2, (minY + maxY) / 2, maxZ);
 }
 
 int CompositeMesh::getVertexCount() const {
