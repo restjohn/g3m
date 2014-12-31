@@ -181,6 +181,7 @@ public:
                  const IImage* image) {
     if (!url.isFileProtocol()) {
       if (image != NULL) {
+        // TODO: another EXC_BAD_ACCESS crash point
         if (_storage->isAvailable()) {
           _downloader->countSave();
 
@@ -220,9 +221,6 @@ public:
   void onCanceledDownload(const URL& url,
                           IImage* image,
                           bool expired) {
-    if (!expired) {
-      saveImage(url, image);
-    }
 
     _listener->onCanceledDownload(url, image, expired);
 

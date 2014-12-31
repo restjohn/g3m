@@ -120,6 +120,42 @@ void Downloader_iOS::cancelRequest(long long requestId) {
 }
 
 void Downloader_iOS::removeDownloadingHandlerForNSURL(const NSURL* url) {
+/*
+TODO: crashing here when popping g3m widget view off stack
+
+one can consistently reproduce this crash by loading a g3m widget
+view controller, zooming to a low level, panning around to trigger
+a bunch of tile downloads, then dismissing the view controller, e.g.,
+popping it from the navigation stack, or possibly suspending the app
+with the home button
+ 
+Log:
+ 2014-12-23 10:06:09.796 DICE[2122:60b] Deleting program ColorMesh
+ 2014-12-23 10:06:18.792 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:06:36.521 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:06:39.311 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:06:51.510 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:06:52.159 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:07:00.154 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:07:00.359 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:07:09.031 DICE[2122:60b] SQLite Busy 2: /var/mobile/Applications/3B7ECE2D-E2C2-493E-9E15-DC6F12CB4BDF/Documents/g3m.cache
+ 2014-12-23 10:07:16.834 DICE[2122:60b] Warning: WARNING: The TexturesHandler is destroyed, but the inner textures were not released.
+ 2014-12-23 10:07:16.913 DICE[2122:5f17] -[UIView lock]: unrecognized selector sent to instance 0x1701678c0
+ 2014-12-23 10:07:16.917 DICE[2122:5f17] *** Terminating app due to uncaught exception 'NSInvalidArgumentException', reason: '-[UIView lock]: unrecognized selector sent to instance 0x1701678c0'
+ *** First throw call stack:
+ (0x18cecf100 0x1998ac1fc 0x18ced3db4 0x18ced1ae0 0x18cdf178c 0x10016d028 0x10017aaf0 0x10017ce20 0x18da5040c 0x19a01be1c 0x19a01bd74 0x19a019554)
+ libc++abi.dylib: terminating with uncaught exception of type NSException
+ 2014-12-23 10:07:45.535 DICE[2122:b40f] -[UIView lock]: unrecognized selector sent to instance 0x1701678c0
+ 
+ there seems to be some lingering tile downloads completing on the
+ worker threads (Downloader_iOS_Handler), then calling back to
+ this method.  the following check prevents this until a more
+ robust solution is applied.
+ */
+    if (!_downloadingHandlers) {
+        return;
+    }
+    
   [_lock lock];
 
   [_downloadingHandlers removeObjectForKey:url];
