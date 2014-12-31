@@ -251,8 +251,6 @@ long long Downloader_iOS::request(const URL &url,
 
   [_lock lock];
 
-  _requestsCounter++;
-
   const long long requestId = _requestIdCounter++;
 
   handler = [_downloadingHandlers objectForKey: nsURL];
