@@ -24,16 +24,28 @@ void Downloader_iOS::start() {
 }
 
 void Downloader_iOS::stop() {
+  [_lock lock];
+  for (Downloader_iOS_Handler* handler in _downloadingHandlers.allValues) {
+    [handler cancelAllListeners];
+  }
+  for (Downloader_iOS_Handler* handler in _queuedHandlers.allValues) {
+    [handler cancelAllListeners];
+  }
   if (_started) {
     for (Downloader_iOS_WorkerThread* worker in _workers) {
       [worker stop];
     }
     _started = false;
   }
+  [_lock unlock];
 }
 
 Downloader_iOS::~Downloader_iOS() {
+  [_lock lock];
+  NSRecursiveLock *savedLock = _lock;
   stop();
+  _lock = nil;
+  [savedLock unlock];
 }
 
 Downloader_iOS::Downloader_iOS(int maxConcurrentOperationCount) :
@@ -61,7 +73,7 @@ _started(false)
 }
 
 void Downloader_iOS::cancelRequest(long long requestId) {
-  if (requestId < 0) {
+  if (requestId < 0 || !_lock) {
     return;
   }
 
@@ -152,10 +164,10 @@ Log:
  this method.  the following check prevents this until a more
  robust solution is applied.
  */
-    if (!_downloadingHandlers) {
-        return;
-    }
-    
+  if (!_lock) {
+    return;
+  }
+
   [_lock lock];
 
   [_downloadingHandlers removeObjectForKey:url];
@@ -164,7 +176,10 @@ Log:
 }
 
 Downloader_iOS_Handler* Downloader_iOS::getHandlerToRun() {
-
+  if (!_lock) {
+    return NULL;
+  }
+    
   __block long long               selectedPriority = -100000000; // TODO: LONG_MAX_VALUE;
   __block Downloader_iOS_Handler* selectedHandler  = nil;
   __block NSURL*                  selectedURL      = nil;
@@ -235,6 +250,10 @@ long long Downloader_iOS::request(const URL &url,
                                   long long priority,
                                   Downloader_iOS_Listener* iosListener) {
 
+  if (!_lock) {
+    return -1;
+  }
+    
   //printf("URL=%s\n", url._path.c_str());
 
   NSURL* nsURL = [NSURL URLWithString: [NSString stringWithCppString: url._path] ];

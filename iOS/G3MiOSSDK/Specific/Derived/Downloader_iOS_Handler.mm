@@ -71,6 +71,8 @@
 {
   self = [super init];
   if (self) {
+    _lock = [[NSLock alloc] init];
+    _lock.name = [NSString stringWithFormat:@"Downloader_iOS_Handler{%@}", nsURL.absoluteString];
     _nsURL     = nsURL;
     _url       = url;
     _priority  = priority;
@@ -223,7 +225,7 @@
                                       [[_nsURL absoluteString] UTF8String]);
       }
 
-      const int listenersCount = [_listeners count];
+      const NSUInteger listenersCount = _listeners.count;
 
       const URL url( [[_nsURL absoluteString] cStringUsingEncoding:NSUTF8StringEncoding] , false);
 
@@ -233,14 +235,11 @@
           Downloader_iOS_Listener* listener = [entry listener];
 
           if ([entry isCanceled]) {
-            [listener onCanceledDownloadURL: url
-                                       data: data];
-
-            [listener onCancel: url];
+            [listener onCanceledDownloadURL:url data:data];
+            [listener onCancel:url];
           }
           else {
-            [listener onDownloadURL: url
-                               data: data];
+            [listener onDownloadURL:url data:data];
           }
         }
       }
