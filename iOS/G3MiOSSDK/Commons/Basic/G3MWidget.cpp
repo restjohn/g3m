@@ -246,11 +246,16 @@ G3MWidget* G3MWidget::create(GL*                                  gl,
 }
 
 G3MWidget::~G3MWidget() {
+  // do this first to make sure the downloader kills all its background
+  // tasks and prevent them from trying to access other deallocated resources
+  if (_downloader != NULL) {
+     _downloader->stop();
+     delete _downloader;
+  }
+    
   delete _rendererState;
   delete _renderContext;
-
   delete _userData;
-
   delete _planet;
   delete _cameraRenderer;
   delete _mainRenderer;
@@ -263,12 +268,6 @@ G3MWidget::~G3MWidget() {
   delete _nextCamera;
   delete _texturesHandler;
   delete _timer;
-
-  if (_downloader != NULL) {
-    _downloader->stop();
-    delete _downloader;
-  }
-
   delete _storage;
   delete _threadUtils;
   delete _cameraActivityListener;
