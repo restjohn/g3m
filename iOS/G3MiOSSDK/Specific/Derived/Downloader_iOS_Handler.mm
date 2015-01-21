@@ -178,7 +178,24 @@
     __block NSError *error = nil;
 
     if (_url->isFileProtocol()) {
-      data = [NSData dataWithContentsOfURL:_nsURL];
+      const IStringUtils* su = IStringUtils::instance();
+
+      const std::string fileFullName = IStringUtils::instance()->replaceSubstring(_url->_path,
+                                                                                  URL::FILE_PROTOCOL,
+                                                                                  "");
+      const int dotPos = su->indexOf(fileFullName, ".");
+
+      NSString* fileName = [ NSString stringWithCppString: su->left(fileFullName, dotPos) ];
+
+      NSString* fileExt = [ NSString stringWithCppString: su->substring(fileFullName, dotPos + 1, fileFullName.size()) ];
+
+      NSString* filePath = [[NSBundle mainBundle] pathForResource: fileName
+                                                           ofType: fileExt];
+      data = [NSData dataWithContentsOfFile:filePath];
+      if (!data) {
+        data = [NSData dataWithContentsOfURL:_nsURL];
+      }
+
       statusCode = (data) ? 200 : 404;
     }
     else {
